@@ -1,0 +1,18 @@
+{
+  "guyongzhe": {
+    "sounds": [
+      {
+        "name": "hexbingo:guyongzhe",
+        "stream": true
+      }
+    ]
+  },
+  "dechi_song": {
+    "sounds": [
+      {
+        "name": "hexbingo:dechi_song",
+        "stream": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+Bingo: Hex Mayhem - NOTICE
+
+This is an unofficial addon. It is not affiliated with, endorsed by, or
+sponsored by the authors of Bongo, BingoLobby or LibX.
+
+------------------------------------------------------------------
+1. This work
+------------------------------------------------------------------
+Name:        Bingo: Hex Mayhem (Unofficial Addon)
+Mod id:      hexbingo
+Authors:     Big_Jls (design/code)
+             DeepSeek-v4.1-Flash-1017 (code assistance)
+Source:      https://github.com/Big-Jls/bingohex
+License:     Apache License 2.0
+
+All Java sources in this repository are original work written for this addon,
+except where a file header states otherwise.
+
+------------------------------------------------------------------
+2. Dependencies (not bundled)
+------------------------------------------------------------------
+Bongo / ReBongo
+  Original mod: Bongo by noeppi_noeppi, Apache License 2.0
+  https://github.com/noeppi-noeppi/Bongo
+  NeoForge 26.2 port: ReBongo by Big_Jls (with DeepSeek-v4.1-Flash-1017)
+  https://github.com/Big-Jls/rebongo
+  The upstream Bongo license contains a Botania third-party statement; see the
+  ReBongo repository for details. This addon does not copy Bongo source code.
+
+LibX
+  ModdingX (MelanX, noeppi_noeppi), Apache License 2.0
+  https://github.com/ModdingX/LibX
+
+Minecraft / NeoForge
+  Mojang / NeoForged, not bundled.
+
+------------------------------------------------------------------
+3. Assets and audio
+------------------------------------------------------------------
+- Textures and language files in res/assets/hexbingo are original work for this
+  addon, unless a later commit states otherwise.
+- Audio files previously shipped as `dechi_song.ogg` and `guyongzhe.ogg` are
+  third-party recordings and are NOT covered by this project's license.
+  Status: pending replacement. Do not redistribute them unless you hold the
+  rights; see CREDITS.md / the repository issues for the replacement plan.
+- Hex names and descriptions are inspired by League of Legends augments.
+  League of Legends is a trademark of Riot Games, Inc. This project is not
+  affiliated with or endorsed by Riot Games.
+
+------------------------------------------------------------------
+4. Trademarks
+------------------------------------------------------------------
+Project names, logos and trademarks belong to their respective owners.
+This project does not claim any trademark rights (Apache License 2.0, section 6)
+and deliberately uses a distinct name and icon from Bongo, BingoLobby and LibX.

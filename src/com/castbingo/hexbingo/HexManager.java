@@ -1,0 +1,649 @@
+/*
+ * Copyright (c) 2026 Big_Jls and DeepSeek-v4.1-Flash-1017.
+ * Licensed under the Apache License, Version 2.0.
+ * See LICENSE and NOTICE.
+ */
+package com.castbingo.hexbingo;
+
+import com.castbingo.hexbingo.network.HexListPayload;
+import com.castbingo.hexbingo.network.HexOfferPayload;
+import com.castbingo.hexbingo.network.HexRosterPayload;
+import io.github.noeppi_noeppi.mods.bongo.Bingo;
+import io.github.noeppi_noeppi.mods.bongo.data.Team;
+import io.github.noeppi_noeppi.mods.bongo.data.TeamCompletion;
+import io.github.noeppi_noeppi.mods.bongo.event.BingoTaskEvent;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.CommandEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent.Post;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+public final class HexManager {
+   private static final Set<UUID> FREE_PICK = new HashSet<>();
+   private static final Set<UUID> BREAK_LOCK_SEEN = new HashSet<>();
+
+   private static void updateBreakLock(MinecraftServer var0) {
+      for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
+         long var3 = HexEffects.breakLockRemainingMs(var2);
+         if (var3 > 0L) {
+            int var5 = (int)((var3 + 999L) / 1000L);
+            var2.sendOverlayMessage(Component.translatable("hexbingo.msg.break_locked_tick", new Object[]{var5}).withStyle(ChatFormatting.RED));
+            BREAK_LOCK_SEEN.add(var2.getUUID());
+         } else if (BREAK_LOCK_SEEN.remove(var2.getUUID())) {
+            var2.sendSystemMessage(Component.translatable("hexbingo.msg.break_unlocked").withStyle(ChatFormatting.GRAY));
+         }
+      }
+   }
+
+   public static void onCommand(CommandEvent var0) {
+      String var1 = var0.getParseResults().getReader().getString().trim();
+
+      while (var1.startsWith("/")) {
+         var1 = var1.substring(1).trim();
+      }
+
+      String[] var2 = var1.split("\\s+");
+      if (var2.length >= 1) {
+         CommandSourceStack var3 = (CommandSourceStack)var0.getParseResults().getContext().getSource();
+         if (var3.getEntity() instanceof ServerPlayer var4) {
+            String var15 = var2[0].toLowerCase(Locale.ROOT);
+            boolean var6 = var15.equals("tp") || var15.equals("bp");
+            if (var15.equals("bingo") && var2.length >= 2) {
+               String var7 = var2[1].toLowerCase(Locale.ROOT);
+               var6 = var7.equals("tp") || var7.equals("teleport") || var7.equals("backpack");
+            }
+
+            if (var6 && HexEffects.isNetherLocked(var4)) {
+               var3.sendFailure(Component.translatable("hexbingo.msg.nether_locked"));
+               var0.setCanceled(true);
+               return;
+            }
+
+            boolean var18 = var15.equals("bp")
+               || var15.equals("bingo")
+                  && var2.length >= 2
+                  && (var2[1].equalsIgnoreCase("backpack") || var2[1].equalsIgnoreCase("bp"));
+            if (var18 && HexEffects.isBpJammed(var4)) {
+               HexBingo.LOGGER.info("Blocked '/{}' for {} (BP jam active)", var1, var4.getScoreboardName());
+               var3.sendFailure(Component.translatable("hexbingo.msg.bp_jammed"));
+               var0.setCanceled(true);
+               return;
+            }
+         }
+      }
+
+      if (var2.length >= 2 && var2[0].equalsIgnoreCase("bingo")) {
+         MinecraftServer var13 = ((CommandSourceStack)var0.getParseResults().getContext().getSource()).getServer();
+         if (var13 != null) {
+            String var14 = var2[1].toLowerCase(Locale.ROOT);
+            if (var14.equals("create")) {
+               if (var2.length < 3) {
+                  return;
+               }
+
+               Bingo var16 = Bingo.get(var13.overworld());
+               if (var16.running()) {
+                  return;
+               }
+
+               String var17 = var2[2].toLowerCase(Locale.ROOT);
+               boolean var19 = var17.equals("bongo:hard");
+
+               for (int var8 = 3; var8 < var2.length; var8++) {
+                  for (String var12 : var2[var8].split(",")) {
+                     if (var12.equalsIgnoreCase("bongo:mayhem")) {
+                        var19 = true;
+                     }
+                  }
+               }
+
+               resetGame(var13, var19);
+            } else if (var14.equals("stop")) {
+               endGame(var13);
+            }
+         }
+      }
+   }
+
+   private static void resetGame(MinecraftServer var0, boolean var1) {
+      HexGameData var2 = HexGameData.get(var0);
+      FREE_PICK.clear();
+      HexEffects.clearJams();
+      HexEffects.abortTrap(var0);
+      HexEffects.resetSpy();
+      HexEffects.resetTrapCooldown();
+      HexEffects.clearBreakLocks();
+      BREAK_LOCK_SEEN.clear();
+      clearOnlineEffects(var0);
+      var2.reset(var1);
+      var2.setAllPrismatic(var1 && ThreadLocalRandom.current().nextDouble() < 0.05);
+      if (var1 && (Boolean)HexConfig.ANNOUNCE.get()) {
+         broadcast(var0, Component.translatable("hexbingo.msg.mode").withStyle(ChatFormatting.LIGHT_PURPLE));
+         if (var2.allPrismatic()) {
+            broadcast(var0, Component.translatable("hexbingo.msg.all_prismatic").withStyle(ChatFormatting.LIGHT_PURPLE));
+         }
+      }
+   }
+
+   private static void endGame(MinecraftServer var0) {
+      HexGameData var1 = HexGameData.get(var0);
+      FREE_PICK.clear();
+      HexEffects.clearJams();
+      if (!var1.mayhem()) {
+         var1.endGame();
+      } else {
+         HexEffects.abortTrap(var0);
+         HexEffects.resetSpy();
+         HexEffects.resetTrapCooldown();
+         HexEffects.clearBreakLocks();
+         BREAK_LOCK_SEEN.clear();
+         clearOnlineEffects(var0);
+         var1.endGame();
+         if ((Boolean)HexConfig.ANNOUNCE.get()) {
+            broadcast(var0, Component.translatable("hexbingo.msg.off").withStyle(ChatFormatting.GRAY));
+         }
+      }
+   }
+
+   private static void clearOnlineEffects(MinecraftServer var0) {
+      for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
+         HexEffects.clearAll(var2);
+      }
+   }
+
+   private static void broadcast(MinecraftServer var0, Component var1) {
+      for (ServerPlayer var3 : var0.getPlayerList().getPlayers()) {
+         var3.sendSystemMessage(var1);
+      }
+   }
+
+   @SubscribeEvent
+   public static void onServerTick(Post var0) {
+      MinecraftServer var1 = var0.getServer();
+      if (var1.getTickCount() % 20 == 0) {
+         HexGameData var2 = HexGameData.get(var1);
+         HexEffects.ensureNightVision(var1);
+         updateBreakLock(var1);
+         if (var2.mayhem()) {
+            HexEffects.tick(var1);
+            Bingo var3 = Bingo.get(var1.overworld());
+            if (!var3.running()) {
+               if (var2.gameStart() != 0L) {
+                  var2.setGameStart(0L);
+               }
+            } else {
+               if (var2.gameStart() == 0L) {
+                  var2.setGameStart(System.currentTimeMillis());
+               }
+
+               long var4 = (System.currentTimeMillis() - var2.gameStart()) / 1000L;
+
+               for (Team var7 : var3.getTeams()) {
+                  if (!var7.getPlayers().isEmpty()) {
+                     int[] var8 = var2.flags(var7.color.getName());
+                     if (var8[0] == 0 && firstTriggered(var7)) {
+                        var8[0] = 1;
+                        var2.markTeamsDirty();
+                        grantTeam(var1, var2, var7, 0);
+                     }
+
+                     if (var8[1] == 0 && var4 >= ((Integer)HexConfig.SECOND_MINUTES.get()).intValue() * 60L) {
+                        var8[1] = 1;
+                        var2.markTeamsDirty();
+                        grantTeam(var1, var2, var7, 1);
+                     }
+
+                     if (var8[2] == 0 && var4 >= ((Integer)HexConfig.THIRD_MINUTES.get()).intValue() * 60L) {
+                        var8[2] = 1;
+                        var2.markTeamsDirty();
+                        grantTeam(var1, var2, var7, 2);
+                     }
+
+                     if (var8[3] == 0 && var4 >= ((Integer)HexConfig.FOURTH_MINUTES.get()).intValue() * 60L) {
+                        var8[3] = 1;
+                        var2.markTeamsDirty();
+                        grantTeam(var1, var2, var7, 3);
+                     }
+                  }
+               }
+            }
+         }
+
+         Bingo var9 = Bingo.get(var1.overworld());
+         if (var9.running()) {
+            for (ServerPlayer var5 : var1.getPlayerList().getPlayers()) {
+               var9.checkCompleted(EnchantTaskType.INSTANCE, var5, EnchantTaskType.DUMMY);
+            }
+         }
+      }
+   }
+
+   public static void onTask(BingoTaskEvent var0) {
+      ServerPlayer var1 = var0.getPlayer();
+      MinecraftServer var2 = var1.level().getServer();
+      if (var2 != null) {
+         HexGameData var3 = HexGameData.get(var2);
+         if (var3.mayhem()) {
+            Team var4 = var0.getBingo().getTeam(var1);
+            if (var4 != null) {
+               int[] var5 = var3.flags(var4.color.getName());
+               if (var5[0] == 0 && (!(Boolean)HexConfig.FIRST_REWARD_ON_LINE.get() || lineComplete(var4))) {
+                  var5[0] = 1;
+                  var3.markTeamsDirty();
+                  grantTeam(var2, var3, var4, 0);
+               }
+            }
+         }
+      }
+   }
+
+   private static boolean firstTriggered(Team var0) {
+      return HexConfig.FIRST_REWARD_ON_LINE.get() ? lineComplete(var0) : var0.completion().count() > 0;
+   }
+
+   private static boolean lineComplete(Team var0) {
+      TeamCompletion var1 = var0.completion();
+      if (var1.count() < 5) {
+         return false;
+      }
+
+      for (int var2 = 0; var2 < 5; var2++) {
+         boolean var3 = true;
+
+         for (int var4 = 0; var4 < 5; var4++) {
+            if (!var1.has(var2 * 5 + var4)) {
+               var3 = false;
+               break;
+            }
+         }
+
+         if (var3) {
+            return true;
+         }
+      }
+
+      for (int var5 = 0; var5 < 5; var5++) {
+         boolean var7 = true;
+
+         for (int var9 = 0; var9 < 5; var9++) {
+            if (!var1.has(var9 * 5 + var5)) {
+               var7 = false;
+               break;
+            }
+         }
+
+         if (var7) {
+            return true;
+         }
+      }
+
+      boolean var6 = true;
+      boolean var8 = true;
+
+      for (int var10 = 0; var10 < 5; var10++) {
+         var6 &= var1.has(var10 * 6);
+         var8 &= var1.has(var10 * 4 + 4);
+      }
+
+      return var6 || var8;
+   }
+
+   private static void grantTeam(MinecraftServer var0, HexGameData var1, Team var2, int var3) {
+      for (UUID var5 : var2.getPlayers()) {
+         ServerPlayer var6 = var0.getPlayerList().getPlayer(var5);
+         if (var6 != null) {
+            enqueue(var1, var6, var3);
+         }
+      }
+   }
+
+   private static void enqueue(HexGameData var0, ServerPlayer var1, int var2) {
+      if (var0.isHexLocked(var1.getUUID())) {
+         return;
+      }
+
+      var0.pending(var1.getUUID()).add(var2);
+      var0.setDirty();
+      if (var0.offer(var1.getUUID()) == null) {
+         presentNext(var1, var0);
+      }
+   }
+
+   private static void presentNext(ServerPlayer var0, HexGameData var1) {
+      UUID var2 = var0.getUUID();
+      if (!var1.isHexLocked(var2) && var1.offer(var2) == null) {
+         List var3 = var1.pending(var2);
+
+         while (!var3.isEmpty()) {
+            int var4 = (Integer)var3.remove(0);
+            int var5 = var4 < 2 ? var1.qualityUp(var2) : 0;
+            List<Hex> var6;
+            if (var4 == 3) {
+               // 第四档海克斯固定为纯彩色，但静水监狱不能出现在最后一个海克斯中
+               var6 = HexRegistry.offerPrismatic(var1.hexes(var2), var1.hasExtraChoice(var2), "still_water");
+            } else if (var1.allPrismatic()) {
+               var6 = HexRegistry.offerPrismatic(var1.hexes(var2), var1.hasExtraChoice(var2));
+               if (var6.size() < 3) {
+                  var6 = HexRegistry.offer(var4, var1.hexes(var2), var1.hasExtraChoice(var2), var5);
+               }
+            } else if (var4 >= 2 && !ownsPrismatic(var1, var2)) {
+               var6 = HexRegistry.offerPrismatic(var1.hexes(var2), var1.hasExtraChoice(var2));
+               if (var6.size() < 3) {
+                  var6 = HexRegistry.offer(var4, var1.hexes(var2), var1.hasExtraChoice(var2), var5);
+               }
+            } else {
+               var6 = HexRegistry.offer(var4, var1.hexes(var2), var1.hasExtraChoice(var2), var5);
+            }
+
+            if (var6.size() >= 3) {
+               if (var5 > 0) {
+                  var1.clearQualityUp(var2);
+               }
+
+               ArrayList<String> var7 = new ArrayList<>(var6.size());
+
+               for (Hex var9 : var6) {
+                  var7.add(var9.id());
+               }
+
+               var1.setOffer(var2, var4, var7);
+               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var4, var7), new CustomPacketPayload[0]);
+               return;
+            }
+         }
+
+         var1.setDirty();
+      }
+   }
+
+   private static boolean ownsPrismatic(HexGameData var0, UUID var1) {
+      for (String var3 : var0.hexes(var1)) {
+         Hex var4 = HexRegistry.byId(var3);
+         if (var4 != null && var4.color() == HexColor.PRISMATIC) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public static void select(ServerPlayer var0, String var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 != null) {
+         HexGameData var3 = HexGameData.get(var2);
+         if (var3.mayhem()) {
+            UUID var4 = var0.getUUID();
+            if (var3.isHexLocked(var4)) {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.hex_locked").withStyle(ChatFormatting.DARK_GRAY));
+               return;
+            }
+
+            HexGameData.Offer var5 = var3.offer(var4);
+            if (var5 != null && var5.ids().contains(var1)) {
+               Hex var6 = HexRegistry.byId(var1);
+               if (var6 != null && !var3.hexes(var4).contains(var1)) {
+                  var3.removeOffer(var4);
+                  var3.addHex(var4, var1);
+                  HexEffects.apply(var0, var6);
+                  var0.sendSystemMessage(
+                     Component.translatable("hexbingo.msg.selected", new Object[]{Component.translatable("hexbingo.hex." + var1 + ".name")})
+                        .withStyle(ChatFormatting.LIGHT_PURPLE)
+                  );
+                  if ((Boolean)HexConfig.ANNOUNCE.get()) {
+                     Team var7 = Bingo.get(var0.level()).getTeam(var0);
+                     if (var7 != null) {
+                        MutableComponent var8 = Component.translatable(
+                              "hexbingo.msg.team_selected", new Object[]{var0.getDisplayName(), Component.translatable("hexbingo.hex." + var1 + ".name")}
+                           )
+                           .withStyle(ChatFormatting.GRAY);
+
+                        for (UUID var10 : var7.getPlayers()) {
+                           ServerPlayer var11 = var2.getPlayerList().getPlayer(var10);
+                           if (var11 != null) {
+                              var11.sendSystemMessage(var8);
+                           }
+                        }
+                     }
+                  }
+
+                  presentNext(var0, var3);
+               } else {
+                  var0.sendSystemMessage(Component.translatable("hexbingo.msg.no_offer").withStyle(ChatFormatting.RED));
+               }
+            } else {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.no_offer").withStyle(ChatFormatting.RED));
+            }
+         }
+      }
+   }
+
+   public static int openSelfPick(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return 0;
+      }
+
+      HexGameData var2 = HexGameData.get(var1);
+      if (!var2.mayhem()) {
+         return 0;
+      }
+
+      ArrayList var3 = new ArrayList();
+
+      for (Hex var5 : HexRegistry.all()) {
+         if (!var2.hexes(var0.getUUID()).contains(var5.id())) {
+            var3.add(var5.id());
+         }
+      }
+
+      if (var3.isEmpty()) {
+         return 0;
+      }
+
+      FREE_PICK.add(var0.getUUID());
+      PacketDistributor.sendToPlayer(var0, new HexListPayload(List.copyOf(var3)), new CustomPacketPayload[0]);
+      HexBingo.LOGGER.info("Sent self hex pick list ({} entries) to {}", var3.size(), var0.getScoreboardName());
+      return var3.size();
+   }
+
+   public static int openFreePick(MinecraftServer var0) {
+      HexGameData var1 = HexGameData.get(var0);
+      if (!var1.mayhem()) {
+         return 0;
+      }
+
+      List<Hex> var2 = HexRegistry.all();
+      int var3 = 0;
+
+      for (ServerPlayer var5 : var0.getPlayerList().getPlayers()) {
+         ArrayList<String> var6 = new ArrayList<>();
+
+         for (Hex var8 : var2) {
+            if (!var1.hexes(var5.getUUID()).contains(var8.id())) {
+               var6.add(var8.id());
+            }
+         }
+
+         if (!var6.isEmpty()) {
+            FREE_PICK.add(var5.getUUID());
+            PacketDistributor.sendToPlayer(var5, new HexListPayload(List.copyOf(var6)), new CustomPacketPayload[0]);
+            HexBingo.LOGGER.info("Sent hex list ({} entries) to {}", var6.size(), var5.getScoreboardName());
+            var3++;
+         }
+      }
+
+      return var3;
+   }
+
+   public static void freePick(ServerPlayer var0, String var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 != null) {
+         HexGameData var3 = HexGameData.get(var2);
+         if (var3.mayhem() && FREE_PICK.contains(var0.getUUID())) {
+            if (var3.isHexLocked(var0.getUUID())) {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.hex_locked").withStyle(ChatFormatting.DARK_GRAY));
+               return;
+            }
+
+            Hex var4 = HexRegistry.byId(var1);
+            if (var4 != null) {
+               if (var3.hexes(var0.getUUID()).contains(var1)) {
+                  var0.sendSystemMessage(Component.translatable("hexbingo.msg.hex_pick_owned").withStyle(ChatFormatting.GRAY));
+               } else {
+                  FREE_PICK.remove(var0.getUUID());
+                  var3.addHex(var0.getUUID(), var1);
+                  HexEffects.apply(var0, var4);
+                  var0.sendSystemMessage(
+                     Component.translatable("hexbingo.msg.selected", new Object[]{Component.translatable("hexbingo.hex." + var1 + ".name")})
+                        .withStyle(ChatFormatting.LIGHT_PURPLE)
+                  );
+               }
+            }
+         }
+      }
+   }
+
+   public static HexRosterPayload roster(MinecraftServer var0) {
+      HexGameData var1 = HexGameData.get(var0);
+      Bingo var2 = Bingo.get(var0.overworld());
+      ArrayList var3 = new ArrayList();
+      HashSet var4 = new HashSet();
+
+      for (Team var6 : var2.getTeams()) {
+         if (!var6.getPlayers().isEmpty()) {
+            ArrayList var7 = new ArrayList();
+
+            for (UUID var9 : var6.getPlayers()) {
+               ServerPlayer var10 = var0.getPlayerList().getPlayer(var9);
+               if (var10 != null) {
+                  var7.add(new HexRosterPayload.PlayerEntry(var10.getName(), List.copyOf(var1.hexes(var9)), var1.grantedPrefixes(var9)));
+                  var4.add(var9);
+               }
+            }
+
+            if (!var7.isEmpty()) {
+               var3.add(new HexRosterPayload.TeamEntry(var6.getName(), var6.color.getTextureDiffuseColor(), List.copyOf(var7)));
+            }
+         }
+      }
+
+      ArrayList var11 = new ArrayList();
+
+      for (ServerPlayer var13 : var0.getPlayerList().getPlayers()) {
+         if (!var4.contains(var13.getUUID())) {
+            var11.add(
+               new HexRosterPayload.PlayerEntry(var13.getName(), List.copyOf(var1.hexes(var13.getUUID())), var1.grantedPrefixes(var13.getUUID()))
+            );
+         }
+      }
+
+      if (!var11.isEmpty()) {
+         var3.add(new HexRosterPayload.TeamEntry(Component.translatable("hexbingo.roster.solo"), -1, List.copyOf(var11)));
+      }
+
+      return new HexRosterPayload(List.copyOf(var3));
+   }
+
+   public static void openRoster(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 != null) {
+         HexRosterPayload var2 = roster(var1);
+         PacketDistributor.sendToPlayer(var0, var2, new CustomPacketPayload[0]);
+         HexBingo.LOGGER.info("Sent hex roster ({} entries) to {}", var2.teams().size(), var0.getScoreboardName());
+      }
+   }
+
+   public static boolean reopen(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return false;
+      } else {
+         HexGameData var2 = HexGameData.get(var1);
+         if (!var2.mayhem()) {
+            return false;
+         } else {
+            HexGameData.Offer var3 = var2.offer(var0.getUUID());
+            if (var3 != null) {
+               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var3.rewardIndex(), var3.ids()), new CustomPacketPayload[0]);
+               return true;
+            } else if (!var2.pending(var0.getUUID()).isEmpty()) {
+               presentNext(var0, var2);
+               return true;
+            } else {
+               return false;
+            }
+         }
+      }
+   }
+
+   @SubscribeEvent
+   public static void onPlayerJoin(PlayerLoggedInEvent var0) {
+      if (var0.getEntity() instanceof ServerPlayer var1) {
+         MinecraftServer var3 = var1.level().getServer();
+         if (var3 == null) {
+            return;
+         }
+
+         if (HexGameData.get(var3).mayhem()) {
+            HexEffects.reapply(var1);
+            HexEffects.ensureFae(var1);
+            HexEffects.ensureQuestItems(var1);
+            resume(var1);
+         } else {
+            HexEffects.clearAll(var1);
+         }
+      }
+   }
+
+   @SubscribeEvent
+   public static void onPlayerRespawn(PlayerRespawnEvent var0) {
+      if (var0.getEntity() instanceof ServerPlayer var1) {
+         MinecraftServer var3 = var1.level().getServer();
+         if (var3 == null) {
+            return;
+         }
+
+         if (HexGameData.get(var3).mayhem()) {
+            HexEffects.reapply(var1);
+            HexEffects.ensureFae(var1);
+            HexEffects.ensureQuestItems(var1);
+            resume(var1);
+         } else {
+            HexEffects.clearAll(var1);
+         }
+      }
+   }
+
+   private static void resume(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 != null) {
+         HexGameData var2 = HexGameData.get(var1);
+         if (var2.mayhem()) {
+            HexGameData.Offer var3 = var2.offer(var0.getUUID());
+            if (var3 != null) {
+               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var3.rewardIndex(), var3.ids()), new CustomPacketPayload[0]);
+            } else if (!var2.pending(var0.getUUID()).isEmpty()) {
+               presentNext(var0, var2);
+            }
+         }
+      }
+   }
+
+   private HexManager() {
+   }
+}

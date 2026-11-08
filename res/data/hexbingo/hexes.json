@@ -1,0 +1,1023 @@
+{
+    "hexes":  [
+                  {
+                      "id":  "experience_mastery",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "xp_lapis",
+                                          "amount":  500,
+                                          "min":  8,
+                                          "max":  32
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "chain_master",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "task_chain",
+                                          "amount":  1,
+                                          "cap":  0.5,
+                                          "chance":  0.01,
+                                          "perTask":  0.001
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "random_teleport",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "random_teleport"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "i_see_you",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "enemy_scout",
+                                          "seconds":  3,
+                                          "radius":  20
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "golden_shift",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "grant_random_hex",
+                                          "key":  "gold"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "want_items",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "random_items",
+                                          "count":  5
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "want_more_items",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "random_items",
+                                          "count":  10
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "want_lots_items",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "random_items",
+                                          "count":  15
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "random_wood",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "random_wood"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "leg_day",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "speed",
+                                          "amplifier":  0
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "strong",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "strength",
+                                          "amplifier":  1
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "scope_1",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "attribute",
+                                          "key":  "block_interaction_range",
+                                          "amount":  2
+                                      },
+                                      {
+                                          "type":  "attribute",
+                                          "key":  "entity_interaction_range",
+                                          "amount":  2
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "scope_2",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "attribute",
+                                          "key":  "block_interaction_range",
+                                          "amount":  5
+                                      },
+                                      {
+                                          "type":  "attribute",
+                                          "key":  "entity_interaction_range",
+                                          "amount":  5
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "scope_3",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "attribute",
+                                          "key":  "block_interaction_range",
+                                          "amount":  9
+                                      },
+                                      {
+                                          "type":  "attribute",
+                                          "key":  "entity_interaction_range",
+                                          "amount":  9
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "prismatic_shift",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "grant_random_hex",
+                                          "key":  "prismatic"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "bees",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "summon_bees",
+                                          "count":  10
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "gold_rush",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "gold_on_hit",
+                                          "cooldown":  5,
+                                          "min":  1,
+                                          "max":  3
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ascension",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "kill_random_buff"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "still_water",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "lock_hexes"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "pandora",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "reroll_hexes"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "homeguard",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "homeguard_speed"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "gluttonous_feast",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "hunger",
+                                          "amplifier":  1
+                                      },
+                                      {
+                                          "type":  "feast_buff"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "goliath",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "attribute",
+                                          "amount":  0.3,
+                                          "operation":  "add_multiplied_base",
+                                          "key":  "scale"
+                                      },
+                                      {
+                                          "type":  "attribute",
+                                          "amount":  0.3,
+                                          "operation":  "add_multiplied_base",
+                                          "key":  "max_health"
+                                      },
+                                      {
+                                          "type":  "attribute",
+                                          "amount":  0.3,
+                                          "operation":  "add_multiplied_base",
+                                          "key":  "block_break_speed"
+                                      },
+                                      {
+                                          "type":  "attribute",
+                                          "amount":  0.3,
+                                          "operation":  "add_multiplied_base",
+                                          "key":  "attack_damage"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "untouchable",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "block_break_block",
+                                          "seconds":  30
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "stack_dragon",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "kill_stack_crate",
+                                          "interval":  15
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "glass_cannon_bag",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "drop_multiplier",
+                                          "amount":  8
+                                      },
+                                      {
+                                          "type":  "locked_slots",
+                                          "min":  18,
+                                          "max":  35
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "back_to_basics",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "no_crafting_table"
+                                      },
+                                      {
+                                          "type":  "drop_multiplier",
+                                          "percent":  1
+                                      },
+                                      {
+                                          "type":  "effect",
+                                          "key":  "speed",
+                                          "amplifier":  0
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "archmage",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "craft_refund",
+                                          "chance":  0.1
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "lone_hero",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "play_song_buff"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "big_brain",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "inventory_transform",
+                                          "seconds":  5
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "inventor",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "random_enchant",
+                                          "max":  20
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "pet_master",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "pet_companion",
+                                          "interval":  8
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "crown_me_king",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "beacon_target"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "hook_dizzy",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "grapple_hook"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "flip_table",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "reroll_tasks",
+                                          "mode":  "all_incomplete"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "flip_table_one",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "reroll_tasks",
+                                          "mode":  "one_incomplete"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "boomerang_biome",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "boomerang_biome"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "rainbow_duel",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "trap_room"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "fae_magic",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "fae_magic"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "pearl_stock",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "item",
+                                          "key":  "ender_pearl",
+                                          "count":  8
+                                      },
+                                      {
+                                          "type":  "item",
+                                          "key":  "blaze_powder",
+                                          "count":  2
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "chinese_can_fly",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "elytra_flight"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "spy",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "spy_swap"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "soul_bomb",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "item",
+                                          "key":  "soul_sand",
+                                          "count":  3
+                                      },
+                                      {
+                                          "type":  "item",
+                                          "key":  "wither_skeleton_skull",
+                                          "count":  2
+                                      },
+                                      {
+                                          "type":  "item",
+                                          "key":  "flint_and_steel",
+                                          "count":  1
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "practice_day",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "haste",
+                                          "amplifier":  0
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "nether_start",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "nether_start"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "star_voyage",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "star_voyage"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "swap_tasks",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "swap_tasks"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "mushroom_scout",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "mushroom_scout"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "wormhole",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "wormhole"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "cat_cult",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "summon_cats"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "dog_squad",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "summon_wolves"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "jam_bp",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "jam_bp"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "sand_gold",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "sand_gold"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "eye_taxi",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "eye_taxi"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "flowers_walk",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "flowers_walk"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "forge_master",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "forge_master"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "village_road",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "nearest_village"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "travel_frog",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "travel_frog"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "amnesia",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "amnesia"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ice_boots",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "ice_boots"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "snow_pumpkin",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "snow_pumpkin"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "pokemon_master",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "random_spawn_eggs"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "raven_mouth",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "raven_mouth"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "friends_here",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "friend_aura",
+                                          "radius":  8
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "common_wealth",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "common_wealth"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "chaos_shift",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "chaos_shift"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "dechi_song",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "dechi_song",
+                                          "seconds":  165
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "utopia",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "utopia"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "dash_charge",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "dash_charge"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "random_bingo",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "random_bingo"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "love_tribute",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "nearest_shipwreck"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ruined_portal",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "nearest_ruined_portal"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ancient_ruins",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "ancient_ruins"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "sheep_wool",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "sheep_wool"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "portable_bench",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "portable_bench"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "soul_out",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "soul_out"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "bone_meal_spray",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "bone_meal_spray"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "task_copy",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "task_copy"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "village_hero",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "village_hero",
+                                          "amplifier":  0
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "immunity_shield",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "immunity_shield"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "seed_gift",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "seed_gift"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "archaeology_brush",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "archaeology_brush"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "jump_tiger",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "jump_boost",
+                                          "amplifier":  1
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "eighty_one_trials",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "trial_chambers"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "day_night_flip",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "day_night_flip"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "inventory_shuffle",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "inventory_shuffle"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "nether_banish",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "nether_banish"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "wildcard",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "wildcard"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "the_world",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "the_world"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "corrupt_inventory",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "corrupt_inventory"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "black_market",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "black_market"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "demon_pact",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "demon_pact"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "spider_man",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "spider_man"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "magnet",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "magnet"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "dice_roll",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "dice_roll"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "toolbox",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "toolbox"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "louis_xvi",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "louis_xvi"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "airdrop",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "airdrop"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "sea_god",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "sea_god"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "totem_bulk",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "totem_bulk"
+                                      }
+                                  ]
+                  }
+              ]
+}

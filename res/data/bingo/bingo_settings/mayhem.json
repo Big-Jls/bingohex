@@ -1,0 +1,7 @@
+{
+  "game": {
+    "invulnerable": true,
+    "time": 2400,
+    "leaderboard": true
+  }
+}
