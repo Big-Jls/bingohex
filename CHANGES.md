@@ -1,5 +1,17 @@
 # Changelog
 
+## 26.2-1.32.21 — 2026-11-09
+
+### Fixed
+
+- `/bingo hexes` now requires gamemaster (OP) permission, matching its
+  "free pick any hex" behaviour. Previously any player could open it.
+- README command table corrected: the commands live under `/bingo`
+  (`/bingo hex`, `/bingo hexes`, `/bingo hexall`, `/bingo rtp`, `/bingo hook`,
+  `/bingo boomerang`, `/bingo trap`, `/bingo spy`), not under a `/hex` root.
+  Documented that `K` opens the read-only roster while `/bingo hexall` gives
+  every online player a free pick.
+
 ## 26.2-1.32.20 — 2026-11-08
 
 Source release for the ReBongo (Bongo NeoForge 26.2 port) line.

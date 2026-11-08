@@ -38,7 +38,7 @@ public final class HexCommands {
                                           }
                                        )
                                  ))
-                              .then(Commands.literal("hexes").executes(var0x -> {
+                              .then(Commands.literal("hexes").requires(var0x -> var0x.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)).executes(var0x -> {
                                  requireRunning(var0x.getSource());
                                  ServerPlayer var1 = ((CommandSourceStack)var0x.getSource()).getPlayerOrException();
                                  if (HexManager.openSelfPick(var1) <= 0) {
