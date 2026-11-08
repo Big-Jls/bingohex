@@ -2,11 +2,22 @@
 
 > **非官方项目**：这是自写附属模组，不是 Bongo / BingoLobby 的官方项目，与 **noeppi_noeppi**、**ModdingX** 没有隶属关系，也未获其背书或赞助。
 >
-> **许可**：Apache License 2.0。源码即本仓库。音频素材存在第三方版权待处理项，见下方「素材状态」。
+> **许可**：Apache License 2.0。源码即本仓库。音频素材存在第三方版权待处理项，见「素材状态」。
 
 ## 简介
 
-为 ReBongo（Bongo 的 NeoForge 26.2 移植版）增加 **100 个海克斯强化**：40 银色 / 30 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **100 个海克斯强化**：40 银色 / 30 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+## 玩法
+
+- 对局中会发放海克斯三选一，选择后立即生效。
+- 默认节奏（可在 `config/hexbingo-common.toml` 调整）：
+  - 第 1 个：完成第一个任务时（可改为完成第一条 Bingo 线时）
+  - 第 2 个：开局 5 分钟
+  - 第 3 个：开局 10 分钟
+  - 第 4 个：开局 15 分钟，且必为彩色
+- 部分海克斯会发放右键使用的技能物品（例如「混沌智」「不可触碰」），有独立冷却，不能被丢弃或塞进容器。
+- 海克斯分三档：银色偏基础属性/资源，金色偏战术能力，彩色偏强力或改变规则。
 
 ## 环境要求
 
@@ -27,26 +38,265 @@ ReBongo：https://github.com/Big-Jls/rebongo
 3. 把 `HexBingo-26.2-1.32.20.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
-## 内容与按键
+## 按键与命令
 
-- 100 个海克斯：40 银 / 30 金 / 30 彩。
-- 默认 **K**：打开海克斯一览。
-- 默认 **V**：切换蜘蛛类效果（获得对应海克斯后可用）。
-- 部分海克斯会发放右键使用的技能物品（例如「混沌智」「不可触碰」），有独立冷却与丢弃/收纳保护。
-- 命令：
-  - `/hex hexes` — 查看自己的海克斯
-  - `/hex rtp` — 随机传送
-  - `/hex hook` — 钩爪
-  - `/hex boomerang` — 回旋镖
-  - `/hex trap` — 陷阱
-  - `/spy <teammate> <target>` — 间谍交换
-  - `/hexall` — 管理员批量授予（需要 GM 权限）
+| 按键 | 作用 |
+|---|---|
+| **K** | 打开海克斯一览 |
+| **V** | 切换蜘蛛类效果（获得对应海克斯后可用） |
+
+| 命令 | 说明 |
+|---|---|
+| `/hex hexes` | 查看自己的海克斯 |
+| `/hex rtp` | 随机传送（需对应海克斯） |
+| `/hex hook` | 钩爪（需对应海克斯） |
+| `/hex boomerang` | 回旋镖（需对应海克斯） |
+| `/hex trap` | 陷阱（需对应海克斯） |
+| `/spy <teammate> <target>` | 间谍交换 |
+| `/hexall` | 管理员批量授予（需要 GM 权限） |
+
+<!-- HEX-TABLE-START -->
+## 海克斯一览（100）
+
+### 银色（40）
+
+| 名称 | id | 效果 |
+|---|---|---|
+| 经验专精 | `experience_mastery` | 获得 500 点经验和 8–32 个随机青金石。 |
+| 我看到你了 | `i_see_you` | 每 2 秒使周围 20 格内的敌对生物发光。 |
+| 质变黄金阶 | `golden_shift` | 获得一个随机金色海克斯。 |
+| 我想要 | `want_items` | 获得 5 个随机物品。 |
+| 枯木生花 | `random_wood` | 获得 5 种随机木头和 5 种随机花。 |
+| 练腿日 | `leg_day` | 永久获得速度 I。 |
+| 大力 | `strong` | 永久获得力量 II。 |
+| 更万用瞄准镜 | `scope_1` | 方块交互距离 +2，实体交互距离 +2。可与其他瞄准镜叠加。 |
+| 家园卫士 | `homeguard` | 持续奔跑时越跑越快，每跑 10 秒提升一级，停止 0.2 秒后失去加速，最高速度 IV。 |
+| 叠角龙 | `stack_dragon` | 每击杀一个生物累计 1 层，每 15 层获得一个战利品箱，层数越高奖励越好。 |
+| 孤勇者 | `lone_hero` | 播放《孤勇者》，并获得一个随机永久增益。 |
+| 转到我眩晕了 | `hook_dizzy` | 获得 /bingo hook：把你拉向准星指向的方块，冷却 5 秒。 |
+| 珍珠储备 | `pearl_stock` | 获得 8 个末影珍珠和 2 个烈焰粉。 |
+| 练手日 | `practice_day` | 永久获得急迫 I。 |
+| 地狱无门闯进来 | `nether_start` | 立即被传送到地狱，并禁用 /tp、/bp 与 /bingo tp；返回主世界后自动解除。 |
+| 星际航行 | `star_voyage` | 传送到 Y=256 并获得一个平台和水桶；必须用水桶安全落地，否则会摔死。成功落地后随机解锁 1 个 Bingo 格子。 |
+| 换位思考 | `swap_tasks` | 随机交换当前 Bingo 卡片上两个任务的位置。 |
+| 迅捷斥候 | `mushroom_scout` | 以你为中心 3 格内随机长出各种蘑菇（含地狱菌类）。 |
+| 虫洞 | `wormhole` | 立即随机传送到距当前位置 1–1000 格的地方。 |
+| 飞天猫猫神教 | `cat_cult` | 在周围召唤所有种类的猫猫。 |
+| 汪汪队 | `dog_squad` | 在周围召唤所有种类的狗狗（包含不同群系变体）。 |
+| 对方不在服务区 | `jam_bp` | 获得「对方不在服务区」：右键禁用敌方队伍 /bp 3 分钟，冷却 9 分钟。 |
+| 淘金热 | `sand_gold` | 挖掘沙子时有 3% 概率获得金粒。 |
+| 滴滴打眼 | `eye_taxi` | 你投出的末影之眼不再碎裂。 |
+| 步步生花 | `flowers_walk` | 你走过草方块时会长出花。 |
+| 锻造大师 | `forge_master` | 将背包里的工具、武器替换成随机等级的同类型装备。 |
+| 随便 | `random_bingo` | 随便提供一个bingo（包含已完成）。 |
+| 致敬爱情 | `love_tribute` | 传送到最近的沉船。 |
+| 地狱开局 | `ruined_portal` | 传送到最近的废弃地狱门结构。 |
+| 古代遗迹 | `ancient_ruins` | 在你附近随机生成 4–15 个考古砂砾或考古沙子。 |
+| 羊了个羊 | `sheep_wool` | 击杀羊时额外掉落 2 个羊毛，颜色随机。 |
+| 随身工作台 | `portable_bench` | 获得「随身工作台」：右键直接打开 3×3 合成界面，无需放置工作台。 |
+| 催熟喷雾 | `bone_meal_spray` | 每 10 秒向周围 9 格范围内的作物与植物洒下骨粉，随机催熟最多 12 处。 |
+| 村庄英雄 | `village_hero` | 永久获得村庄英雄 I。 |
+| 免疫护盾 | `immunity_shield` | 每 60 秒免疫对手的下一个技能类海克斯。 |
+| 种子礼包 | `seed_gift` | 随机获得小麦、胡萝卜、马铃薯、甜菜根、西瓜、南瓜种子，每种 1-8 个。 |
+| 考古刷 | `archaeology_brush` | 获得一把不会损耗耐久的刷子。 |
+| 跳跳虎 | `jump_tiger` | 永久获得跳跃提升 II。 |
+| 昼夜颠倒 | `day_night_flip` | 立即切换昼夜，之后 10 分钟内时间不再自然变化。 |
+| 工具箱 | `toolbox` | 随机获得工作台、熔炉、铁砧、砂轮、切石机中的 1 个。 |
+
+### 金色（30）
+
+| 名称 | id | 效果 |
+|---|---|---|
+| 随机传送 | `random_teleport` | 获得 /bingo rtp 指令：在当前位置附近随机传送，冷却 5 秒。 |
+| 我很想要 | `want_more_items` | 获得 10 个随机物品。 |
+| 更更万用瞄准镜 | `scope_2` | 方块交互距离 +5，实体交互距离 +5。可与其他瞄准镜叠加。 |
+| 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
+| 小蜜蜂 | `bees` | 在其他所有队伍附近召唤 10 只愤怒的蜜蜂。蜜蜂可以无视无敌蜇伤玩家。 |
+| 饕餮盛宴 | `gluttonous_feast` | 永久获得饥饿 II；每次吃下食物，随机获得一个等级 II 的增益，持续 15 秒。 |
+| 超强大脑 | `big_brain` | 你的所有物品变成随机物品持续 5 秒，之后恢复原背包。 |
+| 掀桌子？ | `flip_table_one` | 重新随机一个尚未被任何队伍完成的任务。 |
+| 灵魂炸弹 | `soul_bomb` | 获得 3 个灵魂沙、2 个凋零骷髅头和 1 个打火石。 |
+| 条条大路通罗马 | `village_road` | 将你传送到最近的村庄。 |
+| 旅行青蛙 | `travel_frog` | 召唤一只青蛙；主手持半组食物右键它，可换取一张随机结构地图（沉船 / 末地遗迹 / 林地府邸 / 村庄 / 幽匿城市 / 前哨站 / 沙漠神殿 / 丛林神庙；在地狱时为猪灵堡垒 / 地狱堡垒 / 废弃地狱门）。 |
+| 健忘症 | `amnesia` | 随机将另一支队伍的一个已完成 Bingo 退回未完成。 |
+| 冰！ | `ice_boots` | 获得冰霜行者 II 钻石靴。 |
+| 雪傀儡互助会 | `snow_pumpkin` | 给敌方所有玩家戴上带绑定诅咒的雕刻南瓜，无法自行脱下；需要队友用剪刀右键你摘除，单人队伍可手持剪刀潜行右键自己。 |
+| 宝可梦大师 | `pokemon_master` | 获得 6 个随机刷怪蛋（可重复）。 |
+| 乌鸦嘴 | `raven_mouth` | 召唤一只黑色鹦鹉；它会随机退回你一个已完成任务，或随机完成一个任务。 |
+| 和朋友一起困在这里 | `friends_here` | 附近每有一位队友，获得 +2% 移速和急迫 I（最多 +10%）。 |
+| 得吃小曲 | `dechi_song` | 播放村民版《得吃小曲》；期间获得随机幸运 III–V，背包里的镐子获得时运 II–III。 |
+| 理想国 | `utopia` | 打乱你身上所有药水效果，并重新获得 5 种永久随机增益或减益。 |
+| 冲冲冲 | `dash_charge` | 获得「冲冲冲」：右键向前突进 3 格，破坏沿途除黑曜石、基岩外的方块并使其掉落，对沿途生物造成 5 点伤害。冷却 5 秒。 |
+| 灵魂出窍 | `soul_out` | 选中后立即进入旁观状态 30 秒，期间可以自由飞行观察，结束后回到进入旁观前的位置。 |
+| 九九八十一难 | `eighty_one_trials` | 传送到最近的试炼大厅。 |
+| 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。冷却 8 分钟。 |
+| Spider Man | `spider_man` | 像蜘蛛一样爬墙，仅吸附有完整碰撞的方块；按 V 可开关爬墙功能。 |
+| 吸铁石 | `magnet` | 16 格内的掉落物会自动飞向你。 |
+| 3面骰 | `dice_roll` | 每 5 分钟投一次六面骰：大于 3 获得速度 II 4 分钟，小于 3 获得缓慢 I 4 分钟，等于 3 禁锢 6 秒。 |
+| 路易十六 | `louis_xvi` | 击杀的第一个生物必定掉落 1 个该生物的头颅。 |
+| 快递到了 | `airdrop` | 在你头顶空投一个装有随机战利品箱奖励的箱子。 |
+| 海神 | `sea_god` | 获得一把附魔三叉戟（忠诚 III、引雷 I、经验修补 I），掷出后自动回收。 |
+| 图腾批发 | `totem_bulk` | 获得 3 个不死图腾；手持不死图腾时可受到伤害，用于完成不死图腾成就。 |
+
+### 彩色（30）
+
+| 名称 | id | 效果 |
+|---|---|---|
+| 铁锁连环 | `chain_master` | 每完成一个团队任务，有 1% + 0.1% × 已完成任务数 的概率额外完成 1 个相邻任务，最高 50%。 |
+| 我真的很想要 | `want_lots_items` | 获得 15 个随机物品。 |
+| 更更更万用瞄准镜 | `scope_3` | 方块交互距离 +9，实体交互距离 +9。可与其他瞄准镜叠加。 |
+| 夺金 | `gold_rush` | 攻击生物时随机获得 1-3 个金粒，同一生物冷却 5 秒。 |
+| 飞升仪式 | `ascension` | 击杀敌对生物时获得随机增益。 |
+| 静水监狱 | `still_water` | 所有人无法获得下一个及以后所有海克斯。 |
+| 潘多拉的盒子 | `pandora` | 重新随机你已有的所有海克斯。 |
+| 歌莉娅巨人 | `goliath` | 体型、最大生命、挖掘速度和攻击伤害提高 30%。 |
+| 你摸不到 | `untouchable` | 右键使用技能物品：敌对 Bingo 队伍 30 秒内无法破坏方块，冷却 5 分钟。 |
+| 玻璃大炮 | `glass_cannon_bag` | 背包后 18 格被屏障占据（放入的物品会被移出或掉落），但方块与生物掉落变为 8 倍，并受时运与幸运加成（每级 +25%）。 |
+| 回归基本功 | `back_to_basics` | 无法使用工作台，但获得的物品掉落翻倍（受抢夺加成），并永久获得速度 I。 |
+| 大法师 | `archmage` | 制作物品后，每个材料有 10% 概率返还。 |
+| 尖端发明家 | `inventor` | 获得时附魔当前背包里的工具、武器和盔甲；以后制作的同类物品也会获得随机附魔。 |
+| 仆从大师 | `pet_master` | 获得一只无敌宠物，每 8 秒从全物品池中随机给你一个物品（贵重物品概率较低）。 |
+| 尊我为王 | `crown_me_king` | 敌方位置出现信标光柱，抵达后获得一个彩色海克斯、一套随机附魔钻石盔甲、效率 IV 钻石镐与锋利 IV/火焰附加 I 钻石剑。 |
+| 掀桌子！ | `flip_table` | 重新随机所有未被任意队伍完成的任务。 |
+| 回力ok镖 | `boomerang_biome` | 获得回力ok镖：投掷后飞向一个未完成群系任务所在的群系并返回。 |
+| 和我一起困在这里 | `rainbow_duel` | 获得一个绑定锁链。右键与最近的敌人进入基岩决斗场并允许 PVP：先死亡者失败，死亡者复活后额外坐牢 20 秒；胜者立即出来；5 分钟无人交战则双方自动出来。冷却 3 分钟。 |
+| 精怪魔法 | `fae_magic` | 获得「精怪魔法」：右键把敌对队伍变成小动物 1 分钟，冷却 5 分钟。 |
+| 中国人会飞 | `chinese_can_fly` | 获得一个无限耐久的鞘翅，以及一个用掉后会自动补充的绑定烟花火箭。 |
+| 间谍 | `spy` | 使用 /bingo spy <队友> <敌人> 交换两人的位置和背包。钩爪、回力ok镖、彩虹大作战等绑定物品会留在原主人身上。整局只能使用一次。 |
+| 共同富裕 | `common_wealth` | 没收所有人的物品栏物品到公共池，然后随机重新分配。 |
+| 质变混沌 | `chaos_shift` | 随机获得两个随机种类的海克斯。 |
+| CV工程师 | `task_copy` | 随机复制一个对手已完成而你队未完成的任务；Lockout 模式下改为直接抢占该格。 |
+| 维度放逐 | `nether_banish` | 将其他每支队伍的一名玩家放逐到下界随机位置 1 分钟。冷却 8 分钟。 |
+| 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格。 |
+| The World！ | `the_world` | 获得「The World」时停技能：右键使用后时间停止 8 秒，只有你能移动。冷却 3 分钟。 |
+| 腐蚀背包 | `corrupt_inventory` | 除你所在队伍外，每队随机一名玩家的 5 个物品变成腐肉。 |
+| 黑市开张 | `black_market` | 下次打开村民交易界面时，将该村民升到最高等级，并获得永久村庄英雄 II。 |
+| 恶魔契约 | `demon_pact` | 永久失去 15 点生命上限，但允许你受到伤害，并立即完成 1 个 Bingo 任务。 |
+
+## Hex list (English)
+
+### Silver (40)
+
+| Name | id | Effect |
+|---|---|---|
+| Experience Mastery | `experience_mastery` | Gain 500 experience and 8-32 random lapis lazuli. |
+| I See You | `i_see_you` | Every 2s, hostile mobs within 20 blocks glow. |
+| Golden Ascension | `golden_shift` | Gain a random gold hex. |
+| I Want It | `want_items` | Gain 5 random items. |
+| Dead Wood Blooms | `random_wood` | Gain 5 random wood types and 5 random flower types. |
+| Leg Day | `leg_day` | Permanent Speed I. |
+| Strength | `strong` | Permanent Strength II. |
+| Utility Scope | `scope_1` | Gain +1 block interaction range and +1 entity interaction range. |
+| Homeguard | `homeguard` | Gain speed while running continuously; each 10s raises the speed level. Stop for 0.2s and it fades. Max Speed IV. |
+| Stack Dragon | `stack_dragon` | Each mob kill adds a stack; every 15 stacks grants a loot chest. Higher stacks mean better loot. |
+| Lone Hero | `lone_hero` | Plays the song and grants a random permanent buff. |
+| Hook Dizzy | `hook_dizzy` | Unlocks /bingo hook: pull yourself toward the block you are looking at. 5s cooldown. |
+| Pearl Stock | `pearl_stock` | Gain 8 ender pearls and 2 blaze powder. |
+| Practice Day | `practice_day` | Permanent Haste I. |
+| Breaking Into Hell | `nether_start` | Immediately sent to the Nether; /tp, /bp and /bingo tp are disabled until you return to the Overworld. |
+| Star Voyage | `star_voyage` | Teleported to Y=256 with a platform and a water bucket. You MUST land in water or you will die. Landing safely unlocks 1 random Bingo slot. |
+| Perspective Swap | `swap_tasks` | Randomly swap the positions of two tasks on the current Bingo card. |
+| Swift Scout | `mushroom_scout` | Random mushrooms (including nether fungi) grow in a 3 block radius around you. |
+| Wormhole | `wormhole` | Instantly teleport to a random spot 1-1000 blocks away. |
+| Flying Cat Cult | `cat_cult` | Summon every cat variant around you. |
+| Dog Squad | `dog_squad` | Summon every wolf variant around you. |
+| Out of Service | `jam_bp` | Gain Out of Service: right-click to disable enemy /bp for 3 minutes. 9 minute cooldown. |
+| Gold Rush | `sand_gold` | Mining sand has a 3% chance to drop a gold nugget. |
+| Eye Taxi | `eye_taxi` | Your thrown eyes of ender no longer shatter. |
+| Flowers on the Way | `flowers_walk` | Flowers grow on grass blocks you walk over. |
+| Forge Master | `forge_master` | Replace the tools and weapons in your inventory with random tiers of the same type. |
+| Whatever | `random_bingo` | Gives you a random bingo (completed ones included). |
+| Tribute to Love | `love_tribute` | Teleport to the nearest shipwreck. |
+| Nether Start | `ruined_portal` | Teleport to the nearest ruined portal. |
+| Ancient Ruins | `ancient_ruins` | Randomly spawn 4-15 suspicious gravel or suspicious sand near you. |
+| Sheep Sheep Sheep | `sheep_wool` | Killing a sheep additionally drops 2 wool of random colors. |
+| Portable Workbench | `portable_bench` | Gain "Portable Workbench": right-click to open a 3x3 crafting grid without placing a crafting table. |
+| Growth Spray | `bone_meal_spray` | Every 10 seconds, sprinkles bone meal on crops and plants within a 9 block radius, randomly growing up to 12 of them. |
+| Village Hero | `village_hero` | Gain Hero of the Village I permanently. |
+| Immunity Shield | `immunity_shield` | Every 60 seconds, become immune to the next skill-type hex from an opponent. |
+| Seed Pack | `seed_gift` | Gain 1-8 each of random wheat, carrot, potato, beetroot, melon, and pumpkin seeds. |
+| Archaeology Brush | `archaeology_brush` | Gain a brush that never loses durability. |
+| Jumping Tiger | `jump_tiger` | Gain Jump Boost II permanently. |
+| Day-Night Flip | `day_night_flip` | Instantly flip day and night; time will not change naturally for the next 10 minutes. |
+| Toolbox | `toolbox` | Gain 1 random crafting table, furnace, anvil, grindstone or stonecutter. |
+
+### Gold (30)
+
+| Name | id | Effect |
+|---|---|---|
+| Random Teleport | `random_teleport` | Unlocks /bingo rtp: randomly teleport nearby with a 5s cooldown. |
+| I Want More | `want_more_items` | Gain 10 random items. |
+| Greater Utility Scope | `scope_2` | Gain +2 block interaction range and +2 entity interaction range. |
+| Prismatic Ascension | `prismatic_shift` | Gain a random prismatic hex. |
+| Little Bees | `bees` | Summon 10 angry bees around every enemy team. Bees can sting through invulnerability. |
+| Gluttonous Feast | `gluttonous_feast` | Permanently gain Hunger II. Eating any food grants a random level II buff for 15s. |
+| Big Brain | `big_brain` | All your inventory items become random items for 5s, then are restored. |
+| Flip the Table? | `flip_table_one` | Reroll one task that no team has completed yet. |
+| Soul Bomb | `soul_bomb` | Gain 3 soul sand, 2 wither skeleton skulls and 1 flint and steel. |
+| All Roads Lead to Rome | `village_road` | Teleport to the nearest village. |
+| Travel Frog | `travel_frog` | Summon a frog; right-click it with half a stack of food for a random structure map (shipwreck / End ruin / woodland mansion / village / ancient city / pillager outpost / desert pyramid / jungle temple; in the Nether: bastion / fortress / ruined portal). |
+| Amnesia | `amnesia` | Randomly revert one completed Bingo task of another team. |
+| Ice! | `ice_boots` | Gain Frost Walker II diamond boots. |
+| Snow Golem Society | `snow_pumpkin` | Put cursed carved pumpkins on all enemy players; they cannot be removed by yourself — a teammate must right-click you with shears. A solo player can sneak-right-click with shears. |
+| Pokemon Master | `pokemon_master` | Gain 6 random spawn eggs (duplicates allowed). |
+| Raven Mouth | `raven_mouth` | Summon a black parrot; it randomly reverts one of your completed tasks or completes one random task. |
+| Trapped With Friends | `friends_here` | Each nearby teammate grants +2% speed and Haste I (max +10%). |
+| Dechi Song | `dechi_song` | Plays the villager version of the Dechi song; grants random Luck III-V during it, and all pickaxes in your inventory gain Fortune II-III. |
+| Utopia | `utopia` | Scrambles all your potion effects and grants 5 new permanent random buffs or debuffs. |
+| Rush Rush Rush | `dash_charge` | Gain "Rush Rush Rush": right-click to dash 3 blocks forward, breaking and dropping blocks along the way except obsidian and bedrock, and dealing 5 damage to creatures hit. 5 second cooldown. |
+| Soul Out | `soul_out` | Immediately enter spectator mode for 30 seconds to scout freely, then return to the position where you entered spectator mode. |
+| Eighty-One Trials | `eighty_one_trials` | Teleport to the nearest trial chambers. |
+| Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). 8 minute cooldown. |
+| Spider Man | `spider_man` | Climb walls like a spider (only full-collision blocks). Press V to toggle. |
+| Magnet | `magnet` | All dropped items within 16 blocks fly toward you. |
+| 3-Sided Die | `dice_roll` | Every 5 minutes roll a d6: above 3 grants Speed II for 4 minutes, below 3 grants Slowness I for 4 minutes, and 3 roots you for 6 seconds. |
+| Louis XVI | `louis_xvi` | The first mob you kill is guaranteed to drop 1 of its heads. |
+| Delivery Arrived | `airdrop` | Airdrop a chest above you filled with loot from a random vanilla chest loot table. |
+| Sea God | `sea_god` | Gain an enchanted trident (Loyalty III, Channeling I, Mending I) that returns when thrown. |
+| Totem Wholesale | `totem_bulk` | Gain 3 Totems of Undying. While holding one, you can take damage, so the 'Postmortal' advancement can be completed. |
+
+### Prismatic (30)
+
+| Name | id | Effect |
+|---|---|---|
+| Iron Chain | `chain_master` | Each completed team task gives a 1% + 0.1% per-completed-task chance (max 50%) to complete 1 adjacent task. |
+| I Really Want It | `want_lots_items` | Gain 15 random items. |
+| Greatest Utility Scope | `scope_3` | Gain +3 block interaction range and +3 entity interaction range. |
+| Gold Rush | `gold_rush` | Attacking a mob grants 1-3 gold nuggets, 5s cooldown per mob. |
+| Ascension Ritual | `ascension` | Killing a hostile mob grants a random buff. |
+| Still Water Prison | `still_water` | All players can no longer receive any hex rewards. |
+| Pandora's Box | `pandora` | Reroll all of your current hexes. |
+| Goliath | `goliath` | Gain +30% size, max health, block break speed and attack damage. |
+| You Cannot Touch Me | `untouchable` | Right-click the skill item: enemy Bingo teams cannot break blocks for 30s. 5 minute cooldown. |
+| Glass Cannon Bag | `glass_cannon_bag` | The last 18 inventory slots are filled with barrier markers (items are moved out or dropped). Item drops are doubled. |
+| Back to Basics | `back_to_basics` | You cannot use a crafting table, but item drops are doubled (boosted by Looting) and you gain permanent Speed I. |
+| Archmage | `archmage` | After crafting, each material has a 10% chance to be refunded. |
+| Inventor | `inventor` | Tools, weapons and armor you craft in the future gain random enchantments. |
+| Pet Master | `pet_master` | Gain an invincible pet that gives you a random item from the full item pool every 8s (valuable items are rarer). |
+| Crown Me King | `crown_me_king` | A beacon marks an enemy position. Reach it to gain a prismatic hex, a randomly enchanted diamond armor set, an Efficiency IV diamond pickaxe and a Sharpness IV / Fire Aspect I diamond sword. |
+| Flip the Table! | `flip_table` | Reroll every task that no team has completed. |
+| Boomerang OK | `boomerang_biome` | Gain a boomerang that flies toward an unfinished biome task and returns. |
+| Trapped With Me | `rainbow_duel` | Gain a bound chain. Right-click to enter a bedrock duel with the nearest enemy; PvP is allowed, whoever dies first loses, the winner leaves at once, and both leave after 5 minutes without PvP. 3 minute cooldown. |
+| Fey Magic | `fae_magic` | Gain Fey Magic: right-click to turn the enemy team into critters for 1 minute. 5 minute cooldown. |
+| Chinese Can Fly | `chinese_can_fly` | Gain an unbreakable elytra and one bound firework rocket that is always replenished. |
+| Spy | `spy` | Use /bingo spy <teammate> <enemy> to swap their positions and inventories. Bound items stay with their owner. Once per game. |
+| Common Wealth | `common_wealth` | Confiscate everyone's inventory items into a common pool, then redistribute them randomly. |
+| Chaos Shift | `chaos_shift` | Gain two random hexes of random colors. |
+| CV Engineer | `task_copy` | Randomly copies a task an opponent has completed but your team has not; in Lockout mode, directly claims that slot instead. |
+| Dimensional Banish | `nether_banish` | Banish one player from each enemy team to a random place in the Nether for 1 minute. Cooldown: 8 minutes. |
+| Wildcard | `wildcard` | Randomly light up one cell on the Bingo card. |
+| The World! | `the_world` | Gain the "The World" time-stop skill; right-click to stop time for 8 seconds so only you can move. Cooldown: 3 minutes. |
+| Corrupt Backpacks | `corrupt_inventory` | For every team except yours, 5 random items of one random player turn into rotten flesh. |
+| Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
+| Demon Pact | `demon_pact` | Permanently lose 15 max health, but you can take damage; immediately complete 1 Bingo task. |
+
+<!-- HEX-TABLE-END -->
 
 ## 素材状态
 
-- `dechi_song.ogg`、`guyongzhe.ogg` 为第三方录音，**不在本仓库许可范围内**，正在替换为自制音频；在替换完成前请勿再分发这两个文件。
+- `dechi_song.ogg`、`guyongzhe.ogg` 为第三方录音，**不在本仓库许可范围内**，计划替换为自制音频；替换完成前请勿再分发这两个文件。
 - 海克斯名称与文案参考《英雄联盟》强化符文，仅作玩法致敬；《英雄联盟》为 Riot Games, Inc. 的商标，本项目与 Riot Games 无关。
-- 贴图与语言文件为本项目原创。
+- 贴图与其余语言文件为本项目原创。
 
 ## 构建
 
