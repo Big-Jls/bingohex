@@ -1,5 +1,10 @@
 # Bingo: Hex Mayhem — 非官方 Bingo 海克斯附属
 
+> **原项目（上游）**
+> - Bongo — <https://github.com/noeppi-noeppi/Bongo>
+> - BingoLobby — <https://github.com/noeppi-noeppi/BingoLobby>
+> - LibX — <https://github.com/ModdingX/LibX>
+>
 > **非官方项目**：这是自写附属模组，不是 Bongo / BingoLobby 的官方项目，与 **noeppi_noeppi**、**ModdingX** 没有隶属关系，也未获其背书或赞助。
 >
 > **许可**：Apache License 2.0。源码即本仓库。音频素材存在第三方版权待处理项，见「素材状态」。
