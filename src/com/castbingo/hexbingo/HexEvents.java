@@ -457,6 +457,8 @@ public class HexEvents {
    @SubscribeEvent
    public void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post var1) {
       HexEffects.tickDash(var1.getServer());
+      HexEffects.tickPortableFurnaces(var1.getServer());
+      HexEffects.tickSmeltBoost(var1.getServer());
       HexEffects.tickTrap(var1.getServer());
       HexEffects.tickFaeDisguises(var1.getServer());
       HexEffects.tickHomeguard(var1.getServer());

@@ -491,6 +491,7 @@
     "hexbingo.msg.blind_no_target":  "Blind: no enemies to blind.",
     "hexbingo.msg.blind_cast":  "Blind: %s enemies blinded for 8 seconds.",
     "hexbingo.msg.end_exile_fail":  "Is It Over?: the End dimension is unavailable.",
+    "hexbingo.msg.end_exile_no_spot":  "Is It Over?: no suitable outer End island was found, please try again.",
     "hexbingo.msg.end_exile_start":  "Is It Over?: you are exiled to the End outer islands for %s minutes and cannot be teleported.",
     "hexbingo.msg.end_exile_end":  "Is It Over?: you returned to your previous position.",
     "hexbingo.msg.end_exile_blocked":  "Is It Over?: teleport blocked, you were pulled back to the End.",

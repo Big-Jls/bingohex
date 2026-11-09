@@ -1,5 +1,23 @@
 # Changelog
 
+## 26.2-1.37.1 — 2026-11-10
+
+### Fixed
+
+- Blind (`blind`): casting it now plays the squid ink spray sound.
+- Is It Over? (`is_it_over`): no longer fails with "the End dimension is
+  unavailable". The outer-island chunks are force-loaded before reading the
+  surface height, so the exile teleport finds a real island (previously the
+  height of unloaded chunks resolved to the world bottom and the lookup always
+  failed). A separate message is shown when no island spot is found.
+- Portable Furnace (`portable_furnace`): the furnace logic ran only once per
+  second, so cooking was 20x too slow and the burn bar advanced far too
+  slowly. It now ticks every server tick, matching vanilla furnace speed.
+- Smelting Speed (`smelt_speed`): the extra furnace tick was also only applied
+  once per second, which came out at roughly +5% instead of the advertised
+  doubling. Furnaces now receive one extra tick per server tick (2x), and the
+  Portable Furnace cooks twice as fast as well.
+
 ## 26.2-1.37.0 — 2026-11-10
 
 ### Fixed

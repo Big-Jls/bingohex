@@ -52,8 +52,12 @@ $outDir = $build -replace '\\', '/'
 
 Write-Host "Compiling ($Version) ..."
 Push-Location $root
+# javac writes warnings to stderr; keep PowerShell from treating them as terminating errors
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
 & $javac '-J-Duser.language=en' '-J-Duser.country=US' "@$argsFile" "-Xmaxerrs" "500" "@$srcFile"
 $code = $LASTEXITCODE
+$ErrorActionPreference = $prevEap
 Pop-Location
 if ($code -ne 0) { throw "compile failed ($code)" }
 

@@ -491,6 +491,7 @@
     "hexbingo.msg.blind_no_target":  "致盲：没有可致盲的敌人。",
     "hexbingo.msg.blind_cast":  "致盲：%s 名敌人失明 8 秒。",
     "hexbingo.msg.end_exile_fail":  "结束了?：无法打开末地维度。",
+    "hexbingo.msg.end_exile_no_spot":  "结束了?：没有找到合适的末地外岛落点，请重试。",
     "hexbingo.msg.end_exile_start":  "结束了?：你被放逐到末地外岛 %s 分钟，期间无法被传送。",
     "hexbingo.msg.end_exile_end":  "结束了?：你回到了原来的位置。",
     "hexbingo.msg.end_exile_blocked":  "结束了?：传送被阻止，你被拉回了末地。",

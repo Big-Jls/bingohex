@@ -1166,8 +1166,6 @@ public final class HexEffects {
       long var1 = System.currentTimeMillis();
       TEMP_DAMAGE.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
       TEMP_LIFESTEAL.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
-      tickPortableFurnaces(var0);
-      tickSmeltBoost(var0);
       tickTheWorld(var0);
       tickHexBees(var0);
       tickEndExile(var0);
@@ -4600,7 +4598,7 @@ public final class HexEffects {
       return true;
    }
 
-   private static void tickPortableFurnaces(MinecraftServer var0) {
+   public static void tickPortableFurnaces(MinecraftServer var0) {
       if (!PORTABLE_FURNACES.isEmpty()) {
          Iterator<Map.Entry<UUID, HexEffects.PortableFurnace>> var1 = PORTABLE_FURNACES.entrySet().iterator();
 
@@ -4613,7 +4611,7 @@ public final class HexEffects {
                var1.remove();
             } else if (var3.containerMenu == var4.menu && var4.menu != null) {
                tickPortableFurnace(var3, var4);
-               if (++var4.saveTicks >= 10) {
+               if (++var4.saveTicks >= 100) {
                   var4.saveTicks = 0;
                   HexGameData.get(var0).setPortableFurnace(var3.getUUID(), var4.save());
                }
@@ -4675,7 +4673,7 @@ public final class HexEffects {
       }
    }
 
-   private static void tickSmeltBoost(MinecraftServer var0) {
+   public static void tickSmeltBoost(MinecraftServer var0) {
       boolean var1 = false;
 
       for (ServerPlayer var3 : var0.getPlayerList().getPlayers()) {
@@ -7852,6 +7850,7 @@ public final class HexEffects {
       }
 
       BLIND_COOLDOWN.put(var0.getUUID(), var1 + 180000L);
+      var10.playSound(null, var0.getX(), var0.getY(), var0.getZ(), SoundEvents.SQUID_SQUIRT, SoundSource.PLAYERS, 1.0F, 0.9F);
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.blind_cast", var5).withStyle(ChatFormatting.DARK_GRAY));
       return true;
    }
@@ -7895,19 +7894,21 @@ public final class HexEffects {
       int var10 = 0;
       int var11 = -1;
 
-      for (int var12 = 0; var12 < 8; var12++) {
+      for (int var12 = 0; var12 < 12; var12++) {
          double var5 = var4.nextDouble() * Math.PI * 2.0;
          double var7 = 1200.0 + var4.nextDouble() * 600.0;
          var9 = Mth.floor(Math.cos(var5) * var7);
          var10 = Mth.floor(Math.sin(var5) * var7);
+         // 末地外岛区块默认未加载，getHeight 对未加载区块会返回最低点，必须先加载区块
+         var3.getChunk(var9 >> 4, var10 >> 4);
          var11 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var9, var10);
-         if (var11 > 0) {
+         if (var11 > var3.getMinY()) {
             break;
          }
       }
 
-      if (var11 <= 0) {
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_fail").withStyle(ChatFormatting.GRAY));
+      if (var11 <= var3.getMinY()) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_no_spot").withStyle(ChatFormatting.GRAY));
          return;
       }
       END_EXILE.put(
