@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.35.2 — 2026-11-09
+
+### Fixed
+
+- **Is It Over?** (`is_it_over`): chorus fruit teleports are no longer blocked
+  either; ender pearls and chorus fruit remain normal movement tools.
+- **Is It Over?**: `/bingo tp`, `/bingo teleport`, `/tp`, `/teleport` and
+  `/spreadplayers` are still blocked while exiled, including when wrapped in
+  `/execute ... run`.
+
 ## 26.2-1.35.1 — 2026-11-09
 
 ### Fixed

@@ -83,9 +83,9 @@ public final class HexManager {
             }
 
             boolean var19 = var15.equals("tp")
-               || var15.equals("bingo")
-                  && var2.length >= 2
-                  && (var2[1].equalsIgnoreCase("tp") || var2[1].equalsIgnoreCase("teleport"));
+               || var15.equals("teleport")
+               || var15.equals("spreadplayers")
+               || isBingoTp(var2);
             if (var19 && HexEffects.isEndExiled(var4)) {
                var3.sendFailure(Component.translatable("hexbingo.msg.end_exile_no_tp"));
                var0.setCanceled(true);
@@ -136,6 +136,17 @@ public final class HexManager {
             }
          }
       }
+   }
+
+   private static boolean isBingoTp(String[] var0) {
+      for (int var1 = 0; var1 + 1 < var0.length; var1++) {
+         if (var0[var1].equalsIgnoreCase("bingo")
+            && (var0[var1 + 1].equalsIgnoreCase("tp") || var0[var1 + 1].equalsIgnoreCase("teleport"))) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private static void resetGame(MinecraftServer var0, boolean var1) {
