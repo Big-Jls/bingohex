@@ -1,12 +1,4 @@
 {
-  "guyongzhe": {
-    "sounds": [
-      {
-        "name": "hexbingo:guyongzhe",
-        "stream": true
-      }
-    ]
-  },
   "dechi_song": {
     "sounds": [
       {

@@ -699,10 +699,10 @@ public final class HexEffects {
          case "reroll_hexes":
             rerollHexes(var0);
             break;
-         // 孤勇者
-         case "play_song_buff":
-            playSongBuff(var0);
-            break;
+         // 孤勇者（已禁用：音频移除）
+         // case "play_song_buff":
+         //    playSongBuff(var0);
+         //    break;
          // 得吃小曲
          case "dechi_song":
             playDechiSong(var0, var3.seconds);
@@ -1040,9 +1040,10 @@ public final class HexEffects {
                         case "no_armor_task_xp":
                            applyNegativeAttribute(var0, var4, var7, Attributes.ARMOR, -var8.amount, Operation.ADD_VALUE);
                            break;
-                        case "play_song_buff":
-                           ensureSongBuff(var0);
-                           break;
+                        // 孤勇者已禁用
+                        // case "play_song_buff":
+                        //    ensureSongBuff(var0);
+                        //    break;
                         case "elytra_flight":
                            ensureFlightRocket(var0);
                            break;
@@ -1269,10 +1270,10 @@ public final class HexEffects {
                      case "fae_magic":
                      default:
                         break;
-                     // 孤勇者：维持随机歌声 buff
-                     case "play_song_buff":
-                        ensureSongBuff(var5);
-                        break;
+                     // 孤勇者已禁用（音频移除）
+                     // case "play_song_buff":
+                     //    ensureSongBuff(var5);
+                     //    break;
                      // 中国人会飞：补充飞行烟花
                      case "elytra_flight":
                         ensureFlightRocket(var5);

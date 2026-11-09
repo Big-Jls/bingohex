@@ -340,15 +340,6 @@
                                   ]
                   },
                   {
-                      "id":  "lone_hero",
-                      "color":  "silver",
-                      "effects":  [
-                                      {
-                                          "type":  "play_song_buff"
-                                      }
-                                  ]
-                  },
-                  {
                       "id":  "big_brain",
                       "color":  "gold",
                       "effects":  [

@@ -1,5 +1,16 @@
 # Changelog
 
+## 26.2-1.35.3 — 2026-11-09
+
+### Changed
+
+- **Lone Hero** (`lone_hero`, silver) is disabled. The hex is removed from the
+  card pool, its effect handlers are commented out, and the third-party audio
+  `assets/hexbingo/sounds/guyongzhe.ogg` is removed along with its
+  `sounds.json` entry. Existing saves that already own the hex no longer
+  receive any effect.
+- Hex count is now 118 (46 silver / 36 gold / 36 prismatic).
+
 ## 26.2-1.35.2 — 2026-11-09
 
 ### Fixed

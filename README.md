@@ -11,7 +11,12 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **119 个海克斯强化**：47 银色 / 36 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **118 个海克斯强化**：46 银色 / 36 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.35.3 变更
+
+- 注释掉银色海克斯 **孤勇者**（`lone_hero`），并从卡池与音效表中移除；同时删除第三方音频 `guyongzhe.ogg`。
+- 现有存档中已获得的孤勇者不再生效（海克斯 id 不再注册）。
 
 ### 1.35.2 修复
 
@@ -74,7 +79,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.3.jar`）。
-3. 把 `HexBingo-26.2-1.35.2.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.35.3.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -99,9 +104,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（119）
+## 海克斯一览（118）
 
-### 银色（47）
+### 银色（46）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -115,7 +120,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 更万用瞄准镜 | `scope_1` | 方块交互距离 +2，实体交互距离 +2。可与其他瞄准镜叠加。 |
 | 家园卫士 | `homeguard` | 持续奔跑时越跑越快，每跑 10 秒提升一级，停止 0.2 秒后失去加速，最高速度 IV。 |
 | 叠角龙 | `stack_dragon` | 每击杀一个生物累计 1 层，每 15 层获得一个战利品箱，层数越高奖励越好。 |
-| 孤勇者 | `lone_hero` | 播放《孤勇者》，并获得一个随机永久增益。 |
 | 转到我眩晕了 | `hook_dizzy` | 获得 /bingo hook：把你拉向准星指向的方块，冷却 5 秒。 |
 | 珍珠储备 | `pearl_stock` | 获得 8 个末影珍珠和 2 个烈焰粉。 |
 | 练手日 | `practice_day` | 永久获得急迫 I。 |
@@ -237,7 +241,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 ## Hex list (English)
 
-### Silver (47)
+### Silver (46)
 
 | Name | id | Effect |
 |---|---|---|
@@ -251,7 +255,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Utility Scope | `scope_1` | Gain +1 block interaction range and +1 entity interaction range. |
 | Homeguard | `homeguard` | Gain speed while running continuously; each 10s raises the speed level. Stop for 0.2s and it fades. Max Speed IV. |
 | Stack Dragon | `stack_dragon` | Each mob kill adds a stack; every 15 stacks grants a loot chest. Higher stacks mean better loot. |
-| Lone Hero | `lone_hero` | Plays the song and grants a random permanent buff. |
 | Hook Dizzy | `hook_dizzy` | Unlocks /bingo hook: pull yourself toward the block you are looking at. 5s cooldown. |
 | Pearl Stock | `pearl_stock` | Gain 8 ender pearls and 2 blaze powder. |
 | Practice Day | `practice_day` | Permanent Haste I. |
@@ -375,7 +378,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 ## 素材状态
 
-- `dechi_song.ogg`、`guyongzhe.ogg` 为第三方录音，**不在本仓库许可范围内**，计划替换为自制音频；替换完成前请勿再分发这两个文件。
+- `dechi_song.ogg` 为第三方录音，**不在本仓库许可范围内**，计划替换为自制音频；替换完成前请勿再分发该文件。
 - 海克斯名称与文案参考《英雄联盟》强化符文，仅作玩法致敬；《英雄联盟》为 Riot Games, Inc. 的商标，本项目与 Riot Games 无关。
 - 贴图与其余语言文件为本项目原创。
 
@@ -384,7 +387,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.35.2 `
+.\build.ps1 -Version 26.2-1.35.3 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
