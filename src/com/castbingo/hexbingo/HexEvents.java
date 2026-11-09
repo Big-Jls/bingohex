@@ -31,6 +31,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
@@ -145,6 +146,7 @@ public class HexEvents {
          HexEffects.tickSpiderMan(var2);
          HexEffects.tickMagnet(var2);
          HexEffects.tickDice(var2);
+         HexEffects.tickMindControl(var2);
          if (var2.tickCount % 10 == 0) {
             HexEffects.tickBoundItems(var2);
          }
@@ -177,6 +179,7 @@ public class HexEvents {
          HexEffects.onTrapDeath(var2);
          HexEffects.clearLockedSlotMarkers(var2);
          HexEffects.restoreTransform(var2);
+         HexEffects.onSpecialDeath(var2);
       }
 
       HexEffects.death(var1);
@@ -214,6 +217,11 @@ public class HexEvents {
 
    @SubscribeEvent
    public void rightClickBlock(RightClickBlock var1) {
+      if (var1.getEntity() instanceof ServerPlayer var0 && useAbilityItem(var0, var1.getItemStack())) {
+         var1.setCanceled(true);
+         return;
+      }
+
       if (var1.getEntity() instanceof ServerPlayer var2 && isHookItem(var1.getItemStack()) && HexEffects.hasHex(var2, "hook_dizzy")) {
          if (HexEffects.grapple(var2)) {
             var1.setCanceled(true);
@@ -270,6 +278,11 @@ public class HexEvents {
 
    @SubscribeEvent
    public void rightClickItem(RightClickItem var1) {
+      if (var1.getEntity() instanceof ServerPlayer var0 && useAbilityItem(var0, var1.getItemStack())) {
+         var1.setCanceled(true);
+         return;
+      }
+
       if (var1.getEntity() instanceof ServerPlayer var2 && var1.getItemStack().is(Items.ENDER_EYE) && HexEffects.hasHex(var2, "eye_taxi")) {
          HexEffects.markEye(var2);
       }
@@ -337,6 +350,26 @@ public class HexEvents {
          && isPortableFurnace(var1.getItemStack())
          && HexEffects.openPortableFurnace(var23)) {
          var1.setCanceled(true);
+      }
+   }
+
+   private static boolean useAbilityItem(ServerPlayer var0, ItemStack var1) {
+      String var2 = var1.getHoverName().getString();
+      if (var1.is(Items.INK_SAC) && var2.equals("致盲")) {
+         return HexEffects.castBlind(var0);
+      } else if (var1.is(Items.PHANTOM_MEMBRANE) && var2.equals("蝙蝠形态")) {
+         return HexEffects.castBatForm(var0);
+      } else if (var1.is(Items.PRISMARINE_CRYSTALS) && var2.equals("精神控制")) {
+         return HexEffects.castMindControl(var0);
+      } else if (var1.is(Items.BARRIER) && var2.equals("目标封锁")) {
+         HexManager.openTaskPick(var0);
+         return true;
+      } else if (var1.is(Items.SPYGLASS) && var2.equals("矿物透视")) {
+         return HexEffects.castXray(var0);
+      } else if (var1.is(Items.ECHO_SHARD) && var2.equals("镜像复制")) {
+         return HexEffects.castMirror(var0);
+      } else {
+         return false;
       }
    }
 
@@ -426,6 +459,15 @@ public class HexEvents {
       HexEffects.tickTrap(var1.getServer());
       HexEffects.tickFaeDisguises(var1.getServer());
       HexEffects.tickHomeguard(var1.getServer());
+      HexEffects.tickMeteors(var1.getServer());
+   }
+
+   @SubscribeEvent
+   public void teleport(EntityTeleportEvent var1) {
+      if (var1.getEntity() instanceof ServerPlayer var2 && HexEffects.isEndExiled(var2) && !HexEffects.isExileBypassing()) {
+         var1.setCanceled(true);
+         var2.sendSystemMessage(net.minecraft.network.chat.Component.translatable("hexbingo.msg.end_exile_no_tp").withStyle(net.minecraft.ChatFormatting.DARK_PURPLE));
+      }
    }
 
    @SubscribeEvent
@@ -473,6 +515,10 @@ public class HexEvents {
    public void taskCompleted(BingoTaskEvent var1) {
       MinecraftServer var2 = var1.getLevel().getServer();
       if (var2 != null && HexGameData.get(var2).mayhem()) {
+         if (HexEffects.handleObjectiveDeny(var1)) {
+            return;
+         }
+
          HexManager.onTask(var1);
          HexEffects.onTask(var1);
       }

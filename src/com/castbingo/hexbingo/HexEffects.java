@@ -59,6 +59,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
@@ -70,6 +71,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.Container;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -104,6 +106,7 @@ import net.minecraft.world.entity.animal.wolf.WolfVariant;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.entity.player.Input;
@@ -337,6 +340,30 @@ public final class HexEffects {
    private static final Map<UUID, HexEffects.HomeguardState> HOMEGUARD = new HashMap<>();
    private static final Map<UUID, Long> BREAK_LOCK = new HashMap<>();
    private static final Map<UUID, Integer> KILL_STACKS = new HashMap<>();
+   // 陨石：正在坠落的陨石
+   private static final List<HexEffects.MeteorState> METEORS = new ArrayList<>();
+   // 致盲
+   private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
+   // 结束了？：被放逐到末地外岛
+   private static final Map<UUID, HexEffects.ExileState> END_EXILE = new HashMap<>();
+   // 点石成金
+   private static final Map<UUID, Long> MIDAS_COOLDOWN = new HashMap<>();
+   // 蝙蝠形态
+   private static final Map<UUID, Long> BAT_UNTIL = new HashMap<>();
+   private static final Map<UUID, Long> BAT_COOLDOWN = new HashMap<>();
+   // 精神控制
+   private static final Map<UUID, HexEffects.MindState> MIND_CONTROL = new HashMap<>();
+   private static final Map<UUID, Long> MIND_COOLDOWN = new HashMap<>();
+   // 目标封锁
+   private static HexEffects.DenyState OBJECTIVE_DENY;
+   private static final Map<UUID, Long> DENY_COOLDOWN = new HashMap<>();
+   // 透视
+   private static final Map<UUID, Long> XRAY_UNTIL = new HashMap<>();
+   private static final Map<UUID, Long> XRAY_COOLDOWN = new HashMap<>();
+   private static final Map<UUID, List<ItemEntity>> XRAY_MARKERS = new HashMap<>();
+   private static final String XRAY_TAG = "hexbingo_xray_marker";
+   // 任务护盾：队伍 -> 受保护的卡牌
+   private static final Map<String, Set<Task>> TASK_SHIELDS = new HashMap<>();
    private static final Map<UUID, HexEffects.TransformState> TRANSFORMS = new HashMap<>();
    private static final Map<UUID, TamableAnimal> PETS = new HashMap<>();
    private static final Map<UUID, BlockPos> BEACONS = new HashMap<>();
@@ -838,6 +865,58 @@ public final class HexEffects {
          case "sea_god":
             giveSeaGod(var0);
             break;
+         // 陨石
+         case "meteor":
+            castMeteor(var0, var3);
+            break;
+         // 致盲
+         case "blind":
+            giveBlindItem(var0);
+            break;
+         // 结束了？
+         case "is_it_over":
+            startEndExile(var0, Math.max(1, var3.seconds));
+            break;
+         // 自动熔炼
+         case "auto_smelt":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.auto_smelt").withStyle(ChatFormatting.GOLD));
+            break;
+         // 任务护盾
+         case "task_shield":
+            applyTaskShield(var0, Math.max(1, var3.count));
+            break;
+         // 点石成金
+         case "midas_touch":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.midas_info").withStyle(ChatFormatting.GOLD));
+            break;
+         // 蝙蝠形态
+         case "bat_form":
+            giveBatItem(var0);
+            break;
+         // 精神控制
+         case "mind_control":
+            giveMindItem(var0);
+            break;
+         // 目标封锁
+         case "objective_deny":
+            giveDenyItem(var0);
+            break;
+         // 透视
+         case "xray":
+            giveXrayItem(var0);
+            break;
+         // 拾荒者
+         case "scavenger":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.scavenger").withStyle(ChatFormatting.GOLD));
+            break;
+         // 洗牌
+         case "card_shuffle":
+            cardShuffle(var0);
+            break;
+         // 镜像复制
+         case "mirror_hex":
+            giveMirrorItem(var0);
+            break;
          // 图腾批发
          case "totem_bulk":
             giveTotems(var0);
@@ -1007,6 +1086,17 @@ public final class HexEffects {
       DICE_NEXT.remove(var0.getUUID());
       LOUIS_PENDING.remove(var0.getUUID());
       restoreTransform(var0);
+      endBatForm(var0, false);
+      endEndExile(var0, false);
+      clearXrayMarkers(var0);
+      BLIND_COOLDOWN.remove(var0.getUUID());
+      MIDAS_COOLDOWN.remove(var0.getUUID());
+      MIND_COOLDOWN.remove(var0.getUUID());
+      DENY_COOLDOWN.remove(var0.getUUID());
+      XRAY_UNTIL.remove(var0.getUUID());
+      XRAY_COOLDOWN.remove(var0.getUUID());
+      MIND_CONTROL.remove(var0.getUUID());
+      MIND_CONTROL.entrySet().removeIf(var1 -> var1.getValue().target.equals(var0.getUUID()));
 
       for (Holder var4 : ALL_ATTRIBUTES) {
          AttributeInstance var5 = var0.getAttribute(var4);
@@ -1048,6 +1138,7 @@ public final class HexEffects {
       tickSmeltBoost(var0);
       tickTheWorld(var0);
       tickHexBees(var0);
+      tickEndExile(var0);
       if (DAY_NIGHT_UNTIL > 0L && var1 >= DAY_NIGHT_UNTIL) {
          DAY_NIGHT_UNTIL = 0L;
          Registry<WorldClock> var21 = var0.registryAccess().lookupOrThrow(Registries.WORLD_CLOCK);
@@ -1085,6 +1176,8 @@ public final class HexEffects {
          }
 
          List<Hex> var6 = hexes(var5);
+         tickBatForm(var5);
+         tickXray(var5);
          boolean var7 = false;
          if (var6.isEmpty()) {
             clearLockedSlotMarkers(var5);
@@ -1876,6 +1969,12 @@ public final class HexEffects {
 
    public static void damageDealt(Pre var0) {
       if (var0.getSource().getEntity() instanceof ServerPlayer var1) {
+         // 蝙蝠形态无法攻击
+         if (isBatForm(var1)) {
+            var0.setNewDamage(0.0F);
+            return;
+         }
+
          HexEffects.Temp var7 = TEMP_DAMAGE.get(var1.getUUID());
          if (var7 != null && var7.active()) {
             var0.setNewDamage(var0.getNewDamage() * (1.0F + var7.value()));
@@ -2656,6 +2755,11 @@ public final class HexEffects {
 
    private static void uncompleteSlot(MinecraftServer var0, Bingo var1, Team var2, int var3) {
       if (var3 >= 0) {
+         // 任务护盾：被锁定的卡牌不会被退回
+         if (isTaskShielded(var2, var1, var3)) {
+            return;
+         }
+
          ArrayList<Integer> var4 = new ArrayList<>();
 
          for (int var5 = 0; var5 < 25; var5++) {
@@ -4853,6 +4957,30 @@ public final class HexEffects {
       if (hasHex(var0, "chinese_can_fly")) {
          ensureFlightRocket(var0);
       }
+
+      if (hasHex(var0, "blind") && !hasNamedItem(var0, "致盲")) {
+         giveBlindItem(var0);
+      }
+
+      if (hasHex(var0, "bat_form") && !hasNamedItem(var0, "蝙蝠形态")) {
+         giveBatItem(var0);
+      }
+
+      if (hasHex(var0, "mind_control") && !hasNamedItem(var0, "精神控制")) {
+         giveMindItem(var0);
+      }
+
+      if (hasHex(var0, "objective_deny") && !hasNamedItem(var0, "目标封锁")) {
+         giveDenyItem(var0);
+      }
+
+      if (hasHex(var0, "xray") && !hasNamedItem(var0, "矿物透视")) {
+         giveXrayItem(var0);
+      }
+
+      if (hasHex(var0, "mirror_hex") && !hasNamedItem(var0, "镜像复制")) {
+         giveMirrorItem(var0);
+      }
    }
 
    private static boolean hasNamedItem(ServerPlayer var0, String var1) {
@@ -6029,6 +6157,12 @@ public final class HexEffects {
                   }
 
                   var7.setChanged();
+                  // 叠角龙开箱：不死图腾粒子 + 经验“叮”声
+                  var2.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, var6.getX() + 0.5, var6.getY() + 1.0, var6.getZ() + 0.5, 40, 0.6, 0.8, 0.6, 0.45);
+                  var2.playSound(
+                     null, var6.getX() + 0.5, var6.getY() + 0.5, var6.getZ() + 0.5, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0F, 1.2F
+                  );
+                  var0.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.0F, 1.2F);
                   return;
                }
             }
@@ -6071,6 +6205,14 @@ public final class HexEffects {
                      var0.getLevel(), var0.getPos().getX() + 0.5, var0.getPos().getY() + 0.5, var0.getPos().getZ() + 0.5, new ItemStack(Items.GOLD_NUGGET)
                   )
                );
+         }
+
+         if (hasHex(var1, "auto_smelt")) {
+            autoSmeltDrops(var1, var0.getDrops());
+         }
+
+         if (hasHex(var1, "scavenger")) {
+            scavengerDrop(var1, var0);
          }
       }
    }
@@ -7343,7 +7485,988 @@ public final class HexEffects {
       return hasHex(var0, "totem_bulk") && (var0.getMainHandItem().is(Items.TOTEM_OF_UNDYING) || var0.getOffhandItem().is(Items.TOTEM_OF_UNDYING));
    }
 
+   // ===== 26.2-1.35.0 新增海克斯 =====
+
+   private static final Set<Item> VALUABLE_ITEMS = Set.of(
+      Items.DIAMOND,
+      Items.DIAMOND_BLOCK,
+      Items.EMERALD,
+      Items.EMERALD_BLOCK,
+      Items.NETHERITE_INGOT,
+      Items.NETHERITE_SCRAP,
+      Items.NETHERITE_BLOCK,
+      Items.ANCIENT_DEBRIS,
+      Items.ENCHANTED_GOLDEN_APPLE,
+      Items.GOLDEN_APPLE,
+      Items.TOTEM_OF_UNDYING,
+      Items.ELYTRA,
+      Items.TRIDENT,
+      Items.NETHER_STAR,
+      Items.DRAGON_EGG,
+      Items.HEART_OF_THE_SEA
+   );
+
+   // 陨石：取所有在线玩家的平均坐标，生成 5-10 颗大小不一的紫水晶陨石
+   private static void castMeteor(ServerPlayer var0, HexEffect var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 != null && var0.level() instanceof ServerLevel var3) {
+         List<ServerPlayer> var4 = var2.getPlayerList().getPlayers();
+         double var5 = 0.0;
+         double var6 = 0.0;
+         double var7 = 0.0;
+         int var8 = 0;
+
+         for (ServerPlayer var9 : var4) {
+            if (!var9.isSpectator()) {
+               var5 += var9.getX();
+               var6 += var9.getY();
+               var7 += var9.getZ();
+               var8++;
+            }
+         }
+
+         if (var8 == 0) {
+            var5 = var0.getX();
+            var6 = var0.getY();
+            var7 = var0.getZ();
+            var8 = 1;
+         }
+
+         var5 /= var8;
+         var6 /= var8;
+         var7 /= var8;
+         int var10 = Math.max(1, var1.min > 0 ? var1.min : 5);
+         int var11 = Math.max(var10, var1.max > 0 ? var1.max : 10);
+         ThreadLocalRandom var12 = ThreadLocalRandom.current();
+         int var13 = var10 + var12.nextInt(var11 - var10 + 1);
+         ItemStack var14 = MapItem.create(var3, Mth.floor(var5), Mth.floor(var7), (byte)1, true, true);
+         var14.set(DataComponents.CUSTOM_NAME, Component.translatable("hexbingo.item.meteor_map"));
+
+         for (int var15 = 0; var15 < var13; var15++) {
+            double var16 = var12.nextDouble() * Math.PI * 2.0;
+            double var18 = 24.0 + var12.nextDouble() * 64.0;
+            int var20 = Mth.floor(var5 + Math.cos(var16) * var18);
+            int var21 = Mth.floor(var7 + Math.sin(var16) * var18);
+            int var22 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var20, var21);
+            int var23 = 2 + var12.nextInt(4);
+            METEORS.add(new HexEffects.MeteorState(var3, var20 + 0.5, var22 + 72.0, var21 + 0.5, var22, var23, var0.getUUID()));
+            MapItemSavedData.addTargetDecoration(var14, new BlockPos(var20, var22, var21), "meteor" + var15, MapDecorationTypes.RED_X);
+         }
+
+         var0.addItem(var14);
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.meteor", var13).withStyle(ChatFormatting.DARK_PURPLE));
+         meteorQuake(var0, var4);
+      }
+   }
+
+   private static void meteorQuake(ServerPlayer var0, List<ServerPlayer> var1) {
+      Team var2 = team(var0);
+
+      for (ServerPlayer var3 : var1) {
+         if (!var3.isSpectator() && var3 != var0 && (var2 == null || !var2.hasPlayer(var3))) {
+            var3.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 200, 2, false, true, true));
+            quakeBreak(var3);
+            if (var3.level() instanceof ServerLevel var4) {
+               var4.sendParticles(ParticleTypes.EXPLOSION, var3.getX(), var3.getY(), var3.getZ(), 8, 3.0, 1.0, 3.0, 0.0);
+               var4.playSound(null, var3.getX(), var3.getY(), var3.getZ(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.6F, 0.6F);
+               var3.sendSystemMessage(Component.translatable("hexbingo.msg.meteor_quake").withStyle(ChatFormatting.DARK_PURPLE));
+            }
+         }
+      }
+   }
+
+   private static void quakeBreak(ServerPlayer var0) {
+      if (var0.level() instanceof ServerLevel var1) {
+         BlockPos var2 = var0.blockPosition();
+
+         for (int var3 = -5; var3 < 5; var3++) {
+            for (int var4 = -5; var4 < 5; var4++) {
+               for (int var5 = 0; var5 >= -2; var5--) {
+                  BlockPos var6 = var2.offset(var3, var5, var4);
+                  BlockState var7 = var1.getBlockState(var6);
+                  if (!var7.isAir() && var7.getDestroySpeed(var1, var6) >= 0.0F) {
+                     var1.setBlockAndUpdate(var6, Blocks.AIR.defaultBlockState());
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   public static void tickMeteors(MinecraftServer var0) {
+      if (!METEORS.isEmpty()) {
+         Iterator<HexEffects.MeteorState> var1 = METEORS.iterator();
+
+         while (var1.hasNext()) {
+            HexEffects.MeteorState var2 = var1.next();
+            var2.y -= 4.5;
+            if (var2.y > var2.targetY + 1.0) {
+               var2.level.sendParticles(ParticleTypes.FLAME, var2.x, var2.y, var2.z, 6, 0.5, 0.8, 0.5, 0.02);
+               var2.level.sendParticles(ParticleTypes.LARGE_SMOKE, var2.x, var2.y + 1.5, var2.z, 4, 0.5, 1.0, 0.5, 0.01);
+            } else {
+               var1.remove();
+               meteorImpact(var0, var2);
+            }
+         }
+      }
+   }
+
+   private static void meteorImpact(MinecraftServer var0, HexEffects.MeteorState var1) {
+      ServerLevel var2 = var1.level;
+      ThreadLocalRandom var3 = ThreadLocalRandom.current();
+      int var4 = var1.radius;
+      BlockPos var5 = BlockPos.containing(var1.x, var1.targetY, var1.z);
+
+      for (int var6 = -var4; var6 <= var4; var6++) {
+         for (int var7 = -var4; var7 <= var4; var7++) {
+            for (int var8 = -var4; var8 <= 1; var8++) {
+               if (var6 * var6 + var8 * var8 + var7 * var7 <= var4 * var4) {
+                  BlockPos var9 = var5.offset(var6, var8, var7);
+                  BlockState var10 = var2.getBlockState(var9);
+                  if (!var10.isAir() && var10.getDestroySpeed(var2, var9) >= 0.0F) {
+                     var2.setBlockAndUpdate(var9, Blocks.AIR.defaultBlockState());
+                  }
+               }
+            }
+         }
+      }
+
+      var2.setBlockAndUpdate(var5, Blocks.AMETHYST_BLOCK.defaultBlockState());
+      var2.setBlockAndUpdate(var5.above(), Blocks.AMETHYST_BLOCK.defaultBlockState());
+      var2.setBlockAndUpdate(var5.above(2), Blocks.BUDDING_AMETHYST.defaultBlockState());
+
+      for (int var11 = 0; var11 < 4; var11++) {
+         BlockPos var12 = var5.offset(var3.nextInt(7) - 3, 0, var3.nextInt(7) - 3);
+         if (var2.getBlockState(var12).isAir()) {
+            var2.setBlockAndUpdate(var12, Blocks.CALCITE.defaultBlockState());
+         }
+      }
+
+      spawnMeteorChest(var1, var5);
+      ServerPlayer var16 = var0.getPlayerList().getPlayer(var1.owner);
+      int var17 = 1 + var3.nextInt(3);
+
+      for (int var18 = 0; var18 < var17; var18++) {
+         Skeleton var19 = (Skeleton)EntityTypes.SKELETON.create(var2, EntitySpawnReason.MOB_SUMMONED);
+         if (var19 != null) {
+            var19.setPos(var5.getX() + var3.nextDouble() * 8.0 - 4.0 + 0.5, var5.getY() + 1.0, var5.getZ() + var3.nextDouble() * 8.0 - 4.0 + 0.5);
+            Item[] var20 = new Item[]{Items.IRON_HELMET, Items.CHAINMAIL_HELMET, Items.GOLDEN_HELMET, Items.DIAMOND_HELMET};
+            Item[] var21 = new Item[]{Items.IRON_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.DIAMOND_CHESTPLATE};
+            Item[] var22 = new Item[]{Items.IRON_LEGGINGS, Items.CHAINMAIL_LEGGINGS, Items.GOLDEN_LEGGINGS, Items.DIAMOND_LEGGINGS};
+            Item[] var23 = new Item[]{Items.IRON_BOOTS, Items.CHAINMAIL_BOOTS, Items.GOLDEN_BOOTS, Items.DIAMOND_BOOTS};
+            Item[] var24 = new Item[]{Items.IRON_SWORD, Items.BOW, Items.DIAMOND_SWORD, Items.STONE_SWORD};
+            var19.setItemSlot(EquipmentSlot.HEAD, meteorArmor(var16, var20[var3.nextInt(var20.length)]));
+            var19.setItemSlot(EquipmentSlot.CHEST, meteorArmor(var16, var21[var3.nextInt(var21.length)]));
+            var19.setItemSlot(EquipmentSlot.LEGS, meteorArmor(var16, var22[var3.nextInt(var22.length)]));
+            var19.setItemSlot(EquipmentSlot.FEET, meteorArmor(var16, var23[var3.nextInt(var23.length)]));
+            var19.setItemSlot(EquipmentSlot.MAINHAND, meteorArmor(var16, var24[var3.nextInt(var24.length)]));
+            var19.setPersistenceRequired();
+            var2.addFreshEntity(var19);
+         }
+      }
+
+      var2.sendParticles(ParticleTypes.EXPLOSION_EMITTER, var1.x, var1.targetY + 0.5, var1.z, 2, 1.0, 1.0, 1.0, 0.0);
+      var2.playSound(null, var1.x, var1.targetY, var1.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.WEATHER, 1.2F, 0.7F);
+   }
+
+   private static ItemStack meteorArmor(ServerPlayer var0, Item var1) {
+      return var0 == null ? new ItemStack(var1) : randomlyEnchantedArmor(var0, var1);
+   }
+
+   private static void spawnMeteorChest(HexEffects.MeteorState var0, BlockPos var1) {
+      ThreadLocalRandom var2 = ThreadLocalRandom.current();
+
+      for (int var3 = 0; var3 < 12; var3++) {
+         BlockPos var4 = var1.offset(var2.nextInt(9) - 4, 1, var2.nextInt(9) - 4);
+         if (var0.level.getBlockState(var4).isAir()) {
+            var0.level.setBlockAndUpdate(var4, Blocks.CHEST.defaultBlockState());
+            if (var0.level.getBlockEntity(var4) instanceof ChestBlockEntity var5) {
+               int var6 = 9 + var2.nextInt(10);
+
+               for (int var7 = 0; var7 < var6; var7++) {
+                  var5.setItem(var7, new ItemStack(lootItem(var2, 3), 1 + var2.nextInt(2)));
+               }
+
+               var5.setChanged();
+               return;
+            }
+         }
+      }
+   }
+
+   // 致盲：右键使所有敌人失明 8 秒，冷却 3 分钟
+   private static void giveBlindItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "致盲")) {
+         var0.addItem(questItem(Items.INK_SAC, "致盲", "hexbingo.item.blind.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.blind_item").withStyle(ChatFormatting.GRAY));
+      }
+   }
+
+   public static boolean castBlind(ServerPlayer var0) {
+      if (!hasHex(var0, "blind")) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      Long var3 = BLIND_COOLDOWN.get(var0.getUUID());
+      if (var3 != null && var1 < var3) {
+         long var4 = (var3 - var1 + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.blind_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      if (!(var0.level() instanceof ServerLevel var10)) {
+         return false;
+      }
+
+      Team var11 = team(var0);
+      int var5 = 0;
+
+      for (ServerPlayer var7 : var10.players()) {
+         if (var7 != var0 && !var7.isSpectator() && (var11 == null || !var11.hasPlayer(var7))) {
+            var7.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 160, 0, false, true, true));
+            var7.sendSystemMessage(Component.translatable("hexbingo.msg.blinded").withStyle(ChatFormatting.DARK_GRAY));
+            var5++;
+         }
+      }
+
+      if (var5 == 0) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.blind_no_target").withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      BLIND_COOLDOWN.put(var0.getUUID(), var1 + 180000L);
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.blind_cast", var5).withStyle(ChatFormatting.DARK_GRAY));
+      return true;
+   }
+
+   // 结束了？：传送到末地外岛 10 分钟，期间无法被传送
+   private static final ThreadLocal<Boolean> EXILE_BYPASS = ThreadLocal.withInitial(() -> Boolean.FALSE);
+
+   private static void exileTeleport(ServerPlayer var0, ServerLevel var1, double var2, double var4, double var6, float var8, float var9) {
+      EXILE_BYPASS.set(Boolean.TRUE);
+
+      try {
+         var0.teleportTo(var1, var2, var4, var6, Set.of(), var8, var9, false);
+      } finally {
+         EXILE_BYPASS.set(Boolean.FALSE);
+      }
+   }
+
+   public static boolean isExileBypassing() {
+      return EXILE_BYPASS.get();
+   }
+
+   public static void onSpecialDeath(ServerPlayer var0) {
+      endBatForm(var0, false);
+      END_EXILE.remove(var0.getUUID());
+   }
+
+   private static void startEndExile(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return;
+      }
+
+      ServerLevel var3 = var2.getLevel(Level.END);
+      if (var3 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_fail").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      ThreadLocalRandom var4 = ThreadLocalRandom.current();
+      int var9 = 0;
+      int var10 = 0;
+      int var11 = -1;
+
+      for (int var12 = 0; var12 < 8; var12++) {
+         double var5 = var4.nextDouble() * Math.PI * 2.0;
+         double var7 = 1200.0 + var4.nextDouble() * 600.0;
+         var9 = Mth.floor(Math.cos(var5) * var7);
+         var10 = Mth.floor(Math.sin(var5) * var7);
+         var11 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var9, var10);
+         if (var11 > 0) {
+            break;
+         }
+      }
+
+      if (var11 <= 0) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_fail").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+      END_EXILE.put(
+         var0.getUUID(),
+         new HexEffects.ExileState(
+            var0.level().dimension(),
+            var0.getX(),
+            var0.getY(),
+            var0.getZ(),
+            var0.getYRot(),
+            var0.getXRot(),
+            System.currentTimeMillis() + var1 * 1000L,
+            var9 + 0.5,
+            var11 + 1.0,
+            var10 + 0.5
+         )
+      );
+      exileTeleport(var0, var3, var9 + 0.5, var11 + 1.0, var10 + 0.5, var0.getYRot(), var0.getXRot());
+      var0.resetFallDistance();
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_start", var1 / 60).withStyle(ChatFormatting.DARK_PURPLE));
+   }
+
+   public static boolean isEndExiled(ServerPlayer var0) {
+      return END_EXILE.containsKey(var0.getUUID());
+   }
+
+   public static void tickEndExile(MinecraftServer var0) {
+      long var1 = System.currentTimeMillis();
+      Iterator<Map.Entry<UUID, HexEffects.ExileState>> var3 = END_EXILE.entrySet().iterator();
+
+      while (var3.hasNext()) {
+         Map.Entry<UUID, HexEffects.ExileState> var4 = var3.next();
+         ServerPlayer var5 = var0.getPlayerList().getPlayer(var4.getKey());
+         if (var5 == null) {
+            var3.remove();
+         } else {
+            HexEffects.ExileState var6 = var4.getValue();
+            if (var1 >= var6.until) {
+               ServerLevel var7 = var0.getLevel(var6.dimension);
+               if (var7 != null) {
+                  exileTeleport(var5, var7, var6.x, var6.y, var6.z, var6.yaw, var6.pitch);
+               }
+
+               var3.remove();
+               var5.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_end").withStyle(ChatFormatting.GREEN));
+            } else if (!var5.level().dimension().equals(Level.END)) {
+               ServerLevel var8 = var0.getLevel(Level.END);
+               if (var8 != null) {
+                  exileTeleport(var5, var8, var6.endX, var6.endY, var6.endZ, var5.getYRot(), var5.getXRot());
+               }
+
+               var5.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_blocked").withStyle(ChatFormatting.DARK_PURPLE));
+            }
+         }
+      }
+   }
+
+   private static void endEndExile(ServerPlayer var0, boolean var1) {
+      HexEffects.ExileState var2 = END_EXILE.remove(var0.getUUID());
+      if (var2 != null && var0.level().getServer() != null) {
+         ServerLevel var3 = var0.level().getServer().getLevel(var2.dimension);
+         if (var3 != null) {
+            exileTeleport(var0, var3, var2.x, var2.y, var2.z, var2.yaw, var2.pitch);
+         }
+
+         if (var1) {
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.end_exile_end").withStyle(ChatFormatting.GREEN));
+         }
+      }
+   }
+
+   // 自动熔炼：原矿掉落直接变成成品并额外给经验
+   private static Item autoSmeltResult(Item var0) {
+      if (var0 == Items.RAW_IRON) {
+         return Items.IRON_INGOT;
+      } else if (var0 == Items.RAW_GOLD) {
+         return Items.GOLD_INGOT;
+      } else if (var0 == Items.RAW_COPPER) {
+         return Items.COPPER_INGOT;
+      } else {
+         return var0 == Items.ANCIENT_DEBRIS ? Items.NETHERITE_SCRAP : null;
+      }
+   }
+
+   private static void autoSmeltDrops(ServerPlayer var0, Collection<ItemEntity> var1) {
+      int var2 = 0;
+
+      for (ItemEntity var4 : var1) {
+         ItemStack var5 = var4.getItem();
+         Item var6 = autoSmeltResult(var5.getItem());
+         if (var6 != null) {
+            var4.setItem(new ItemStack(var6, var5.getCount()));
+            var2 += var5.getCount();
+         }
+      }
+
+      if (var2 > 0) {
+         var0.giveExperiencePoints(Math.max(1, var2 + ThreadLocalRandom.current().nextInt(var2 + 1)));
+      }
+   }
+
+   // 任务护盾：锁定权重最高的 3 个任务，其他海克斯无法将其退回
+   private static void applyTaskShield(ServerPlayer var0, int var1) {
+      Bingo var2 = Bingo.get(var0.level());
+      Team var3 = var2.getTeam(var0);
+      if (var3 != null) {
+         ArrayList<Integer> var4 = new ArrayList<>();
+
+         for (int var5 = 0; var5 < var2.tasks().size(); var5++) {
+            if (var2.task(var5) != Task.EMPTY) {
+               var4.add(var5);
+            }
+         }
+
+         var4.sort((var5x, var6x) -> Integer.compare(var2.task(var6x).weight(), var2.task(var5x).weight()));
+         Set<Task> var7 = TASK_SHIELDS.computeIfAbsent(var3.color.getName(), var0x -> new HashSet<>());
+         MutableComponent var8 = Component.empty();
+         int var9 = 0;
+
+         for (int var10 : var4) {
+            if (var9 >= var1) {
+               break;
+            }
+
+            Task var11 = var2.task(var10);
+            if (var7.add(var11)) {
+               if (var9 > 0) {
+                  var8.append(Component.literal("、"));
+               }
+
+               var8.append(var11.contentName(var0.level().getServer()));
+               var9++;
+            }
+         }
+
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.task_shield", var9, var8).withStyle(ChatFormatting.GOLD));
+      }
+   }
+
+   public static boolean isTaskShielded(Team var0, Bingo var1, int var2) {
+      Set<Task> var3 = TASK_SHIELDS.get(var0.color.getName());
+      return var3 != null && var3.contains(var1.task(var2));
+   }
+
+   public static void clearTaskShields() {
+      TASK_SHIELDS.clear();
+   }
+
+   // 点石成金：按 G 把副手物品变成等量金锭
+   public static void castMidas(ServerPlayer var0) {
+      if (hasHex(var0, "midas_touch")) {
+         long var1 = System.currentTimeMillis();
+         Long var3 = MIDAS_COOLDOWN.get(var0.getUUID());
+         if (var3 != null && var1 < var3) {
+            long var4 = (var3 - var1 + 999L) / 1000L;
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.midas_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         } else {
+            ItemStack var6 = var0.getOffhandItem();
+            if (var6.isEmpty()) {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.midas_empty").withStyle(ChatFormatting.GRAY));
+            } else if (!var6.has(DataComponents.CUSTOM_NAME) && !VALUABLE_ITEMS.contains(var6.getItem()) && !var6.isEnchanted()) {
+               int var7 = var6.getCount();
+               var0.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.GOLD_INGOT, var7));
+               MIDAS_COOLDOWN.put(var0.getUUID(), var1 + 60000L);
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.midas_done", var7).withStyle(ChatFormatting.GOLD));
+               var0.level().playSound(null, var0.getX(), var0.getY(), var0.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.5F, 2.0F);
+            } else {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.midas_valuable").withStyle(ChatFormatting.GRAY));
+            }
+         }
+      }
+   }
+
+   // 蝙蝠形态：右键变成蝙蝠 60 秒，可飞行、无法攻击、血量与体型变小
+   private static void giveBatItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "蝙蝠形态")) {
+         var0.addItem(questItem(Items.PHANTOM_MEMBRANE, "蝙蝠形态", "hexbingo.item.bat.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.bat_item").withStyle(ChatFormatting.GOLD));
+      }
+   }
+
+   public static boolean castBatForm(ServerPlayer var0) {
+      if (!hasHex(var0, "bat_form")) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      if (BAT_UNTIL.containsKey(var0.getUUID())) {
+         return true;
+      }
+
+      Long var3 = BAT_COOLDOWN.get(var0.getUUID());
+      if (var3 != null && var1 < var3) {
+         long var4 = (var3 - var1 + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.bat_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      BAT_UNTIL.put(var0.getUUID(), var1 + 60000L);
+      BAT_COOLDOWN.put(var0.getUUID(), var1 + 420000L);
+      AttributeInstance var6 = var0.getAttribute(Attributes.SCALE);
+      if (var6 != null) {
+         var6.addOrUpdateTransientModifier(new AttributeModifier(modifierId("bat_form", 0), -0.5, Operation.ADD_MULTIPLIED_BASE));
+      }
+
+      AttributeInstance var7 = var0.getAttribute(Attributes.MAX_HEALTH);
+      if (var7 != null) {
+         var7.addOrUpdateTransientModifier(new AttributeModifier(modifierId("bat_form", 1), -14.0, Operation.ADD_VALUE));
+      }
+
+      var0.setHealth(Math.min(var0.getHealth(), 6.0F));
+      var0.getAbilities().mayfly = true;
+      var0.getAbilities().flying = false;
+      var0.onUpdateAbilities();
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.bat_start").withStyle(ChatFormatting.GOLD));
+      return true;
+   }
+
+   public static boolean isBatForm(ServerPlayer var0) {
+      return BAT_UNTIL.containsKey(var0.getUUID());
+   }
+
+   private static void tickBatForm(ServerPlayer var0) {
+      Long var1 = BAT_UNTIL.get(var0.getUUID());
+      if (var1 != null && System.currentTimeMillis() >= var1) {
+         endBatForm(var0, true);
+      }
+   }
+
+   private static void endBatForm(ServerPlayer var0, boolean var1) {
+      if (BAT_UNTIL.remove(var0.getUUID()) != null) {
+         AttributeInstance var2 = var0.getAttribute(Attributes.SCALE);
+         if (var2 != null) {
+            var2.removeModifier(modifierId("bat_form", 0));
+         }
+
+         AttributeInstance var3 = var0.getAttribute(Attributes.MAX_HEALTH);
+         if (var3 != null) {
+            var3.removeModifier(modifierId("bat_form", 1));
+         }
+
+         if (!var0.isCreative() && !var0.isSpectator()) {
+            var0.getAbilities().mayfly = false;
+            var0.getAbilities().flying = false;
+            var0.onUpdateAbilities();
+         }
+
+         var0.setHealth(Math.min(var0.getHealth(), var0.getMaxHealth()));
+         if (var1) {
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.bat_end").withStyle(ChatFormatting.GRAY));
+         }
+      }
+   }
+
+   // 精神控制：右键控制一名敌人 15 秒的移动方向
+   private static void giveMindItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "精神控制")) {
+         var0.addItem(questItem(Items.PRISMARINE_CRYSTALS, "精神控制", "hexbingo.item.mind.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean castMindControl(ServerPlayer var0) {
+      if (!hasHex(var0, "mind_control")) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      Long var3 = MIND_COOLDOWN.get(var0.getUUID());
+      if (var3 != null && var1 < var3) {
+         long var4 = (var3 - var1 + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      ServerPlayer var6 = nearestEnemy(var0, 30.0);
+      if (var6 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_no_target").withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      MIND_CONTROL.put(var0.getUUID(), new HexEffects.MindState(var6.getUUID(), var1 + 15000L));
+      MIND_COOLDOWN.put(var0.getUUID(), var1 + 300000L);
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_cast", var6.getDisplayName()).withStyle(ChatFormatting.LIGHT_PURPLE));
+      var6.sendSystemMessage(Component.translatable("hexbingo.msg.mind_controlled").withStyle(ChatFormatting.DARK_PURPLE));
+      return true;
+   }
+
+   private static ServerPlayer nearestEnemy(ServerPlayer var0, double var1) {
+      if (!(var0.level() instanceof ServerLevel var3)) {
+         return null;
+      }
+
+      Team var4 = team(var0);
+      ServerPlayer var5 = null;
+      double var6 = var1 * var1;
+
+      for (ServerPlayer var8 : var3.players()) {
+         if (var8 != var0 && !var8.isSpectator() && (var4 == null || !var4.hasPlayer(var8))) {
+            double var9 = var0.distanceToSqr(var8);
+            if (var9 <= var6) {
+               var6 = var9;
+               var5 = var8;
+            }
+         }
+      }
+
+      return var5;
+   }
+
+   /** 每 tick 由被控制者的 PlayerTickEvent 调用。 */
+   public static void tickMindControl(ServerPlayer var0) {
+      if (!MIND_CONTROL.isEmpty()) {
+         long var1 = System.currentTimeMillis();
+         Iterator<Map.Entry<UUID, HexEffects.MindState>> var3 = MIND_CONTROL.entrySet().iterator();
+
+         while (var3.hasNext()) {
+            Map.Entry<UUID, HexEffects.MindState> var4 = var3.next();
+            HexEffects.MindState var5 = var4.getValue();
+            if (!var5.target.equals(var0.getUUID())) {
+               continue;
+            }
+
+            if (var1 >= var5.until) {
+               var3.remove();
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_end").withStyle(ChatFormatting.GRAY));
+               continue;
+            }
+
+            MinecraftServer var6 = var0.level().getServer();
+            ServerPlayer var7 = var6 == null ? null : var6.getPlayerList().getPlayer(var4.getKey());
+            if (var7 == null) {
+               var3.remove();
+               continue;
+            }
+
+            Vec3 var8 = var7.getLookAngle();
+            var0.setDeltaMovement(var8.x * 0.35, var0.getDeltaMovement().y, var8.z * 0.35);
+            var0.hurtMarked = true;
+         }
+      }
+   }
+
+   // 目标封锁：指定一个任务，30 秒内所有队伍无法完成
+   private static void giveDenyItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "目标封锁")) {
+         var0.addItem(questItem(Items.BARRIER, "目标封锁", "hexbingo.item.deny.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.deny_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean denyReady(ServerPlayer var0) {
+      if (!hasHex(var0, "objective_deny")) {
+         return false;
+      }
+
+      Long var1 = DENY_COOLDOWN.get(var0.getUUID());
+      if (var1 != null && System.currentTimeMillis() < var1) {
+         long var2 = (var1 - System.currentTimeMillis() + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.deny_cooldown", var2).withStyle(ChatFormatting.GRAY));
+         return false;
+      }
+
+      return true;
+   }
+
+   public static void applyObjectiveDeny(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 != null && hasHex(var0, "objective_deny") && denyReady(var0)) {
+         Bingo var3 = Bingo.get(var2.overworld());
+         if (var1 >= 0 && var1 < var3.tasks().size()) {
+            OBJECTIVE_DENY = new HexEffects.DenyState(var1, System.currentTimeMillis() + 30000L);
+            DENY_COOLDOWN.put(var0.getUUID(), System.currentTimeMillis() + 900000L);
+            Component var4 = var3.task(var1).contentName(var2);
+            Component var5 = Component.translatable("hexbingo.msg.deny_cast", var0.getDisplayName(), var4).withStyle(ChatFormatting.RED);
+
+            for (ServerPlayer var7 : var2.getPlayerList().getPlayers()) {
+               var7.sendSystemMessage(var5);
+            }
+         }
+      }
+   }
+
+   /** 由 BingoTaskEvent 调用；命中被封锁任务时立即退回并返回 true。 */
+   public static boolean handleObjectiveDeny(BingoTaskEvent var0) {
+      if (OBJECTIVE_DENY == null) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      if (var1 >= OBJECTIVE_DENY.until) {
+         OBJECTIVE_DENY = null;
+         return false;
+      }
+
+      Bingo var3 = var0.getBingo();
+      int var4 = -1;
+
+      for (int var5 = 0; var5 < var3.tasks().size(); var5++) {
+         if (var3.task(var5) == var0.getTask()) {
+            var4 = var5;
+            break;
+         }
+      }
+
+      if (var4 != OBJECTIVE_DENY.taskIndex) {
+         return false;
+      }
+
+      Team var10 = var3.getTeam(var0.getPlayer());
+      MinecraftServer var6 = var0.getLevel().getServer();
+      if (var10 != null && var6 != null) {
+         uncompleteSlot(var6, var3, var10, var4);
+         Component var7 = Component.translatable("hexbingo.msg.deny_blocked", var0.getTask().contentName(var6)).withStyle(ChatFormatting.RED);
+
+         for (ServerPlayer var9 : var6.getPlayerList().getPlayers()) {
+            var9.sendSystemMessage(var7);
+         }
+      }
+
+      return true;
+   }
+
+   // 透视：右键 20 秒矿物透视（用发光物品实体标出附近矿石）
+   private static void giveXrayItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "矿物透视")) {
+         var0.addItem(questItem(Items.SPYGLASS, "矿物透视", "hexbingo.item.xray.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean castXray(ServerPlayer var0) {
+      if (!hasHex(var0, "xray")) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      Long var3 = XRAY_COOLDOWN.get(var0.getUUID());
+      if (var3 != null && var1 < var3) {
+         long var4 = (var3 - var1 + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      XRAY_UNTIL.put(var0.getUUID(), var1 + 20000L);
+      XRAY_COOLDOWN.put(var0.getUUID(), var1 + 300000L);
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_start").withStyle(ChatFormatting.AQUA));
+      tickXray(var0);
+      return true;
+   }
+
+   public static void tickXray(ServerPlayer var0) {
+      Long var1 = XRAY_UNTIL.get(var0.getUUID());
+      if (var1 != null) {
+         long var2 = System.currentTimeMillis();
+         if (var2 >= var1) {
+            XRAY_UNTIL.remove(var0.getUUID());
+            clearXrayMarkers(var0);
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_end").withStyle(ChatFormatting.GRAY));
+         } else if (var0.level() instanceof ServerLevel var4) {
+            clearXrayMarkers(var0);
+            ArrayList<ItemEntity> var5 = new ArrayList<>();
+            BlockPos var6 = var0.blockPosition();
+
+            for (int var7 = -16; var7 <= 16 && var5.size() < 96; var7++) {
+               for (int var8 = -16; var8 <= 16 && var5.size() < 96; var8++) {
+                  for (int var9 = -12; var9 <= 12 && var5.size() < 96; var9++) {
+                     BlockPos var10 = var6.offset(var7, var9, var8);
+                     BlockState var11 = var4.getBlockState(var10);
+                     if (isOreBlock(var11)) {
+                        Item var12 = var11.getBlock().asItem();
+                        if (var12 != Items.AIR) {
+                           ItemEntity var13 = new ItemEntity(
+                              var4, var10.getX() + 0.5, var10.getY() + 0.5, var10.getZ() + 0.5, new ItemStack(var12)
+                           );
+                           var13.setNoGravity(true);
+                           var13.setNeverPickUp();
+                           var13.setPickUpDelay(32767);
+                           var13.setInvulnerable(true);
+                           var13.setGlowingTag(true);
+                           var13.setSilent(true);
+                           var13.setCustomNameVisible(false);
+                           var13.setDeltaMovement(Vec3.ZERO);
+                           var13.addTag(XRAY_TAG);
+                           var4.addFreshEntity(var13);
+                           var5.add(var13);
+                        }
+                     }
+                  }
+               }
+            }
+
+            XRAY_MARKERS.put(var0.getUUID(), var5);
+         }
+      }
+   }
+
+   private static boolean isOreBlock(BlockState var0) {
+      String var1 = BuiltInRegistries.BLOCK.getKey(var0.getBlock()).getPath();
+      return var1.endsWith("_ore") || var1.equals("ancient_debris") || var1.equals("gilded_blackstone");
+   }
+
+   private static void clearXrayMarkers(ServerPlayer var0) {
+      List<ItemEntity> var1 = XRAY_MARKERS.remove(var0.getUUID());
+      if (var1 != null) {
+         for (ItemEntity var3 : var1) {
+            var3.discard();
+         }
+      }
+   }
+
+   // 拾荒者：破坏方块有 3% 概率额外掉落自身（在 blockDrops 中调用）
+   private static void scavengerDrop(ServerPlayer var0, BlockDropsEvent var1) {
+      if (ThreadLocalRandom.current().nextDouble() < 0.03) {
+         Item var2 = var1.getState().getBlock().asItem();
+         if (var2 != Items.AIR) {
+            var1.getDrops()
+               .add(
+                  new ItemEntity(
+                     var1.getLevel(),
+                     var1.getPos().getX() + 0.5,
+                     var1.getPos().getY() + 0.5,
+                     var1.getPos().getZ() + 0.5,
+                     new ItemStack(var2)
+                  )
+               );
+         }
+      }
+   }
+
+   // 洗牌：所有队伍卡面位置随机重排，完成/锁定状态跟随任务
+   private static void cardShuffle(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 != null) {
+         Bingo var2 = Bingo.get(var1.overworld());
+         int var3 = var2.tasks().size();
+         if (var3 > 1) {
+            ArrayList<Task> var4 = new ArrayList<>(var2.tasks());
+            int[] var5 = new int[var3];
+
+            for (int var6 = 0; var6 < var3; var6++) {
+               var5[var6] = var6;
+            }
+
+            ThreadLocalRandom var15 = ThreadLocalRandom.current();
+
+            for (int var7 = var3 - 1; var7 > 0; var7--) {
+               int var8 = var15.nextInt(var7 + 1);
+               int var9 = var5[var7];
+               var5[var7] = var5[var8];
+               var5[var8] = var9;
+            }
+
+            ArrayList<Task> var16 = new ArrayList<>(var3);
+
+            for (int var10 = 0; var10 < var3; var10++) {
+               var16.add(var4.get(var5[var10]));
+            }
+
+            var2.setTasks(var16);
+
+            for (Team var17 : var2.getTeams()) {
+               boolean[] var18 = new boolean[var3];
+               boolean[] var19 = new boolean[var3];
+
+               for (int var11 = 0; var11 < var3; var11++) {
+                  var18[var11] = var17.completed(var11);
+                  var19[var11] = var17.locked(var11);
+               }
+
+               var17.resetCompleted();
+               var17.resetLocked();
+
+               for (int var12 = 0; var12 < var3; var12++) {
+                  if (var18[var5[var12]]) {
+                     var17.complete(var12);
+                  }
+
+                  if (var19[var5[var12]]) {
+                     var17.lock(var12);
+                  }
+               }
+            }
+
+            var2.markDirty(true);
+            var2.checkWin();
+            Component var20 = Component.translatable("hexbingo.msg.card_shuffle").withStyle(ChatFormatting.LIGHT_PURPLE);
+
+            for (ServerPlayer var21 : var1.getPlayerList().getPlayers()) {
+               var21.sendSystemMessage(var20);
+            }
+         }
+      }
+   }
+
+   // 镜像复制：打开最近队伍的海克斯列表（UI 在 HexManager 中发送）
+   private static void giveMirrorItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "镜像复制")) {
+         var0.addItem(questItem(Items.ECHO_SHARD, "镜像复制", "hexbingo.item.mirror.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mirror_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean castMirror(ServerPlayer var0) {
+      return hasHex(var0, "mirror_hex") && HexManager.openMirror(var0);
+   }
+
+   public static int killStacks(UUID var0) {
+      return KILL_STACKS.getOrDefault(var0, 0);
+   }
+
+   public static void clearNewStates(MinecraftServer var0) {
+      METEORS.clear();
+      BLIND_COOLDOWN.clear();
+      MIDAS_COOLDOWN.clear();
+      BAT_UNTIL.clear();
+      BAT_COOLDOWN.clear();
+      MIND_CONTROL.clear();
+      MIND_COOLDOWN.clear();
+      OBJECTIVE_DENY = null;
+      DENY_COOLDOWN.clear();
+      XRAY_UNTIL.clear();
+      XRAY_COOLDOWN.clear();
+
+      for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
+         endEndExile(var2, false);
+         clearXrayMarkers(var2);
+      }
+
+      END_EXILE.clear();
+      XRAY_MARKERS.clear();
+      TASK_SHIELDS.clear();
+   }
+
    private HexEffects() {
+   }
+
+   private static final class MeteorState {
+      private final ServerLevel level;
+      private final double x;
+      private double y;
+      private final double z;
+      private final int targetY;
+      private final int radius;
+      private final UUID owner;
+
+      private MeteorState(ServerLevel var0, double var1, double var2, double var3, int var4, int var5, UUID var6) {
+         this.level = var0;
+         this.x = var1;
+         this.y = var2;
+         this.z = var3;
+         this.targetY = var4;
+         this.radius = var5;
+         this.owner = var6;
+      }
+   }
+
+   private record ExileState(
+      ResourceKey<Level> dimension,
+      double x,
+      double y,
+      double z,
+      float yaw,
+      float pitch,
+      long until,
+      double endX,
+      double endY,
+      double endZ
+   ) {
+   }
+
+   private record MindState(UUID target, long until) {
+   }
+
+   private record DenyState(int taskIndex, long until) {
    }
 
    private static final class BanishState {

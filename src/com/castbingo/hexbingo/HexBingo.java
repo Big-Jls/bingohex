@@ -8,6 +8,9 @@ package com.castbingo.hexbingo;
 import com.castbingo.hexbingo.client.HexClient;
 import com.castbingo.hexbingo.client.HexKeys;
 import com.castbingo.hexbingo.network.HexListPayload;
+import com.castbingo.hexbingo.network.HexMidasPayload;
+import com.castbingo.hexbingo.network.HexMirrorPayload;
+import com.castbingo.hexbingo.network.HexMirrorPickPayload;
 import com.castbingo.hexbingo.network.HexOfferPayload;
 import com.castbingo.hexbingo.network.HexPickPayload;
 import com.castbingo.hexbingo.network.HexRosterPayload;
@@ -15,6 +18,8 @@ import com.castbingo.hexbingo.network.HexRefreshPayload;
 import com.castbingo.hexbingo.network.HexRosterRequestPayload;
 import com.castbingo.hexbingo.network.HexSelectPayload;
 import com.castbingo.hexbingo.network.HexSpiderTogglePayload;
+import com.castbingo.hexbingo.network.HexTaskListPayload;
+import com.castbingo.hexbingo.network.HexTaskPickPayload;
 import com.mojang.logging.LogUtils;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypes;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,6 +88,23 @@ public final class HexBingo {
          .playToServer(HexRefreshPayload.TYPE, HexRefreshPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
                HexManager.refresh(var2);
+            }
+         }))
+         .playToServer(HexMidasPayload.TYPE, HexMidasPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
+            if (var1x.player() instanceof ServerPlayer var2) {
+               HexEffects.castMidas(var2);
+            }
+         }))
+         .playToClient(HexMirrorPayload.TYPE, HexMirrorPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexClient.openMirror(var0.ids())))
+         .playToServer(HexMirrorPickPayload.TYPE, HexMirrorPickPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
+            if (var1x.player() instanceof ServerPlayer var2) {
+               HexManager.mirrorPick(var2, var0.id());
+            }
+         }))
+         .playToClient(HexTaskListPayload.TYPE, HexTaskListPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexClient.openTasks(var0)))
+         .playToServer(HexTaskPickPayload.TYPE, HexTaskPickPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
+            if (var1x.player() instanceof ServerPlayer var2) {
+               HexManager.denyTaskPick(var2, var0.index());
             }
          }));
    }

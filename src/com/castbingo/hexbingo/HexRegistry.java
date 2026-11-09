@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class HexRegistry {
+   /** 只在第一次海克斯三选一出现的海克斯，不能被质变/自选列表获得。 */
+   public static final String OFFER_UPGRADE = "offer_upgrade";
    private static final Gson GSON = new Gson();
    private static final Map<String, Hex> BY_ID = new LinkedHashMap<>();
    private static final Map<HexColor, List<Hex>> BY_COLOR = new LinkedHashMap<>();
@@ -172,7 +174,7 @@ public final class HexRegistry {
       ArrayList var6 = new ArrayList();
 
       for (Hex var8 : BY_COLOR.get(var5)) {
-         if (!var0.contains(var8.id()) && !var1.contains(var8)) {
+         if (!var0.contains(var8.id()) && !var1.contains(var8) && !var8.id().equals(OFFER_UPGRADE)) {
             var6.add(var8);
          }
       }
@@ -180,7 +182,7 @@ public final class HexRegistry {
       if (var6.isEmpty()) {
          for (HexColor var10 : HexColor.values()) {
             for (Hex var12 : BY_COLOR.get(var10)) {
-               if (!var0.contains(var12.id()) && !var1.contains(var12)) {
+               if (!var0.contains(var12.id()) && !var1.contains(var12) && !var12.id().equals(OFFER_UPGRADE)) {
                   var6.add(var12);
                }
             }
@@ -189,6 +191,36 @@ public final class HexRegistry {
 
       if (!var6.isEmpty()) {
          var1.add((Hex)var6.get(var2.nextInt(var6.size())));
+      }
+   }
+
+   /** 品质提升：保证本次三选一至少出现 1 个彩色。 */
+   public static void forcePrismatic(List<Hex> var0, Collection<String> var1) {
+      for (Hex var3 : var0) {
+         if (var3.color() == HexColor.PRISMATIC) {
+            return;
+         }
+      }
+
+      ArrayList<Hex> var7 = new ArrayList<>();
+
+      for (Hex var4 : BY_COLOR.get(HexColor.PRISMATIC)) {
+         if (!var1.contains(var4.id()) && !var0.contains(var4)) {
+            var7.add(var4);
+         }
+      }
+
+      if (!var7.isEmpty()) {
+         int var5 = 0;
+
+         for (int var8 = 0; var8 < var0.size(); var8++) {
+            if (var0.get(var8).color() == HexColor.SILVER) {
+               var5 = var8;
+               break;
+            }
+         }
+
+         var0.set(var5, var7.get(ThreadLocalRandom.current().nextInt(var7.size())));
       }
    }
 

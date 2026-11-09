@@ -45,6 +45,11 @@ public class HexRosterScreen extends Screen {
                         .append(Component.translatable("hexbingo.color." + var8.color().id))
                         .append(Component.literal("] "))
                         .append(var18);
+                     int var19 = var5.counts().getOrDefault(var7, 0);
+                     if (var19 > 0) {
+                        var9.append(Component.translatable("hexbingo.roster.stacks", var19).withColor(0xAAAAAA));
+                     }
+
                      this.lines.add(new HexRosterScreen.Line(var9, var8, -2039584, 28, var17));
                   }
                }

@@ -1065,6 +1065,149 @@
                                           "type":  "ultimate_refresh"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "meteor",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "meteor",
+                                          "min":  5,
+                                          "max":  10
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "offer_upgrade",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "quality_up",
+                                          "amount":  1
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "blind",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "blind",
+                                          "seconds":  8,
+                                          "cooldown":  180
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "is_it_over",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "is_it_over",
+                                          "seconds":  600
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "auto_smelt",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "auto_smelt"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "task_shield",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "task_shield",
+                                          "count":  3
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "midas_touch",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "midas_touch",
+                                          "cooldown":  60
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "bat_form",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "bat_form",
+                                          "seconds":  60,
+                                          "cooldown":  420
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "mind_control",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "mind_control",
+                                          "seconds":  15,
+                                          "cooldown":  300
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "objective_deny",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "objective_deny",
+                                          "seconds":  30,
+                                          "cooldown":  900
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "xray",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "xray",
+                                          "seconds":  20,
+                                          "cooldown":  300
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "scavenger",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "scavenger",
+                                          "chance":  0.03
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "card_shuffle",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "card_shuffle"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "mirror_hex",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "mirror_hex"
+                                      }
+                                  ]
                   }
               ]
 }

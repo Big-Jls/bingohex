@@ -9,6 +9,7 @@ import com.castbingo.hexbingo.Hex;
 import com.castbingo.hexbingo.HexBingo;
 import com.castbingo.hexbingo.HexRegistry;
 import com.castbingo.hexbingo.network.HexRosterPayload;
+import com.castbingo.hexbingo.network.HexTaskListPayload;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -48,6 +49,27 @@ public final class HexClient {
    public static void openRoster(HexRosterPayload var0) {
       HexBingo.LOGGER.info("Opening hex roster screen with {} teams", var0.teams().size());
       Minecraft.getInstance().setScreenAndShow(new HexRosterScreen(var0));
+   }
+
+   public static void openMirror(List<String> var0) {
+      ArrayList var1 = new ArrayList(var0.size());
+
+      for (String var3 : var0) {
+         Hex var4 = HexRegistry.byId(var3);
+         if (var4 != null) {
+            var1.add(var4);
+         }
+      }
+
+      if (!var1.isEmpty()) {
+         Minecraft.getInstance().setScreenAndShow(new HexListScreen(var1, true));
+      }
+   }
+
+   public static void openTasks(HexTaskListPayload var0) {
+      if (!var0.tasks().isEmpty()) {
+         Minecraft.getInstance().setScreenAndShow(new HexTaskScreen(var0.tasks()));
+      }
    }
 
    private HexClient() {

@@ -40,6 +40,11 @@ public record HexRosterPayload(List<HexRosterPayload.TeamEntry> teams) implement
                var0.writeUtf(hexId);
                var0.writeUtf(prefix);
             });
+            var0.writeVarInt(var5.counts().size());
+            var5.counts().forEach((hexId, count) -> {
+               var0.writeUtf(hexId);
+               var0.writeVarInt(count);
+            });
          }
       }
    }, var0 -> {
@@ -68,7 +73,14 @@ public record HexRosterPayload(List<HexRosterPayload.TeamEntry> teams) implement
                var14.put(var0.readUtf(), var0.readUtf());
             }
 
-            var7.add(new HexRosterPayload.PlayerEntry(var9, List.copyOf(var11), Map.copyOf(var14)));
+            int var16 = var0.readVarInt();
+            HashMap<String, Integer> var17 = new HashMap<>(var16);
+
+            for (int var18 = 0; var18 < var16; var18++) {
+               var17.put(var0.readUtf(), var0.readVarInt());
+            }
+
+            var7.add(new HexRosterPayload.PlayerEntry(var9, List.copyOf(var11), Map.copyOf(var14), Map.copyOf(var17)));
          }
 
          var2.add(new HexRosterPayload.TeamEntry(var4, var5, List.copyOf(var7)));
@@ -81,7 +93,7 @@ public record HexRosterPayload(List<HexRosterPayload.TeamEntry> teams) implement
       return TYPE;
    }
 
-   public record PlayerEntry(Component name, List<String> hexes, Map<String, String> prefixes) {
+   public record PlayerEntry(Component name, List<String> hexes, Map<String, String> prefixes, Map<String, Integer> counts) {
    }
 
    public record TeamEntry(Component name, int color, List<HexRosterPayload.PlayerEntry> players) {

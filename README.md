@@ -11,7 +11,16 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **105 个海克斯强化**：43 银色 / 32 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **119 个海克斯强化**：47 银色 / 36 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.35.0 更新摘要
+
+- 新增银色：**陨石**、**品质提升**、**致盲**、**结束了?**。
+- 新增金色：**自动熔炼**、**任务护盾**、**点石成金**、**蝙蝠形态**。
+- 新增彩色：**精神控制**、**目标封锁**、**透视**、**拾荒者**、**洗牌**、**镜像复制**。
+- **叠角龙**：K 键名单显示当前层数；开箱时增加不死图腾粒子与经验「叮」声。
+- **/bingo bp**：队伍背包从 27 格扩大到 54 格（需 ReBongo `26.2-1.0.0-port.3` 或更高）。
+- **品质提升**只会在第一次海克斯选择中出现，不会进入质变与自由选择列表。
 
 ### 1.34.0 更新摘要
 
@@ -47,7 +56,7 @@
 | Minecraft | 26.2 |
 | NeoForge | 26.2.0.93 或更高 |
 | Java | 25 |
-| ReBongo（`modId = bongo`） | 26.2-1.0.0-port.2 或更高 |
+| ReBongo（`modId = bongo`） | 26.2-1.0.0-port.3 或更高 |
 | LibX | 26.2-8.0.0（官方版） |
 
 ReBongo：https://github.com/Big-Jls/rebongo
@@ -55,16 +64,17 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.2.jar`）。
-3. 把 `HexBingo-26.2-1.34.0.jar` 放入客户端与服务端的 `mods`。
+2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.3.jar`）。
+3. 把 `HexBingo-26.2-1.35.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
 
 | 按键 | 作用 |
 |---|---|
-| **K** | 打开「海克斯一览」：查看所有队伍/玩家已经选了哪些海克斯（只读名单） |
+| **K** | 打开「海克斯一览」：查看所有队伍/玩家已经选了哪些海克斯（只读名单），叠角龙会显示当前层数 |
 | **V** | 切换蜘蛛类效果（获得对应海克斯后可用） |
+| **G** | 点石成金：把副手物品转化为等量金锭（获得对应海克斯后可用） |
 
 | 命令 | 权限 | 说明 |
 |---|---|---|
@@ -80,9 +90,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（105）
+## 海克斯一览（119）
 
-### 银色（43）
+### 银色（47）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -129,8 +139,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 鱼神 | `dolphin_dash` | 在水中获得永久的海豚的恩惠 II。 |
 | 便携熔炉 | `portable_furnace` | 获得「便携熔炉」：右键随时打开熔炉界面，熔炼速度受「烧制加速」影响。 |
 | 烧制加速 | `smelt_speed` | 附近的熔炉、高炉、烟熏炉烧制速度翻倍。 |
+| 陨石 | `meteor` | 计算所有队伍玩家的平均位置，召唤 5-10 颗大小不一的紫水晶陨石坠落；其他队伍玩家脚下 10×10 方块被震碎并减速 III，并获得标记落点的地图。 |
+| 品质提升 | `offer_upgrade` | 下一次海克斯选择必定出现至少 1 个彩色；只会在第一次海克斯选择中出现。 |
+| 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
+| 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
 
-### 金色（32）
+### 金色（36）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -166,8 +180,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 图腾批发 | `totem_bulk` | 获得 3 个不死图腾；手持不死图腾时可受到伤害，用于完成不死图腾成就。 |
 | 末影杀手 | `ender_slayer` | 击杀末影人时有 1% 概率掉落一本附魔书：精准采集 I、经验修补 I 或无限 I。 |
 | 终极刷新 | `ultimate_refresh` | 下次海克斯选择可以额外刷新一次，并随机获得 2 个战利品箱。 |
+| 自动熔炼 | `auto_smelt` | 挖掘矿物时自动烧炼掉落物，并额外获得经验。 |
+| 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
+| 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
+| 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
 
-### 彩色（30）
+### 彩色（36）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -201,10 +219,16 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 腐蚀背包 | `corrupt_inventory` | 除你所在队伍外，每队随机一名玩家的 5 个物品变成腐肉。 |
 | 黑市开张 | `black_market` | 下次打开村民交易界面时，将该村民升到最高等级，并获得永久村庄英雄 II。 |
 | 恶魔契约 | `demon_pact` | 永久失去 10 点生命上限，但允许你受到伤害，获得一整套随机附魔铁套，并立即完成当前权重最高的 1 个 Bingo 任务。 |
+| 精神控制 | `mind_control` | 获得「精神控制」：右键控制一名敌人 15 秒的移动方向。冷却 5 分钟。 |
+| 目标封锁 | `objective_deny` | 获得「目标封锁」：右键指定一个任务，30 秒内所有队伍无法完成它。冷却 15 分钟。 |
+| 透视 | `xray` | 获得「矿物透视」：右键获得 20 秒矿物透视。冷却 5 分钟。 |
+| 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
+| 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
+| 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。 |
 
 ## Hex list (English)
 
-### Silver (43)
+### Silver (47)
 
 | Name | id | Effect |
 |---|---|---|
@@ -251,8 +275,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Fish God | `dolphin_dash` | Gain permanent Dolphin's Grace II while in water. |
 | Portable Furnace | `portable_furnace` | Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Its smelting speed is affected by Smelting Speed. |
 | Smelting Speed | `smelt_speed` | Nearby furnaces, blast furnaces and smokers smelt twice as fast. |
+| Meteor | `meteor` | Average all teams' positions and call down 5-10 amethyst meteors of varying size. Enemy players have a 10x10 area under their feet shattered and get Slowness III; you gain a map marking every impact point. |
+| Quality Upgrade | `offer_upgrade` | Your next hex selection is guaranteed to contain at least 1 prismatic hex. Only offered during the first hex selection. |
+| Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
+| Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
 
-### Gold (32)
+### Gold (36)
 
 | Name | id | Effect |
 |---|---|---|
@@ -288,8 +316,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Totem Wholesale | `totem_bulk` | Gain 3 Totems of Undying. While holding one, you can take damage, so the 'Postmortal' advancement can be completed. |
 | Ender Slayer | `ender_slayer` | Killing an Enderman has a 1% chance to drop an enchanted book: Silk Touch I, Mending I or Infinity I. |
 | Ultimate Refresh | `ultimate_refresh` | Your next hex selection can be refreshed one extra time, and you immediately gain 2 loot chests. |
+| Auto Smelt | `auto_smelt` | Mining ores automatically smelts the drops and grants extra experience. |
+| Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
+| Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
+| Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). Cooldown 7 minutes. |
 
-### Prismatic (30)
+### Prismatic (36)
 
 | Name | id | Effect |
 |---|---|---|
@@ -323,6 +355,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Corrupt Backpacks | `corrupt_inventory` | For every team except yours, 5 random items of one random player turn into rotten flesh. |
 | Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
 | Demon Pact | `demon_pact` | Permanently lose 10 max health, but you can take damage; gain a full set of randomly enchanted iron armor and immediately complete the highest-weight Bingo task. |
+| Mind Control | `mind_control` | Gain 'Mind Control': right-click to control one enemy's movement direction for 15 seconds. Cooldown 5 minutes. |
+| Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click and pick a task; no team can complete it for 30 seconds. Cooldown 15 minutes. |
+| X-Ray | `xray` | Gain 'Ore Vision': right-click for 20 seconds of ore x-ray. Cooldown 5 minutes. |
+| Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
+| Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
+| Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
 
 <!-- HEX-TABLE-END -->
 
@@ -337,11 +375,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.34.0 `
+.\build.ps1 -Version 26.2-1.35.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.2.jar"
+  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.3.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。

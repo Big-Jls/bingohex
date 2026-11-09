@@ -1,5 +1,53 @@
 # Changelog
 
+## 26.2-1.35.0 — 2026-11-09
+
+Requires ReBongo `26.2-1.0.0-port.3` or newer (team backpacks now have 54
+slots).
+
+### Added
+
+- **Meteor** (`meteor`, silver): average every team's position and call down
+  5-10 amethyst meteors of varying size. Enemy players get Slowness III and a
+  10x10 hole under their feet; a map with all impact points is given to the
+  holder. Impact sites leave an amethyst crater, loot chests and geared
+  skeletons.
+- **Quality Upgrade** (`offer_upgrade`, silver): the next hex selection is
+  guaranteed to contain at least one prismatic hex. Only appears in the first
+  hex selection and is excluded from transform effects and free-pick lists.
+- **Blind** (`blind`, silver): right-click to blind every enemy for 8 seconds.
+  3 minute cooldown.
+- **Is It Over?** (`is_it_over`, silver): exile yourself to the End outer
+  islands for 10 minutes. You cannot be teleported by anything during it and
+  return automatically.
+- **Auto Smelt** (`auto_smelt`, gold): mined raw ores are smelted
+  automatically, with extra experience.
+- **Task Shield** (`task_shield`, gold): locks your team's 3 highest-weight
+  tasks so other hexes cannot revert them.
+- **Midas Touch** (`midas_touch`, gold): press G to turn your offhand item
+  into the same amount of gold ingots (valuables excluded). 1 minute cooldown.
+- **Bat Form** (`bat_form`, gold): right-click to become a bat for 60 seconds
+  (flight, cannot attack, bat-sized health and body). 7 minute cooldown.
+- **Mind Control** (`mind_control`, prismatic): right-click to steer one
+  enemy's movement with your view for 15 seconds. 5 minute cooldown.
+- **Objective Deny** (`objective_deny`, prismatic): pick a task; no team can
+  complete it for 30 seconds. 15 minute cooldown.
+- **X-Ray** (`xray`, prismatic): right-click for 20 seconds of ore x-ray.
+  5 minute cooldown.
+- **Scavenger** (`scavenger`, prismatic): breaking blocks has a 3% chance to
+  drop the block itself.
+- **Card Shuffle** (`card_shuffle`, prismatic): all teams' card positions are
+  randomly rearranged while completion and lock states follow their tasks.
+- **Mirror Hex** (`mirror_hex`, prismatic): right-click to open a list and
+  copy one hex you do not own from the nearest other team.
+
+### Changed
+
+- Stack Dragon (`stack_dragon`) now shows its current stack count in the K
+  roster, and its loot chest spawns totem particles plus an experience orb
+  pickup sound.
+- `/bingo bp` team backpacks are now 54 slots instead of 27.
+
 ## 26.2-1.34.0 — 2026-11-09
 
 ### Added

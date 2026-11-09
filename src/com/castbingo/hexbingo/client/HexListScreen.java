@@ -6,6 +6,7 @@
 package com.castbingo.hexbingo.client;
 
 import com.castbingo.hexbingo.Hex;
+import com.castbingo.hexbingo.network.HexMirrorPickPayload;
 import com.castbingo.hexbingo.network.HexPickPayload;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,14 +25,20 @@ public class HexListScreen extends Screen {
    private static final int BUTTON_W = 100;
    private static final int BUTTON_H = 18;
    private final List<Hex> hexes;
+   private final boolean mirror;
    private int selected = -1;
    private int scroll;
    private int hovered = -1;
 
    public HexListScreen(List<Hex> var1) {
-      super(Component.translatable("hexbingo.list.title"));
+      this(var1, false);
+   }
+
+   public HexListScreen(List<Hex> var1, boolean var2) {
+      super(Component.translatable(var2 ? "hexbingo.mirror.title" : "hexbingo.list.title"));
       this.hexes = new ArrayList<>(var1);
       this.hexes.sort(Comparator.comparingInt((Hex var0) -> var0.color().ordinal()).thenComparing(Hex::id));
+      this.mirror = var2;
    }
 
    public boolean isPauseScreen() {
@@ -43,7 +50,9 @@ public class HexListScreen extends Screen {
       var1.centeredText(this.font, this.title, this.width / 2, 14, -10496);
       var1.centeredText(
          this.font,
-         Component.translatable("hexbingo.list.subtitle", new Object[]{Component.literal(Integer.toString(this.hexes.size()))}),
+         Component.translatable(
+            this.mirror ? "hexbingo.mirror.subtitle" : "hexbingo.list.subtitle", new Object[]{Component.literal(Integer.toString(this.hexes.size()))}
+         ),
          this.width / 2,
          28,
          -4144960
@@ -82,7 +91,13 @@ public class HexListScreen extends Screen {
       }
 
       this.drawConfirmButton(var1, var2, var3);
-      var1.centeredText(this.font, Component.translatable("hexbingo.list.hint"), this.width / 2, this.height - 14, -8355712);
+      var1.centeredText(
+         this.font,
+         Component.translatable(this.mirror ? "hexbingo.mirror.hint" : "hexbingo.list.hint"),
+         this.width / 2,
+         this.height - 14,
+         -8355712
+      );
       if (this.hovered >= 0) {
          HexRender.drawTooltip(var1, this.font, this.width, this.height, var2, var3, this.hexes.get(this.hovered), true);
       }
@@ -121,7 +136,13 @@ public class HexListScreen extends Screen {
          }
 
          if (this.selected >= 0 && this.isOverButton(var1.x(), var1.y())) {
-            ClientPacketDistributor.sendToServer(new HexPickPayload(this.hexes.get(this.selected).id()), new CustomPacketPayload[0]);
+            String var4 = this.hexes.get(this.selected).id();
+            if (this.mirror) {
+               ClientPacketDistributor.sendToServer(new HexMirrorPickPayload(var4), new CustomPacketPayload[0]);
+            } else {
+               ClientPacketDistributor.sendToServer(new HexPickPayload(var4), new CustomPacketPayload[0]);
+            }
+
             this.onClose();
             return true;
          }
