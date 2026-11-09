@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.35.4 — 2026-11-09
+
+### Fixed
+
+- **Pet Master** (`pet_master`): teleporting (including cross-dimension
+  teleports) no longer leaves the old pet behind and spawns a second one. The
+  existing pet is moved with its owner, and duplicate/stale pets are discarded
+  on summon, game reset and effect cleanup.
+
 ## 26.2-1.35.3 — 2026-11-09
 
 ### Changed

@@ -1087,6 +1087,12 @@ public final class HexEffects {
       DICE_NEXT.remove(var0.getUUID());
       LOUIS_PENDING.remove(var0.getUUID());
       restoreTransform(var0);
+      TamableAnimal var13 = PETS.remove(var0.getUUID());
+      if (var13 != null) {
+         var13.discard();
+      }
+
+      PET_TIMER.remove(var0.getUUID());
       endBatForm(var0, false);
       endEndExile(var0, false);
       clearXrayMarkers(var0);
@@ -4080,6 +4086,12 @@ public final class HexEffects {
    }
 
    private static void summonPet(ServerPlayer var0) {
+      // 先清理旧宠物，避免传送后重复生成
+      TamableAnimal var2 = PETS.remove(var0.getUUID());
+      if (var2 != null) {
+         var2.discard();
+      }
+
       if (var0.level() instanceof ServerLevel var1) {
          ThreadLocalRandom var4 = ThreadLocalRandom.current();
          TamableAnimal var3 = var4.nextBoolean()
@@ -4101,8 +4113,11 @@ public final class HexEffects {
 
    private static void tickPet(ServerPlayer var0, HexEffect var1) {
       TamableAnimal var2 = PETS.get(var0.getUUID());
-      if (var2 == null || !var2.isAlive() || var2.level() != var0.level()) {
+      if (var2 == null || !var2.isAlive()) {
          summonPet(var0);
+      } else if (var2.level() != var0.level() || var2.distanceToSqr(var0) > 1024.0) {
+         // 玩家传送或跨维度后把宠物一并带过去，避免在旧位置遗留后再生成第二只
+         var2.teleportTo((ServerLevel)var0.level(), var0.getX(), var0.getY(), var0.getZ(), Set.of(), var0.getYRot(), var0.getXRot(), false);
       }
 
       int var3 = Math.max(1, var1.interval);
@@ -8425,6 +8440,13 @@ public final class HexEffects {
       END_EXILE.clear();
       XRAY_MARKERS.clear();
       TASK_SHIELDS.clear();
+
+      for (TamableAnimal var3 : PETS.values()) {
+         var3.discard();
+      }
+
+      PETS.clear();
+      PET_TIMER.clear();
    }
 
    private HexEffects() {
