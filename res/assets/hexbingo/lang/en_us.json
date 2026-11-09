@@ -445,5 +445,14 @@
     "hexbingo.msg.dash_blocked":  "Dash Charge: blocked by obsidian or bedrock, dash interrupted.",
     "hexbingo.select.refresh":  "Refresh",
     "hexbingo.msg.refresh_none":  "No refreshes available.",
-    "hexbingo.msg.refresh_fail":  "No hexes available to refresh."
+    "hexbingo.msg.refresh_fail":  "No hexes available to refresh.",
+    "hexbingo.hex.dolphin_dash.name":  "Fish God",
+    "hexbingo.hex.dolphin_dash.desc":  "Gain permanent Dolphin's Grace II while in water.",
+    "hexbingo.hex.portable_furnace.name":  "Portable Furnace",
+    "hexbingo.hex.portable_furnace.desc":  "Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Its smelting speed is affected by Smelting Speed.",
+    "hexbingo.hex.smelt_speed.name":  "Smelting Speed",
+    "hexbingo.hex.smelt_speed.desc":  "Furnaces, blast furnaces and smokers smelt twice as fast.",
+    "hexbingo.item.portable_furnace.lore":  "Right-click to open a furnace screen.",
+    "hexbingo.menu.portable_furnace":  "Portable Furnace",
+    "hexbingo.msg.portable_furnace_item":  "You received 'Portable Furnace': right-click to open it."
 }

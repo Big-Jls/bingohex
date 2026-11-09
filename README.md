@@ -11,7 +11,13 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **102 个海克斯强化**：40 银色 / 32 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **105 个海克斯强化**：43 银色 / 32 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.34.0 更新摘要
+
+- 新增 **鱼神**（银色）：在水中获得永久海豚的恩惠 II。
+- 新增 **便携熔炉**（银色）：右键随时打开熔炉界面，熔炼速度受「烧制加速」影响。
+- 新增 **烧制加速**（银色）：附近的熔炉、高炉、烟熏炉烧制速度翻倍。
 
 ### 1.33.0 更新摘要
 
@@ -50,7 +56,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.2.jar`）。
-3. 把 `HexBingo-26.2-1.33.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.34.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -74,9 +80,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（102）
+## 海克斯一览（105）
 
-### 银色（40）
+### 银色（43）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -120,6 +126,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 跳跳虎 | `jump_tiger` | 永久获得跳跃提升 II。 |
 | 昼夜颠倒 | `day_night_flip` | 立即切换昼夜，之后 10 分钟内时间不再自然变化。 |
 | 工具箱 | `toolbox` | 随机获得工作台、熔炉、铁砧、砂轮、切石机中的 1 个。 |
+| 鱼神 | `dolphin_dash` | 在水中获得永久的海豚的恩惠 II。 |
+| 便携熔炉 | `portable_furnace` | 获得「便携熔炉」：右键随时打开熔炉界面，熔炼速度受「烧制加速」影响。 |
+| 烧制加速 | `smelt_speed` | 附近的熔炉、高炉、烟熏炉烧制速度翻倍。 |
 
 ### 金色（32）
 
@@ -144,7 +153,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 和朋友一起困在这里 | `friends_here` | 附近每有一位队友，获得 +2% 移速和急迫 I（最多 +10%）。 |
 | 得吃小曲 | `dechi_song` | 播放村民版《得吃小曲》；期间获得随机幸运 III–V，背包里的镐子获得时运 II–III。 |
 | 理想国 | `utopia` | 打乱你身上所有药水效果，并重新获得 5 种永久随机增益或减益。 |
-| 冲冲冲 | `dash_charge` | 获得「冲冲冲」：右键向前突进 3 格，破坏沿途除黑曜石、基岩外的方块并使其掉落，对沿途生物造成 5 点伤害。冷却 5 秒。 |
+| 冲冲冲 | `dash_charge` | 获得「冲冲冲」：右键持续向前冲刺 8 秒，可跟随视线转向，破坏沿途除黑曜石、基岩外的方块并使其掉落，对撞到的生物造成 10 点伤害。冲刺结束后冷却 15 秒。 |
 | 灵魂出窍 | `soul_out` | 选中后立即进入旁观状态 30 秒，期间可以自由飞行观察，结束后回到进入旁观前的位置。 |
 | 九九八十一难 | `eighty_one_trials` | 传送到最近的试炼大厅。 |
 | 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。冷却 8 分钟。 |
@@ -191,11 +200,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | The World！ | `the_world` | 获得「The World」时停技能：右键使用后时间停止 8 秒，只有你能移动。冷却 3 分钟。 |
 | 腐蚀背包 | `corrupt_inventory` | 除你所在队伍外，每队随机一名玩家的 5 个物品变成腐肉。 |
 | 黑市开张 | `black_market` | 下次打开村民交易界面时，将该村民升到最高等级，并获得永久村庄英雄 II。 |
-| 恶魔契约 | `demon_pact` | 永久失去 15 点生命上限，但允许你受到伤害，并立即完成 1 个 Bingo 任务。 |
+| 恶魔契约 | `demon_pact` | 永久失去 10 点生命上限，但允许你受到伤害，获得一整套随机附魔铁套，并立即完成当前权重最高的 1 个 Bingo 任务。 |
 
 ## Hex list (English)
 
-### Silver (40)
+### Silver (43)
 
 | Name | id | Effect |
 |---|---|---|
@@ -239,6 +248,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Jumping Tiger | `jump_tiger` | Gain Jump Boost II permanently. |
 | Day-Night Flip | `day_night_flip` | Instantly flip day and night; time will not change naturally for the next 10 minutes. |
 | Toolbox | `toolbox` | Gain 1 random crafting table, furnace, anvil, grindstone or stonecutter. |
+| Fish God | `dolphin_dash` | Gain permanent Dolphin's Grace II while in water. |
+| Portable Furnace | `portable_furnace` | Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Its smelting speed is affected by Smelting Speed. |
+| Smelting Speed | `smelt_speed` | Nearby furnaces, blast furnaces and smokers smelt twice as fast. |
 
 ### Gold (32)
 
@@ -263,7 +275,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Trapped With Friends | `friends_here` | Each nearby teammate grants +2% speed and Haste I (max +10%). |
 | Dechi Song | `dechi_song` | Plays the villager version of the Dechi song; grants random Luck III-V during it, and all pickaxes in your inventory gain Fortune II-III. |
 | Utopia | `utopia` | Scrambles all your potion effects and grants 5 new permanent random buffs or debuffs. |
-| Rush Rush Rush | `dash_charge` | Gain "Rush Rush Rush": right-click to dash 3 blocks forward, breaking and dropping blocks along the way except obsidian and bedrock, and dealing 5 damage to creatures hit. 5 second cooldown. |
+| Rush Rush Rush | `dash_charge` | Gain "Rush Rush Rush": right-click to dash forward for 8 seconds, steering with your view. Blocks in the way are broken and drop (except obsidian and bedrock), and creatures hit take 10 damage. 15 second cooldown after the dash ends. |
 | Soul Out | `soul_out` | Immediately enter spectator mode for 30 seconds to scout freely, then return to the position where you entered spectator mode. |
 | Eighty-One Trials | `eighty_one_trials` | Teleport to the nearest trial chambers. |
 | Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). 8 minute cooldown. |
@@ -310,7 +322,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | The World! | `the_world` | Gain the "The World" time-stop skill; right-click to stop time for 8 seconds so only you can move. Cooldown: 3 minutes. |
 | Corrupt Backpacks | `corrupt_inventory` | For every team except yours, 5 random items of one random player turn into rotten flesh. |
 | Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
-| Demon Pact | `demon_pact` | Permanently lose 15 max health, but you can take damage; immediately complete 1 Bingo task. |
+| Demon Pact | `demon_pact` | Permanently lose 10 max health, but you can take damage; gain a full set of randomly enchanted iron armor and immediately complete the highest-weight Bingo task. |
 
 <!-- HEX-TABLE-END -->
 
@@ -325,7 +337,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.33.0 `
+.\build.ps1 -Version 26.2-1.34.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -337,7 +349,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 版本规则
 
 - 修 bug：第三级 +1（`1.33.1`、`1.33.2`…）
-- 新增海克斯：第二级 +1（`1.34.0`）
+- 新增海克斯：第二级 +1（`1.35.0`）
 
 ## 许可与致谢
 

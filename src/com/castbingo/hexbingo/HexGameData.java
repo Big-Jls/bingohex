@@ -35,6 +35,7 @@ public class HexGameData extends SavedData {
    private final Map<String, int[]> teams = new HashMap<>();
    private final Set<UUID> extraChoice = new HashSet<>();
    private final Map<UUID, Integer> refreshCharges = new HashMap<>();
+   private final Map<UUID, CompoundTag> furnaces = new HashMap<>();
    private final Map<UUID, Integer> qualityUp = new HashMap<>();
    private final Set<UUID> hexLocked = new HashSet<>();
    private boolean hexesLocked;
@@ -190,6 +191,15 @@ public class HexGameData extends SavedData {
       }
    }
 
+   public CompoundTag portableFurnace(UUID var1) {
+      return this.furnaces.computeIfAbsent(var1, var0 -> new CompoundTag());
+   }
+
+   public void setPortableFurnace(UUID var1, CompoundTag var2) {
+      this.furnaces.put(var1, var2.copy());
+      this.setDirty();
+   }
+
    public int qualityUp(UUID var1) {
       return this.qualityUp.getOrDefault(var1, 0);
    }
@@ -262,6 +272,7 @@ public class HexGameData extends SavedData {
       this.teams.clear();
       this.extraChoice.clear();
       this.refreshCharges.clear();
+      this.furnaces.clear();
       this.qualityUp.clear();
       this.hexLocked.clear();
       this.hexesLocked = false;
@@ -313,6 +324,9 @@ public class HexGameData extends SavedData {
       CompoundTag refreshTag = new CompoundTag();
       this.refreshCharges.forEach((var1x, var2x) -> refreshTag.putInt(var1x.toString(), var2x));
       var1.put("refreshes", refreshTag);
+      CompoundTag furnaceTag = new CompoundTag();
+      this.furnaces.forEach((var1x, var2x) -> furnaceTag.put(var1x.toString(), var2x));
+      var1.put("furnaces", furnaceTag);
       CompoundTag var6 = new CompoundTag();
       this.qualityUp.forEach((var1x, var2x) -> var6.putInt(var1x.toString(), var2x));
       var1.put("qualityUp", var6);
@@ -329,6 +343,7 @@ public class HexGameData extends SavedData {
       this.teams.clear();
       this.extraChoice.clear();
       this.refreshCharges.clear();
+      this.furnaces.clear();
       this.qualityUp.clear();
       this.hexLocked.clear();
       this.hexesLocked = false;
@@ -455,6 +470,15 @@ public class HexGameData extends SavedData {
             if (var52 > 0) {
                this.refreshCharges.put(var51, var52);
             }
+         }
+      }
+
+      CompoundTag furnaceTag = var1.getCompoundOrEmpty("furnaces");
+
+      for (String var53 : furnaceTag.keySet()) {
+         UUID var54 = parseUuid(var53);
+         if (var54 != null) {
+            this.furnaces.put(var54, furnaceTag.getCompoundOrEmpty(var53));
          }
       }
 

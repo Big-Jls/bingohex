@@ -1,5 +1,18 @@
 # Changelog
 
+## 26.2-1.34.0 — 2026-11-09
+
+### Added
+
+- **Fish God** (`dolphin_dash`, silver): permanent Dolphin's Grace II while in
+  water.
+- **Portable Furnace** (`portable_furnace`, silver): a bound furnace item that
+  opens a furnace screen anywhere. Its three slots and progress are stored per
+  player in the game save, and its smelting speed is doubled by Smelting Speed.
+- **Smelting Speed** (`smelt_speed`, silver): nearby furnaces, blast furnaces
+  and smokers tick twice per game tick (5x5 loaded chunks around the holder).
+  Fuel efficiency is unchanged; only wall-clock speed doubles.
+
 ## 26.2-1.33.0 — 2026-11-09
 
 Requires ReBongo `26.2-1.0.0-port.2` or newer (card tasks now carry their

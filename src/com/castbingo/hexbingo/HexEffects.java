@@ -46,6 +46,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -65,6 +68,7 @@ import net.minecraft.tags.StructureTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.Container;
 import net.minecraft.world.damagesource.DamageSource;
@@ -108,14 +112,21 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.FurnaceMenu;
 import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
@@ -133,8 +144,11 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.BrushableBlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
@@ -182,6 +196,8 @@ public final class HexEffects {
    private static final long DASH_COOLDOWN_MS = 15000L;
    private static final long DASH_DURATION_MS = 8000L;
    private static final Map<UUID, HexEffects.DashState> DASHING = new HashMap<>();
+   private static final Map<UUID, HexEffects.PortableFurnace> PORTABLE_FURNACES = new HashMap<>();
+   private static final Map<UUID, List<BlockPos>> BOOSTED_FURNACES = new HashMap<>();
    private static final Map<UUID, HexEffects.SoulState> SOULS = new HashMap<>();
    private static final Set<UUID> VOYAGE_ACTIVE = new HashSet<>();
    private static final Map<UUID, Long> JAM_COOLDOWN = new HashMap<>();
@@ -221,7 +237,7 @@ public final class HexEffects {
    );
    private static final Map<UUID, Holder<MobEffect>> SONG_BUFFS = new HashMap<>();
    private static final Set<UUID> SPY_USED = new HashSet<>();
-   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "回力ok镖", "彩虹大作战", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智");
+   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "回力ok镖", "彩虹大作战", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智");
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
@@ -801,6 +817,10 @@ public final class HexEffects {
          case "ultimate_refresh":
             grantUltimateRefresh(var0);
             break;
+         // 便携熔炉
+         case "portable_furnace":
+            givePortableFurnace(var0);
+            break;
          // 工具箱
          case "toolbox":
             giveToolbox(var0);
@@ -965,6 +985,14 @@ public final class HexEffects {
       HOOK_COOLDOWN.remove(var0.getUUID());
       DASH_COOLDOWN.remove(var0.getUUID());
       DASHING.remove(var0.getUUID());
+      HexEffects.PortableFurnace var8 = PORTABLE_FURNACES.remove(var0.getUUID());
+      if (var8 != null) {
+         MinecraftServer var9 = var0.level().getServer();
+         if (var9 != null) {
+            HexGameData.get(var9).setPortableFurnace(var0.getUUID(), var8.save());
+         }
+      }
+      BOOSTED_FURNACES.remove(var0.getUUID());
       JAM_COOLDOWN.remove(var0.getUUID());
       EYE_MARK.remove(var0.getUUID());
       VOYAGE_ACTIVE.remove(var0.getUUID());
@@ -1016,6 +1044,8 @@ public final class HexEffects {
       TEMP_DAMAGE.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
       TEMP_LIFESTEAL.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
       tickDash(var0);
+      tickPortableFurnaces(var0);
+      tickSmeltBoost(var0);
       tickTheWorld(var0);
       tickHexBees(var0);
       if (DAY_NIGHT_UNTIL > 0L && var1 >= DAY_NIGHT_UNTIL) {
@@ -4345,6 +4375,246 @@ public final class HexEffects {
       return true;
    }
 
+   private static void givePortableFurnace(ServerPlayer var0) {
+      var0.addItem(questItem(Items.FURNACE, "便携熔炉", "hexbingo.item.portable_furnace.lore"));
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.portable_furnace_item"));
+   }
+
+   public static boolean openPortableFurnace(ServerPlayer var0) {
+      if (!hasHex(var0, "portable_furnace")) {
+         return false;
+      }
+
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return false;
+      }
+
+      HexEffects.PortableFurnace var2 = PORTABLE_FURNACES.computeIfAbsent(var0.getUUID(), var2x -> {
+         HexEffects.PortableFurnace var3 = new HexEffects.PortableFurnace();
+         var3.load(HexGameData.get(var1).portableFurnace(var2x));
+         return var3;
+      });
+      var2.menu = null;
+      var0.openMenu(
+         new SimpleMenuProvider(
+            (var3, var4, var5) -> {
+               FurnaceMenu var6 = new FurnaceMenu(var3, var4, var2.items, var2);
+               var2.menu = var6;
+               return var6;
+            },
+            Component.translatable("hexbingo.menu.portable_furnace")
+         )
+      );
+      return true;
+   }
+
+   private static void tickPortableFurnaces(MinecraftServer var0) {
+      if (!PORTABLE_FURNACES.isEmpty()) {
+         Iterator<Map.Entry<UUID, HexEffects.PortableFurnace>> var1 = PORTABLE_FURNACES.entrySet().iterator();
+
+         while (var1.hasNext()) {
+            Map.Entry<UUID, HexEffects.PortableFurnace> var2 = var1.next();
+            ServerPlayer var3 = var0.getPlayerList().getPlayer(var2.getKey());
+            HexEffects.PortableFurnace var4 = var2.getValue();
+            if (var3 == null) {
+               HexGameData.get(var0).setPortableFurnace(var2.getKey(), var4.save());
+               var1.remove();
+            } else if (var3.containerMenu == var4.menu && var4.menu != null) {
+               tickPortableFurnace(var3, var4);
+               if (++var4.saveTicks >= 10) {
+                  var4.saveTicks = 0;
+                  HexGameData.get(var0).setPortableFurnace(var3.getUUID(), var4.save());
+               }
+            }
+         }
+      }
+   }
+
+   private static void tickPortableFurnace(ServerPlayer var0, HexEffects.PortableFurnace var1) {
+      if (var0.level() instanceof ServerLevel var2) {
+         ItemStack var3 = var1.items.getItem(0);
+         ItemStack var4 = var1.items.getItem(1);
+         ItemStack var5 = var1.items.getItem(2);
+         ItemStack var6 = ItemStack.EMPTY;
+         int var7 = 200;
+         if (!var3.isEmpty()) {
+            SingleRecipeInput var8 = new SingleRecipeInput(var3);
+            Optional<RecipeHolder<SmeltingRecipe>> var9 = var2.recipeAccess().getRecipeFor(RecipeType.SMELTING, var8, var2);
+            if (var9.isPresent()) {
+               var6 = ((SmeltingRecipe)var9.get().value()).assemble(var8);
+               var7 = ((SmeltingRecipe)var9.get().value()).cookingTime();
+            }
+         }
+
+         boolean var10 = !var6.isEmpty()
+            && (var5.isEmpty() || ItemStack.isSameItemSameComponents(var5, var6) && var5.getCount() + var6.getCount() <= var5.getMaxStackSize());
+         if (var10 && var1.litTime <= 0 && !var4.isEmpty()) {
+            int var11 = var2.fuelValues().burnDuration(var4);
+            if (var11 > 0) {
+               ItemStackTemplate var12 = var4.getItem().getCraftingRemainder();
+               var1.litTime = var11;
+               var1.litTotal = var11;
+               var4.shrink(1);
+               if (var4.isEmpty() && var12 != null) {
+                  var1.items.setItem(1, var12.create());
+               }
+            }
+         }
+
+         if (var1.litTime > 0) {
+            var1.litTime--;
+         }
+
+         if (var10 && var1.litTime > 0) {
+            var1.cookTotal = var7;
+            var1.cookProgress += hasHex(var0, "smelt_speed") ? 2 : 1;
+            if (var1.cookProgress >= var7) {
+               var1.cookProgress = 0;
+               var3.shrink(1);
+               if (var5.isEmpty()) {
+                  var1.items.setItem(2, var6.copy());
+               } else {
+                  var5.grow(var6.getCount());
+               }
+            }
+         } else {
+            var1.cookProgress = 0;
+         }
+      }
+   }
+
+   private static void tickSmeltBoost(MinecraftServer var0) {
+      boolean var1 = false;
+
+      for (ServerPlayer var3 : var0.getPlayerList().getPlayers()) {
+         if (hasHex(var3, "smelt_speed")) {
+            var1 = true;
+            break;
+         }
+      }
+
+      if (!var1) {
+         BOOSTED_FURNACES.clear();
+      } else {
+         if (var0.overworld().getGameTime() % 20L == 0L) {
+            scanFurnaces(var0);
+         }
+
+         HashSet<String> var2 = new HashSet<>();
+
+         for (Map.Entry<UUID, List<BlockPos>> var4 : BOOSTED_FURNACES.entrySet()) {
+            ServerPlayer var5 = var0.getPlayerList().getPlayer(var4.getKey());
+            if (var5 != null && hasHex(var5, "smelt_speed") && var5.level() instanceof ServerLevel var6) {
+               for (BlockPos var8 : var4.getValue()) {
+                  if (!var6.isLoaded(var8)) {
+                     continue;
+                  }
+
+                  if (!(var6.getBlockEntity(var8) instanceof AbstractFurnaceBlockEntity var9) || var9.isRemoved()) {
+                     continue;
+                  }
+
+                  String var10 = var6.dimension().identifier() + "|" + var8.asLong();
+                  if (var2.add(var10)) {
+                     AbstractFurnaceBlockEntity.serverTick(var6, var8, var6.getBlockState(var8), var9);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   private static void scanFurnaces(MinecraftServer var0) {
+      BOOSTED_FURNACES.clear();
+
+      for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
+         if (hasHex(var2, "smelt_speed") && var2.level() instanceof ServerLevel var3) {
+            int var4 = var2.blockPosition().getX() >> 4;
+            int var5 = var2.blockPosition().getZ() >> 4;
+            ArrayList<BlockPos> var6 = new ArrayList<>();
+
+            for (int var7 = -2; var7 <= 2; var7++) {
+               for (int var8 = -2; var8 <= 2; var8++) {
+                  LevelChunk var9 = var3.getChunkSource().getChunkNow(var4 + var7, var5 + var8);
+                  if (var9 != null) {
+                     for (Map.Entry<BlockPos, BlockEntity> var11 : var9.getBlockEntities().entrySet()) {
+                        if (var11.getValue() instanceof AbstractFurnaceBlockEntity) {
+                           var6.add(var11.getKey().immutable());
+                        }
+                     }
+                  }
+               }
+            }
+
+            BOOSTED_FURNACES.put(var2.getUUID(), var6);
+         }
+      }
+   }
+
+   private static final class PortableFurnace implements ContainerData {
+      private final SimpleContainer items = new SimpleContainer(3);
+      private int litTime;
+      private int litTotal;
+      private int cookProgress;
+      private int cookTotal = 200;
+      private int saveTicks;
+      private FurnaceMenu menu;
+
+      public int get(int var1) {
+         return switch (var1) {
+            case 0 -> this.litTime;
+            case 1 -> this.litTotal;
+            case 2 -> this.cookProgress;
+            case 3 -> this.cookTotal;
+            default -> 0;
+         };
+      }
+
+      public void set(int var1, int var2) {
+         switch (var1) {
+            case 0 -> this.litTime = var2;
+            case 1 -> this.litTotal = var2;
+            case 2 -> this.cookProgress = var2;
+            case 3 -> this.cookTotal = var2;
+         }
+      }
+
+      public int getCount() {
+         return 4;
+      }
+
+      private void load(CompoundTag var1) {
+         ListTag var2 = var1.getListOrEmpty("items");
+
+         for (int var3 = 0; var3 < 3 && var3 < var2.size(); var3++) {
+            int var4 = var3;
+            ItemStack.OPTIONAL_CODEC.parse(NbtOps.INSTANCE, var2.get(var4)).result().ifPresent(var2x -> this.items.setItem(var4, var2x));
+         }
+
+         this.litTime = var1.getIntOr("litTime", 0);
+         this.litTotal = var1.getIntOr("litTotal", 0);
+         this.cookProgress = var1.getIntOr("cookProgress", 0);
+         this.cookTotal = var1.getIntOr("cookTotal", 200);
+      }
+
+      private CompoundTag save() {
+         CompoundTag var1 = new CompoundTag();
+         ListTag var2 = new ListTag();
+
+         for (int var3 = 0; var3 < 3; var3++) {
+            ItemStack.OPTIONAL_CODEC.encodeStart(NbtOps.INSTANCE, this.items.getItem(var3)).result().ifPresent(var2::add);
+         }
+
+         var1.put("items", var2);
+         var1.putInt("litTime", this.litTime);
+         var1.putInt("litTotal", this.litTotal);
+         var1.putInt("cookProgress", this.cookProgress);
+         var1.putInt("cookTotal", this.cookTotal);
+         return var1;
+      }
+   }
+
    private static void startSoulOut(ServerPlayer var0) {
       if (!SOULS.containsKey(var0.getUUID())) {
          GameType var1 = var0.gameMode();
@@ -4546,6 +4816,10 @@ public final class HexEffects {
 
       if (hasHex(var0, "portable_bench") && !hasNamedItem(var0, "随身工作台")) {
          givePortableBench(var0);
+      }
+
+      if (hasHex(var0, "portable_furnace") && !hasNamedItem(var0, "便携熔炉")) {
+         givePortableFurnace(var0);
       }
 
       if (hasHex(var0, "rainbow_duel") && !hasNamedItem(var0, "和我一起困在这里")) {

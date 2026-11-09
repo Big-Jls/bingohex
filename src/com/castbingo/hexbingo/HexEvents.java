@@ -252,6 +252,10 @@ public class HexEvents {
          && isPortableBench(var1.getItemStack())
          && HexEffects.openPortableCrafting(var17)) {
          var1.setCanceled(true);
+      } else if (var1.getEntity() instanceof ServerPlayer var22
+         && isPortableFurnace(var1.getItemStack())
+         && HexEffects.openPortableFurnace(var22)) {
+         var1.setCanceled(true);
       } else if (var1.getEntity() instanceof ServerPlayer var11
          && var1.getLevel().getBlockState(var1.getPos()).is(Blocks.CRAFTING_TABLE)
          && HexEffects.isCraftingBlocked(var11)) {
@@ -329,6 +333,10 @@ public class HexEvents {
          && isPortableBench(var1.getItemStack())
          && HexEffects.openPortableCrafting(var17)) {
          var1.setCanceled(true);
+      } else if (var1.getEntity() instanceof ServerPlayer var23
+         && isPortableFurnace(var1.getItemStack())
+         && HexEffects.openPortableFurnace(var23)) {
+         var1.setCanceled(true);
       }
    }
 
@@ -366,6 +374,10 @@ public class HexEvents {
 
    private static boolean isPortableBench(ItemStack var0) {
       return var0.is(Items.CRAFTING_TABLE) && var0.getHoverName().getString().equals("随身工作台");
+   }
+
+   private static boolean isPortableFurnace(ItemStack var0) {
+      return var0.is(Items.FURNACE) && var0.getHoverName().getString().equals("便携熔炉");
    }
 
    private static boolean isWorldItem(ItemStack var0) {

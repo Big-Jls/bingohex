@@ -445,5 +445,14 @@
     "hexbingo.msg.dash_blocked":  "冲冲冲：被黑曜石或基岩挡住，冲刺中断。",
     "hexbingo.select.refresh":  "刷新",
     "hexbingo.msg.refresh_none":  "没有可用的刷新次数。",
-    "hexbingo.msg.refresh_fail":  "没有可刷新的海克斯。"
+    "hexbingo.msg.refresh_fail":  "没有可刷新的海克斯。",
+    "hexbingo.hex.dolphin_dash.name":  "鱼神",
+    "hexbingo.hex.dolphin_dash.desc":  "在水中获得永久的海豚的恩惠 II。",
+    "hexbingo.hex.portable_furnace.name":  "便携熔炉",
+    "hexbingo.hex.portable_furnace.desc":  "获得「便携熔炉」：右键随时打开熔炉界面，熔炼速度受「烧制加速」影响。",
+    "hexbingo.hex.smelt_speed.name":  "烧制加速",
+    "hexbingo.hex.smelt_speed.desc":  "熔炉、高炉、烟熏炉的烧制速度翻倍。",
+    "hexbingo.item.portable_furnace.lore":  "右键打开熔炉界面。",
+    "hexbingo.menu.portable_furnace":  "便携熔炉",
+    "hexbingo.msg.portable_furnace_item":  "你获得了「便携熔炉」，右键打开。"
 }

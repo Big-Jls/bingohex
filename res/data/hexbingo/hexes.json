@@ -984,6 +984,35 @@
                                   ]
                   },
                   {
+                      "id":  "dolphin_dash",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "effect",
+                                          "key":  "dolphins_grace",
+                                          "amplifier":  1
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "portable_furnace",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "portable_furnace"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "smelt_speed",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "smelt_speed"
+                                      }
+                                  ]
+                  },
+                  {
                       "id":  "louis_xvi",
                       "color":  "gold",
                       "effects":  [
