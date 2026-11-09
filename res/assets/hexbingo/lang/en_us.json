@@ -539,5 +539,9 @@
     "hexbingo.deny.title":  "Objective Deny",
     "hexbingo.deny.subtitle":  "%s tasks · pick 1",
     "hexbingo.deny.hint":  "Scroll for more · ESC to close",
-    "hexbingo.key.midas":  "Midas Touch (G)"
+    "hexbingo.key.midas":  "Midas Touch (G)",
+    "hexbingo.hex.gaze_abyss.name":  "Gaze Into the Abyss",
+    "hexbingo.hex.gaze_abyss.desc":  "Teleport to the nearest deep dark biome and find a safe spot inside its caves.",
+    "hexbingo.msg.gaze_abyss":  "Gaze Into the Abyss: teleported to the nearest deep dark biome.",
+    "hexbingo.msg.gaze_abyss_none":  "Gaze Into the Abyss: no deep dark biome found nearby."
 }

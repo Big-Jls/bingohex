@@ -1199,6 +1199,15 @@
                                           "type":  "mirror_hex"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "gaze_abyss",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "gaze_abyss"
+                                      }
+                                  ]
                   }
               ]
 }

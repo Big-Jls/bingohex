@@ -539,5 +539,9 @@
     "hexbingo.deny.title":  "目标封锁",
     "hexbingo.deny.subtitle":  "共 %s 个任务 · 选择 1 个",
     "hexbingo.deny.hint":  "滚动鼠标滚轮查看更多 · ESC 关闭",
-    "hexbingo.key.midas":  "点石成金（G）"
+    "hexbingo.key.midas":  "点石成金（G）",
+    "hexbingo.hex.gaze_abyss.name":  "凝视深渊",
+    "hexbingo.hex.gaze_abyss.desc":  "传送到最近的深暗之域（deep_dark）群系，并在洞穴中寻找安全落脚点。",
+    "hexbingo.msg.gaze_abyss":  "凝视深渊：已传送到最近的深暗之域。",
+    "hexbingo.msg.gaze_abyss_none":  "凝视深渊：附近没有找到深暗之域群系。"
 }

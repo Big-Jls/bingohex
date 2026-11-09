@@ -1,5 +1,28 @@
 # Changelog
 
+## 26.2-1.36.0 — 2026-11-10
+
+### Added
+
+- **Gaze Into the Abyss** (`gaze_abyss`, gold): teleport to the nearest
+  `deep_dark` biome and find a safe spot inside its caves.
+
+### Fixed
+
+- Structure teleport hexes now search and generate in the correct dimension:
+  - Village Road (`village_road`) and Love Tribute (`love_tribute`) use the
+    overworld.
+  - Ruined Portal (`ruined_portal`) uses the Nether when cast there, otherwise
+    the overworld; the Nether fallback generates `ruined_portal_nether`.
+  - Eighty-One Trials (`eighty_one_trials`) uses the overworld.
+  Previously, using these while in the Nether or the End could fail to find
+  anything or try to place the structure in the wrong dimension.
+- Love Tribute / Ruined Portal no longer regenerate a replacement when the
+  found structure is underwater; the player is teleported to the water surface
+  above the real structure instead.
+- Travel Frog's fallback structure is now generated in the same dimension as
+  the map it hands out, instead of the player's current dimension.
+
 ## 26.2-1.35.5 — 2026-11-09
 
 ### Fixed

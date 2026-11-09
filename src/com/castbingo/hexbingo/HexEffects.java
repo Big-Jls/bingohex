@@ -144,6 +144,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -651,17 +652,40 @@ public final class HexEffects {
          case "random_bingo":
             randomBingo(var0);
             break;
-         // 致敬爱情
-         case "nearest_shipwreck":
-            teleportToStructure(
-               var0, StructureTags.SHIPWRECK, "hexbingo.msg.love_tribute", "hexbingo.msg.love_tribute_none", "minecraft:shipwreck"
-            );
+         // 致敬爱情（沉船只在主世界）
+         case "nearest_shipwreck": {
+            MinecraftServer var17 = var0.level().getServer();
+            if (var17 != null) {
+               teleportToStructure(
+                  var0,
+                  var17.overworld(),
+                  StructureTags.SHIPWRECK,
+                  "hexbingo.msg.love_tribute",
+                  "hexbingo.msg.love_tribute_none",
+                  "minecraft:shipwreck"
+               );
+            }
             break;
-         // 地狱开局
-         case "nearest_ruined_portal":
-            teleportToStructure(
-               var0, StructureTags.RUINED_PORTAL, "hexbingo.msg.ruined_portal", "hexbingo.msg.ruined_portal_none", "minecraft:ruined_portal"
-            );
+         }
+         // 地狱开局（地狱找废弃地狱门，其它维度回主世界找）
+         case "nearest_ruined_portal": {
+            MinecraftServer var17 = var0.level().getServer();
+            if (var17 != null) {
+               ServerLevel var18 = var0.level().dimension() == Level.NETHER ? var17.getLevel(Level.NETHER) : var17.overworld();
+               teleportToStructure(
+                  var0,
+                  var18 == null ? var17.overworld() : var18,
+                  StructureTags.RUINED_PORTAL,
+                  "hexbingo.msg.ruined_portal",
+                  "hexbingo.msg.ruined_portal_none",
+                  "minecraft:ruined_portal"
+               );
+            }
+            break;
+         }
+         // 凝视深渊：传送到最近的 deep_dark 群系
+         case "gaze_abyss":
+            gazeAbyss(var0);
             break;
          // 古代遗迹
          case "ancient_ruins":
@@ -2565,7 +2589,7 @@ public final class HexEffects {
          ServerLevel var2 = var1.overworld();
          BlockPos var3 = var2.findNearestMapStructure(StructureTags.VILLAGE, var0.blockPosition(), 100, false);
          if (var3 == null) {
-            if (!generateStructure(var0, "minecraft:village", "hexbingo.msg.village_tp")) {
+            if (!generateStructure(var0, var2, "minecraft:village", "hexbingo.msg.village_tp")) {
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_none").withStyle(ChatFormatting.GRAY));
             }
          } else {
@@ -2573,7 +2597,7 @@ public final class HexEffects {
             int var4 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var3.getX(), var3.getZ());
             int var5 = safeGroundY(var2, var3.getX(), var3.getZ(), var4 + 2);
             if (var5 < 0) {
-               if (!generateStructure(var0, "minecraft:village", "hexbingo.msg.village_tp")) {
+               if (!generateStructure(var0, var2, "minecraft:village", "hexbingo.msg.village_tp")) {
                   var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_fail").withStyle(ChatFormatting.RED));
                }
             } else {
@@ -2582,6 +2606,50 @@ public final class HexEffects {
             }
          }
       }
+   }
+
+   // 凝视深渊：传送到最近的 deep_dark 群系
+   private static void gazeAbyss(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      ServerLevel var2 = var1.overworld();
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.DEEP_DARK), var0.blockPosition(), 6400, 32, 64);
+      if (var3 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      BlockPos var4 = findDeepDarkSpot(var2, var3.getFirst());
+      var0.teleportTo(var2, var4.getX() + 0.5, var4.getY(), var4.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+      var0.resetFallDistance();
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss").withStyle(ChatFormatting.DARK_PURPLE));
+   }
+
+   private static BlockPos findDeepDarkSpot(ServerLevel var0, BlockPos var1) {
+      // 先加载目标附近区块，避免读取到未生成的空气
+      for (int var7 = -1; var7 <= 1; var7++) {
+         for (int var8 = -1; var8 <= 1; var8++) {
+            var0.getChunk((var1.getX() >> 4) + var7, (var1.getZ() >> 4) + var8);
+         }
+      }
+
+      int var6 = Math.max(var0.getMinY() + 2, var1.getY() - 40);
+
+      for (int var2 = var1.getY() + 24; var2 >= var6; var2 -= 2) {
+         for (int var3 = -8; var3 <= 8; var3 += 2) {
+            for (int var4 = -8; var4 <= 8; var4 += 2) {
+               BlockPos var5 = var1.offset(var3, var2 - var1.getY(), var4);
+               if (var0.getBlockState(var5).isAir() && var0.getBlockState(var5.above()).isAir() && !var0.getBlockState(var5.below()).isAir()) {
+                  return var5;
+               }
+            }
+         }
+      }
+
+      return carveSafeSpot(var0, var1);
    }
 
    private static void summonTravelFrog(ServerPlayer var0) {
@@ -2698,7 +2766,7 @@ public final class HexEffects {
                }
             }
 
-            BlockPos var21 = generateStructureAt(var0, var7, 200);
+            BlockPos var21 = generateStructureAt(var3, var0, var7, 200);
             return var21 == null ? null : structureMap(var3, var21.getX(), var21.getZ(), var2 ? "地狱堡垒地图" : "村庄地图");
          }
       }
@@ -3296,51 +3364,51 @@ public final class HexEffects {
       }
    }
 
-   private static void teleportToStructure(ServerPlayer var0, TagKey<Structure> var1, String var2, String var3, String var4) {
-      if (var0.level() instanceof ServerLevel var5) {
-         BlockPos var6 = var5.findNearestMapStructure(var1, var0.blockPosition(), 100, false);
-         if (var6 == null) {
-            if (!generateStructure(var0, var4, var2)) {
+   private static void teleportToStructure(ServerPlayer var0, ServerLevel var5, TagKey<Structure> var1, String var2, String var3, String var4) {
+      BlockPos var6 = var5.findNearestMapStructure(var1, var0.blockPosition(), 100, false);
+      if (var6 == null) {
+         if (!generateStructure(var0, var5, var4, var2)) {
+            var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GRAY));
+         }
+      } else {
+         int var7 = var5.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var6.getX(), var6.getZ());
+         int var8 = safeGroundY(var5, var6.getX(), var6.getZ(), var7 + 2);
+         if (var8 < 0) {
+            // 水下结构（沉船/海底废弃门）找不到干燥落脚点：直接传送到水面上方
+            boolean var10 = !var5.getBlockState(new BlockPos(var6.getX(), var7 - 1, var6.getZ())).getFluidState().isEmpty();
+            if (var10) {
+               int var9 = var7 + 1;
+               var0.teleportTo(var5, var6.getX() + 0.5, var9, var6.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+               var0.resetFallDistance();
+               var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
+            } else if (!generateStructure(var0, var5, var4, var2)) {
                var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GRAY));
             }
          } else {
-            int var7 = var5.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var6.getX(), var6.getZ());
-            int var8 = safeGroundY(var5, var6.getX(), var6.getZ(), var7 + 2);
-            if (var8 < 0) {
-               if (!generateStructure(var0, var4, var2)) {
-                  var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GRAY));
-               }
-            } else {
-               var0.teleportTo(var5, var6.getX() + 0.5, var8, var6.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
-               var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
-            }
+            var0.teleportTo(var5, var6.getX() + 0.5, var8, var6.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+            var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
          }
       }
    }
 
-   private static boolean generateStructure(ServerPlayer var0, String var1, String var2) {
-      BlockPos var3 = var1.equals("minecraft:shipwreck") ? generateShipwreckAt(var0, 250) : generateStructureAt(var0, var1, 200);
-      if (var3 == null) {
+   private static boolean generateStructure(ServerPlayer var0, ServerLevel var1, String var2, String var3) {
+      BlockPos var4 = var2.equals("minecraft:shipwreck") ? generateShipwreckAt(var1, var0, 250) : generateStructureAt(var1, var0, var2, 200);
+      if (var4 == null) {
          return false;
       } else {
-         ServerLevel var4 = (ServerLevel)var0.level();
-         int var5 = safeGroundY(var4, var3.getX(), var3.getZ(), var3.getY() + 3);
+         int var5 = safeGroundY(var1, var4.getX(), var4.getZ(), var4.getY() + 3);
          if (var5 < 0) {
-            var5 = var3.getY() + 1;
+            var5 = var4.getY() + 1;
          }
 
-         var0.teleportTo(var4, var3.getX() + 0.5, var5, var3.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
-         var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
+         var0.teleportTo(var1, var4.getX() + 0.5, var5, var4.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+         var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GOLD));
          return true;
       }
    }
 
    // 致敬爱情兜底：沉船只在海洋/沙滩生物群系可放置，故由近及远搜寻合适位置再生成
-   private static BlockPos generateShipwreckAt(ServerPlayer var0, int var1) {
-      if (!(var0.level() instanceof ServerLevel var2)) {
-         return null;
-      }
-
+   private static BlockPos generateShipwreckAt(ServerLevel var2, ServerPlayer var0, int var1) {
       MinecraftServer var3 = var2.getServer();
       if (var3 == null) {
          return null;
@@ -3439,7 +3507,9 @@ public final class HexEffects {
 
    // 九九八十一难：定位或生成试炼大厅并安全传送
    private static void teleportTrialChambers(ServerPlayer var0) {
-      if (!(var0.level() instanceof ServerLevel var1)) {
+      MinecraftServer var6 = var0.level().getServer();
+      ServerLevel var1 = var6 == null ? null : var6.overworld();
+      if (var1 == null) {
          return;
       }
 
@@ -3453,7 +3523,7 @@ public final class HexEffects {
          }
       }
 
-      BlockPos var4 = generateTrialChambers(var0, 200);
+      BlockPos var4 = generateTrialChambers(var1, var0, 200);
       if (var4 == null) {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.trial_chambers_fail").withStyle(ChatFormatting.GRAY));
       } else {
@@ -3518,11 +3588,7 @@ public final class HexEffects {
       return var1;
    }
 
-   private static BlockPos generateTrialChambers(ServerPlayer var0, int var1) {
-      if (!(var0.level() instanceof ServerLevel var2)) {
-         return null;
-      }
-
+   private static BlockPos generateTrialChambers(ServerLevel var2, ServerPlayer var0, int var1) {
       MinecraftServer var3 = var2.getServer();
       if (var3 == null) {
          return null;
@@ -3556,41 +3622,37 @@ public final class HexEffects {
       return null;
    }
 
-   private static BlockPos generateStructureAt(ServerPlayer var0, String var1, int var2) {
-      if (!(var0.level() instanceof ServerLevel var3)) {
+   private static BlockPos generateStructureAt(ServerLevel var3, ServerPlayer var0, String var1, int var2) {
+      MinecraftServer var4 = var3.getServer();
+      if (var4 == null) {
          return null;
       } else {
-         MinecraftServer var4 = var3.getServer();
-         if (var4 == null) {
-            return null;
-         } else {
-            ThreadLocalRandom var5 = ThreadLocalRandom.current();
+         ThreadLocalRandom var5 = ThreadLocalRandom.current();
 
-            for (int var6 = 0; var6 < 8; var6++) {
-               double var7 = var5.nextDouble() * Math.PI * 2.0;
-               int var9 = var0.getBlockX() + (int)Math.round(Math.cos(var7) * (double)var2);
-               int var10 = var0.getBlockZ() + (int)Math.round(Math.sin(var7) * (double)var2);
-               var3.getChunk(var9 >> 4, var10 >> 4);
-               int var11 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var9, var10);
-               BlockPos var12 = new BlockPos(var9, var11, var10);
-               String var13 = structureForBiome(var1, var3, var12);
-               CommandSourceStack var14 = var4.createCommandSourceStack().withLevel(var3).withPosition(Vec3.atCenterOf(var12)).withSuppressedOutput();
-               int var15;
-               try {
-                  var15 = var4.getCommands()
-                     .getDispatcher()
-                     .execute("place structure " + var13 + " " + var9 + " " + var11 + " " + var10, var14);
-               } catch (CommandSyntaxException var18) {
-                  var15 = 0;
-               }
-
-               if (var15 > 0) {
-                  return var12;
-               }
+         for (int var6 = 0; var6 < 8; var6++) {
+            double var7 = var5.nextDouble() * Math.PI * 2.0;
+            int var9 = var0.getBlockX() + (int)Math.round(Math.cos(var7) * (double)var2);
+            int var10 = var0.getBlockZ() + (int)Math.round(Math.sin(var7) * (double)var2);
+            var3.getChunk(var9 >> 4, var10 >> 4);
+            int var11 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var9, var10);
+            BlockPos var12 = new BlockPos(var9, var11, var10);
+            String var13 = structureForBiome(var1, var3, var12);
+            CommandSourceStack var14 = var4.createCommandSourceStack().withLevel(var3).withPosition(Vec3.atCenterOf(var12)).withSuppressedOutput();
+            int var15;
+            try {
+               var15 = var4.getCommands()
+                  .getDispatcher()
+                  .execute("place structure " + var13 + " " + var9 + " " + var11 + " " + var10, var14);
+            } catch (CommandSyntaxException var18) {
+               var15 = 0;
             }
 
-            return null;
+            if (var15 > 0) {
+               return var12;
+            }
          }
+
+         return null;
       }
    }
 
@@ -3609,7 +3671,9 @@ public final class HexEffects {
             return "minecraft:village_plains";
          }
       } else if (var0.endsWith("ruined_portal")) {
-         if (var3.contains("desert")) {
+         if (var1.dimension() == Level.NETHER) {
+            return "minecraft:ruined_portal_nether";
+         } else if (var3.contains("desert")) {
             return "minecraft:ruined_portal_desert";
          } else if (var3.contains("jungle")) {
             return "minecraft:ruined_portal_jungle";

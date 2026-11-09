@@ -11,7 +11,12 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **118 个海克斯强化**：46 银色 / 36 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **119 个海克斯强化**：46 银色 / 37 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.36.0 更新摘要
+
+- 新增金色 **凝视深渊**（`gaze_abyss`）：传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点。
+- **结构传送修复**：村庄、沉船、废弃地狱门、试炼大厅现在固定在世界对应的维度中搜索/生成，站在地狱或末地使用也能正常传送；地狱中的废弃地狱门兜底生成改为 `ruined_portal_nether`；水下找到的沉船/海底废弃门会传送到水面上方而不是重新生成；旅行青蛙的兜底结构也会生成在地图对应的维度。
 
 ### 1.35.5 修复
 
@@ -87,7 +92,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.3.jar`）。
-3. 把 `HexBingo-26.2-1.35.5.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.36.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -112,7 +117,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（118）
+## 海克斯一览（119）
 
 ### 银色（46）
 
@@ -165,7 +170,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
 | 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
 
-### 金色（36）
+### 金色（37）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -205,6 +210,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
 | 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
+| 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点。 |
 
 ### 彩色（36）
 
@@ -300,7 +306,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
 | Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
 
-### Gold (36)
+### Gold (37)
 
 | Name | id | Effect |
 |---|---|---|
@@ -340,6 +346,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
 | Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). Cooldown 7 minutes. |
+| Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves. |
 
 ### Prismatic (36)
 
@@ -395,7 +402,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.35.5 `
+.\build.ps1 -Version 26.2-1.36.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
