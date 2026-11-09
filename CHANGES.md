@@ -1,5 +1,12 @@
 # Changelog
 
+## 26.2-1.35.1 — 2026-11-09
+
+### Fixed
+
+- **Is It Over?** (`is_it_over`) no longer blocks ender pearl teleports. Pearls
+  are a normal movement tool and keep working while you are exiled.
+
 ## 26.2-1.35.0 — 2026-11-09
 
 Requires ReBongo `26.2-1.0.0-port.3` or newer (team backpacks now have 54

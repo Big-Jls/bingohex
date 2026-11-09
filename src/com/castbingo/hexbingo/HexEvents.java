@@ -464,6 +464,11 @@ public class HexEvents {
 
    @SubscribeEvent
    public void teleport(EntityTeleportEvent var1) {
+      // 末影珍珠属于玩家自身位移手段，不限制
+      if (var1 instanceof EntityTeleportEvent.EnderPearl) {
+         return;
+      }
+
       if (var1.getEntity() instanceof ServerPlayer var2 && HexEffects.isEndExiled(var2) && !HexEffects.isExileBypassing()) {
          var1.setCanceled(true);
          var2.sendSystemMessage(net.minecraft.network.chat.Component.translatable("hexbingo.msg.end_exile_no_tp").withStyle(net.minecraft.ChatFormatting.DARK_PURPLE));
