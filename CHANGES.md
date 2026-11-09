@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.37.2 — 2026-11-10
+
+### Changed
+
+- Bat Form (`bat_form`): the player now really turns into a bat, using the same
+  disguise approach as Fae Magic. The player entity is set invisible and a
+  no-AI, invulnerable, silent bat is spawned and follows the player every tick
+  (with dimension changes). The disguise is removed when the form ends, on
+  death, on logout, on game reset, and leftover disguises are cleaned up.
+
 ## 26.2-1.37.1 — 2026-11-10
 
 ### Fixed

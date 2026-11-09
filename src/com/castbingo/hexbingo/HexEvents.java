@@ -457,6 +457,7 @@ public class HexEvents {
    @SubscribeEvent
    public void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post var1) {
       HexEffects.tickDash(var1.getServer());
+      HexEffects.tickBatForms(var1.getServer());
       HexEffects.tickPortableFurnaces(var1.getServer());
       HexEffects.tickSmeltBoost(var1.getServer());
       HexEffects.tickTrap(var1.getServer());
@@ -482,6 +483,7 @@ public class HexEvents {
    public void playerLoggedOut(PlayerLoggedOutEvent var1) {
       if (var1.getEntity() instanceof ServerPlayer var2) {
          HexEffects.onFaeLogout(var2);
+         HexEffects.onBatLogout(var2);
          HexEffects.onTrapLogout(var2);
          HexEffects.onSoulLogout(var2);
       }

@@ -94,6 +94,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.feline.CatVariant;
@@ -353,6 +354,7 @@ public final class HexEffects {
    // 蝙蝠形态
    private static final Map<UUID, Long> BAT_UNTIL = new HashMap<>();
    private static final Map<UUID, Long> BAT_COOLDOWN = new HashMap<>();
+   private static final Map<UUID, Bat> BAT_DISGUISES = new HashMap<>();
    // 精神控制
    private static final Map<UUID, HexEffects.MindState> MIND_CONTROL = new HashMap<>();
    private static final Map<UUID, Long> MIND_COOLDOWN = new HashMap<>();
@@ -1206,7 +1208,6 @@ public final class HexEffects {
          }
 
          List<Hex> var6 = hexes(var5);
-         tickBatForm(var5);
          tickXray(var5);
          boolean var7 = false;
          if (var6.isEmpty()) {
@@ -8123,23 +8124,98 @@ public final class HexEffects {
       var0.getAbilities().mayfly = true;
       var0.getAbilities().flying = false;
       var0.onUpdateAbilities();
+      var0.setInvisible(true);
+      ensureBatDisguise(var0);
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.bat_start").withStyle(ChatFormatting.GOLD));
       return true;
+   }
+
+   // 蝙蝠形态：本体隐形 + 一只无 AI 的真蝙蝠跟随，参照精怪魔法的伪装实现
+   private static void ensureBatDisguise(ServerPlayer var0) {
+      if (var0.level() instanceof ServerLevel var1) {
+         Bat var2 = BAT_DISGUISES.get(var0.getUUID());
+         if (var2 != null && var2.isAlive()) {
+            if (var2.level() != var1) {
+               var2.teleportTo(var1, var0.getX(), var0.getY() + 0.6, var0.getZ(), Set.of(), var0.getYRot(), 0.0F, false);
+            }
+
+            return;
+         }
+
+         if (var2 != null) {
+            var2.discard();
+         }
+
+         Bat var3 = EntityTypes.BAT.create(var1, EntitySpawnReason.MOB_SUMMONED);
+         if (var3 != null) {
+            var3.setPos(var0.getX(), var0.getY() + 0.6, var0.getZ());
+            var3.setYRot(var0.getYRot());
+            var3.setYHeadRot(var0.getYHeadRot());
+            var3.setResting(false);
+            var3.setNoAi(true);
+            var3.setNoGravity(true);
+            var3.setInvulnerable(true);
+            var3.setSilent(true);
+            var3.setPersistenceRequired();
+            var3.noPhysics = true;
+            var3.setCustomName(Component.literal("蝙蝠形态"));
+            var3.setCustomNameVisible(false);
+            var1.addFreshEntity(var3);
+            BAT_DISGUISES.put(var0.getUUID(), var3);
+         }
+      }
    }
 
    public static boolean isBatForm(ServerPlayer var0) {
       return BAT_UNTIL.containsKey(var0.getUUID());
    }
 
-   private static void tickBatForm(ServerPlayer var0) {
-      Long var1 = BAT_UNTIL.get(var0.getUUID());
-      if (var1 != null && System.currentTimeMillis() >= var1) {
-         endBatForm(var0, true);
+   public static void tickBatForms(MinecraftServer var0) {
+      if (!BAT_UNTIL.isEmpty()) {
+         long var1 = System.currentTimeMillis();
+
+         for (UUID var4 : new ArrayList<>(BAT_UNTIL.keySet())) {
+            ServerPlayer var5 = var0.getPlayerList().getPlayer(var4);
+            Long var6 = BAT_UNTIL.get(var4);
+            if (var5 == null) {
+               Bat var7x = BAT_DISGUISES.remove(var4);
+               if (var7x != null) {
+                  var7x.discard();
+               }
+            } else if (var6 != null && var1 < var6) {
+               ensureBatDisguise(var5);
+               Bat var7 = BAT_DISGUISES.get(var4);
+               if (var7 != null && var7.isAlive()) {
+                  double var8 = var5.getY() + 0.6;
+                  if (var7.level() != var5.level()) {
+                     var7.teleportTo((ServerLevel)var5.level(), var5.getX(), var8, var5.getZ(), Set.of(), var5.getYRot(), 0.0F, false);
+                  }
+
+                  var7.setPos(var5.getX(), var8, var5.getZ());
+                  var7.setYRot(var5.getYRot());
+                  var7.setYHeadRot(var5.getYHeadRot());
+                  var7.setXRot(0.0F);
+                  var7.setDeltaMovement(Vec3.ZERO);
+               }
+            } else {
+               endBatForm(var5, true);
+            }
+         }
       }
+   }
+
+   public static void onBatLogout(ServerPlayer var0) {
+      endBatForm(var0, false);
    }
 
    private static void endBatForm(ServerPlayer var0, boolean var1) {
       if (BAT_UNTIL.remove(var0.getUUID()) != null) {
+         Bat var4 = BAT_DISGUISES.remove(var0.getUUID());
+         if (var4 != null) {
+            var4.discard();
+         }
+
+         var0.setInvisible(false);
          AttributeInstance var2 = var0.getAttribute(Attributes.SCALE);
          if (var2 != null) {
             var2.removeModifier(modifierId("bat_form", 0));
@@ -8537,6 +8613,7 @@ public final class HexEffects {
       MIDAS_COOLDOWN.clear();
       BAT_UNTIL.clear();
       BAT_COOLDOWN.clear();
+      BAT_DISGUISES.clear();
       MIND_CONTROL.clear();
       MIND_COOLDOWN.clear();
       OBJECTIVE_DENY = null;
@@ -8563,7 +8640,8 @@ public final class HexEffects {
       // 清理历史上遗留在世界里的精怪魔法伪装
       for (ServerLevel var2 : var0.getAllLevels()) {
          for (Entity var4 : var2.getAllEntities()) {
-            if (var4.getCustomName() != null && var4.getCustomName().getString().equals("精怪魔法")) {
+            if (var4.getCustomName() != null
+               && (var4.getCustomName().getString().equals("精怪魔法") || var4.getCustomName().getString().equals("蝙蝠形态"))) {
                var4.discard();
             }
          }
