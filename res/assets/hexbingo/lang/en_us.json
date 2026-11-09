@@ -470,7 +470,7 @@
     "hexbingo.hex.midas_touch.name":  "Midas Touch",
     "hexbingo.hex.midas_touch.desc":  "Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute.",
     "hexbingo.hex.bat_form.name":  "Bat Form",
-    "hexbingo.hex.bat_form.desc":  "Gain 'Bat Form'. Right-click to become a real bat for 60 seconds: you turn invisible and a bat follows you, with flight, no attacks, bat-sized health and body. Cooldown 7 minutes.",
+    "hexbingo.hex.bat_form.desc":  "Gain 'Bat Form'. Right-click to become a real bat for 60 seconds: you turn invisible and shrink to 0.5 blocks tall while a real bat follows you; flight, no attacks, reduced health. Cooldown 7 minutes.",
     "hexbingo.hex.mind_control.name":  "Mind Control",
     "hexbingo.hex.mind_control.desc":  "Gain 'Mind Control'. Right-click to control one enemy's movement direction for 15 seconds. Cooldown 5 minutes.",
     "hexbingo.hex.objective_deny.name":  "Objective Deny",
@@ -544,5 +544,8 @@
     "hexbingo.hex.gaze_abyss.name":  "Gaze Into the Abyss",
     "hexbingo.hex.gaze_abyss.desc":  "Teleport to the nearest deep dark biome and find a safe spot inside its caves.",
     "hexbingo.msg.gaze_abyss":  "Gaze Into the Abyss: teleported to the nearest deep dark biome.",
-    "hexbingo.msg.gaze_abyss_none":  "Gaze Into the Abyss: no deep dark biome found nearby."
+    "hexbingo.msg.gaze_abyss_none":  "Gaze Into the Abyss: no deep dark biome found nearby.",
+    "hexbingo.hex.cutting_edge.name":  "Cutting Edge Inventor",
+    "hexbingo.hex.cutting_edge.desc":  "All skill-type hex cooldowns are reduced by 30%.",
+    "hexbingo.msg.cutting_edge":  "Cutting Edge Inventor: your skill hex cooldowns are 30% shorter."
 }

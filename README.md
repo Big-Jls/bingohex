@@ -11,7 +11,12 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **119 个海克斯强化**：46 银色 / 37 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **120 个海克斯强化**：46 银色 / 38 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.38.0 更新摘要
+
+- 新增金色 **尖端发明家**（`cutting_edge`）：当前玩家所有技能型海克斯的冷却时间缩短 30%。
+- **蝙蝠形态**：改为有 AI、无敌、有声的真蝙蝠每 tick 跟随（含跨维度）；本体隐形并缩小到 0.5 格高。
 
 ### 1.37.2 变更
 
@@ -139,7 +144,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（119）
+## 海克斯一览（120）
 
 ### 银色（46）
 
@@ -192,11 +197,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
 | 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
 
-### 金色（37）
+### 金色（38）
 
 | 名称 | id | 效果 |
 |---|---|---|
 | 随机传送 | `random_teleport` | 获得 /bingo rtp 指令：在当前位置附近随机传送，冷却 5 秒。 |
+| 尖端发明家 | `cutting_edge` | 所有技能型海克斯的冷却时间缩短 30%。 |
 | 我很想要 | `want_more_items` | 获得 10 个随机物品。 |
 | 更更万用瞄准镜 | `scope_2` | 方块交互距离 +5，实体交互距离 +5。可与其他瞄准镜叠加。 |
 | 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
@@ -328,11 +334,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
 | Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
 
-### Gold (37)
+### Gold (38)
 
 | Name | id | Effect |
 |---|---|---|
 | Random Teleport | `random_teleport` | Unlocks /bingo rtp: randomly teleport nearby with a 5s cooldown. |
+| Cutting Edge Inventor | `cutting_edge` | All skill-type hex cooldowns are reduced by 30%. |
 | I Want More | `want_more_items` | Gain 10 random items. |
 | Greater Utility Scope | `scope_2` | Gain +2 block interaction range and +2 entity interaction range. |
 | Prismatic Ascension | `prismatic_shift` | Gain a random prismatic hex. |

@@ -690,6 +690,10 @@ public final class HexEffects {
          case "gaze_abyss":
             gazeAbyss(var0);
             break;
+         // 尖端发明家：技能型海克斯冷却缩短 30%
+         case "cutting_edge":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.cutting_edge").withStyle(ChatFormatting.AQUA));
+            break;
          // 古代遗迹
          case "ancient_ruins":
             ancientRuins(var0);
@@ -2142,6 +2146,11 @@ public final class HexEffects {
       return var3.mayhem() && var3.hexes(var0.getUUID()).contains(var1);
    }
 
+   // 尖端发明家：所有技能型海克斯的冷却时间缩短 30%
+   private static long skillCooldown(ServerPlayer var0, long var1) {
+      return hasHex(var0, "cutting_edge") ? (long)(var1 * 0.7) : var1;
+   }
+
    public static boolean randomTeleport(ServerPlayer var0) {
       MinecraftServer var1 = var0.level().getServer();
       if (var1 != null && hasHex(var0, "random_teleport")) {
@@ -2179,7 +2188,7 @@ public final class HexEffects {
                return true;
             } else {
                var0.teleportTo(var5, var7.getX() + 0.5, var7.getY(), var7.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
-               RTP_COOLDOWN.put(var0.getUUID(), var2 + 5000L);
+               RTP_COOLDOWN.put(var0.getUUID(), var2 + skillCooldown(var0, 5000L));
                var0.sendSystemMessage(Component.translatable("hexbingo.rtp.success").withStyle(ChatFormatting.GREEN));
                return true;
             }
@@ -2519,7 +2528,7 @@ public final class HexEffects {
          var0.sendSystemMessage(Component.translatable("hexbingo.jam.none").withStyle(ChatFormatting.GRAY));
          return true;
       } else {
-         JAM_COOLDOWN.put(var0.getUUID(), var2 + 540000L);
+         JAM_COOLDOWN.put(var0.getUUID(), var2 + skillCooldown(var0, 540000L));
          HexBingo.LOGGER.info("BP jam cast by {} against {} teams for 180s", var0.getScoreboardName(), var6);
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.jam_cast", new Object[]{var6}).withStyle(ChatFormatting.LIGHT_PURPLE));
          return true;
@@ -4280,7 +4289,7 @@ public final class HexEffects {
          Vec3 var5 = var4.getLocation().subtract(var0.position()).normalize();
          var0.setDeltaMovement(var5.x * 2.0, var5.y * 2.0 + 0.4, var5.z * 2.0);
          var0.hurtMarked = true;
-         HOOK_COOLDOWN.put(var0.getUUID(), var1 + 5000L);
+         HOOK_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 5000L));
          var0.sendSystemMessage(Component.translatable("hexbingo.hook.success").withStyle(ChatFormatting.AQUA));
       } else {
          var0.sendSystemMessage(Component.translatable("hexbingo.hook.no_target").withStyle(ChatFormatting.GRAY));
@@ -4516,7 +4525,7 @@ public final class HexEffects {
    }
 
    private static void finishDash(ServerPlayer var0, HexEffects.DashState var1, long var2) {
-      DASH_COOLDOWN.put(var0.getUUID(), var2 + DASH_COOLDOWN_MS);
+      DASH_COOLDOWN.put(var0.getUUID(), var2 + skillCooldown(var0, DASH_COOLDOWN_MS));
       var0.resetFallDistance();
       var0.sendSystemMessage(
          Component.translatable(
@@ -5131,7 +5140,7 @@ public final class HexEffects {
          } else {
             if (shieldBlocks(var12, "rainbow_duel")) {
                // 目标被免疫护盾抵挡：效果被挡，但技能已发动，仍进入冷却
-               TRAP_COOLDOWN.put(var0.getUUID(), var1 + 180000L);
+               TRAP_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 180000L));
                var0.sendSystemMessage(
                   Component.translatable("hexbingo.msg.shield_attacker", new Object[]{Component.translatable("hexbingo.hex.rainbow_duel.name")})
                      .withStyle(ChatFormatting.GRAY)
@@ -5156,7 +5165,7 @@ public final class HexEffects {
             var12.resetFallDistance();
             var0.setRemainingFireTicks(0);
             var12.setRemainingFireTicks(0);
-            TRAP_COOLDOWN.put(var0.getUUID(), var1 + 180000L);
+            TRAP_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 180000L));
             MutableComponent var10 = Component.translatable("hexbingo.msg.trap_start").withStyle(ChatFormatting.LIGHT_PURPLE);
             var0.sendSystemMessage(var10);
             var12.sendSystemMessage(var10);
@@ -5665,7 +5674,7 @@ public final class HexEffects {
             }
 
             // 有目标即视为技能已发动：先进入冷却；免疫护盾仅抵挡个别目标的诅咒效果
-            FAE_COOLDOWN.put(var0.getUUID(), var1 + 300000L);
+            FAE_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 300000L));
             long var13 = var1 + 60000L;
             int var14 = 0;
 
@@ -5961,7 +5970,7 @@ public final class HexEffects {
       }
 
       lockEnemyBreaking(var0, 30);
-      UNTOUCHABLE_COOLDOWN.put(var0.getUUID(), var1 + UNTOUCHABLE_COOLDOWN_MS);
+      UNTOUCHABLE_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, UNTOUCHABLE_COOLDOWN_MS));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.untouchable_used").withStyle(ChatFormatting.AQUA));
       return true;
    }
@@ -6789,7 +6798,7 @@ public final class HexEffects {
          return true;
       }
 
-      CHAOS_MIND_COOLDOWN.put(var0.getUUID(), var1 + CHAOS_MIND_COOLDOWN_MS);
+      CHAOS_MIND_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, CHAOS_MIND_COOLDOWN_MS));
       var0.sendSystemMessage(
          Component.translatable("hexbingo.msg.inventory_shuffle", new Object[]{Component.literal(Integer.toString(var5))})
             .withStyle(ChatFormatting.GOLD)
@@ -6913,7 +6922,7 @@ public final class HexEffects {
          var17.sendSystemMessage(Component.translatable("hexbingo.msg.banished").withStyle(ChatFormatting.RED));
       }
 
-      BANISH_COOLDOWN.put(var0.getUUID(), var2 + 480000L);
+      BANISH_COOLDOWN.put(var0.getUUID(), var2 + skillCooldown(var0, 480000L));
       var0.sendSystemMessage(
          Component.translatable("hexbingo.msg.banish_cast", new Object[]{Component.literal(Integer.toString(var7.size()))})
             .withStyle(ChatFormatting.DARK_PURPLE)
@@ -7035,7 +7044,7 @@ public final class HexEffects {
       }
 
       theWorld(var0);
-      THE_WORLD_COOLDOWN.put(var0.getUUID(), var1 + THE_WORLD_COOLDOWN_MS);
+      THE_WORLD_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, THE_WORLD_COOLDOWN_MS));
       return true;
    }
 
@@ -7850,7 +7859,7 @@ public final class HexEffects {
          return true;
       }
 
-      BLIND_COOLDOWN.put(var0.getUUID(), var1 + 180000L);
+      BLIND_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 180000L));
       var10.playSound(null, var0.getX(), var0.getY(), var0.getZ(), SoundEvents.SQUID_SQUIRT, SoundSource.PLAYERS, 1.0F, 0.9F);
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.blind_cast", var5).withStyle(ChatFormatting.DARK_GRAY));
       return true;
@@ -8073,7 +8082,7 @@ public final class HexEffects {
             } else if (!var6.has(DataComponents.CUSTOM_NAME) && !VALUABLE_ITEMS.contains(var6.getItem()) && !var6.isEnchanted()) {
                int var7 = var6.getCount();
                var0.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.GOLD_INGOT, var7));
-               MIDAS_COOLDOWN.put(var0.getUUID(), var1 + 60000L);
+               MIDAS_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 60000L));
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.midas_done", var7).withStyle(ChatFormatting.GOLD));
                var0.level().playSound(null, var0.getX(), var0.getY(), var0.getZ(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.5F, 2.0F);
             } else {
@@ -8109,10 +8118,11 @@ public final class HexEffects {
       }
 
       BAT_UNTIL.put(var0.getUUID(), var1 + 60000L);
-      BAT_COOLDOWN.put(var0.getUUID(), var1 + 420000L);
+      BAT_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 420000L));
       AttributeInstance var6 = var0.getAttribute(Attributes.SCALE);
       if (var6 != null) {
-         var6.addOrUpdateTransientModifier(new AttributeModifier(modifierId("bat_form", 0), -0.5, Operation.ADD_MULTIPLIED_BASE));
+         // 约为 0.5 格高（玩家默认 1.8 格）
+         var6.addOrUpdateTransientModifier(new AttributeModifier(modifierId("bat_form", 0), -0.7222, Operation.ADD_MULTIPLIED_BASE));
       }
 
       AttributeInstance var7 = var0.getAttribute(Attributes.MAX_HEALTH);
@@ -8152,10 +8162,8 @@ public final class HexEffects {
             var3.setYRot(var0.getYRot());
             var3.setYHeadRot(var0.getYHeadRot());
             var3.setResting(false);
-            var3.setNoAi(true);
             var3.setNoGravity(true);
             var3.setInvulnerable(true);
-            var3.setSilent(true);
             var3.setPersistenceRequired();
             var3.noPhysics = true;
             var3.setCustomName(Component.literal("蝙蝠形态"));
@@ -8195,6 +8203,7 @@ public final class HexEffects {
                   var7.setYRot(var5.getYRot());
                   var7.setYHeadRot(var5.getYHeadRot());
                   var7.setXRot(0.0F);
+                  var7.setResting(false);
                   var7.setDeltaMovement(Vec3.ZERO);
                }
             } else {
@@ -8267,7 +8276,7 @@ public final class HexEffects {
       }
 
       MIND_CONTROL.put(var0.getUUID(), new HexEffects.MindState(var6.getUUID(), var1 + 15000L));
-      MIND_COOLDOWN.put(var0.getUUID(), var1 + 300000L);
+      MIND_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 300000L));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_cast", var6.getDisplayName()).withStyle(ChatFormatting.LIGHT_PURPLE));
       var6.sendSystemMessage(Component.translatable("hexbingo.msg.mind_controlled").withStyle(ChatFormatting.DARK_PURPLE));
       return true;
@@ -8357,7 +8366,7 @@ public final class HexEffects {
          Bingo var3 = Bingo.get(var2.overworld());
          if (var1 >= 0 && var1 < var3.tasks().size()) {
             OBJECTIVE_DENY = new HexEffects.DenyState(var1, System.currentTimeMillis() + 30000L);
-            DENY_COOLDOWN.put(var0.getUUID(), System.currentTimeMillis() + 900000L);
+            DENY_COOLDOWN.put(var0.getUUID(), System.currentTimeMillis() + skillCooldown(var0, 900000L));
             Component var4 = var3.task(var1).contentName(var2);
             Component var5 = Component.translatable("hexbingo.msg.deny_cast", var0.getDisplayName(), var4).withStyle(ChatFormatting.RED);
 
@@ -8430,7 +8439,7 @@ public final class HexEffects {
       }
 
       XRAY_UNTIL.put(var0.getUUID(), var1 + 20000L);
-      XRAY_COOLDOWN.put(var0.getUUID(), var1 + 300000L);
+      XRAY_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 300000L));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_start").withStyle(ChatFormatting.AQUA));
       tickXray(var0);
       return true;

@@ -1,5 +1,22 @@
 # Changelog
 
+## 26.2-1.38.0 — 2026-11-10
+
+### Added
+
+- **Cutting Edge Inventor** (`cutting_edge`, gold): all skill-type hex
+  cooldowns of the current player are reduced by 30%. This applies to the
+  skill items and abilities with cooldowns (blind, bat form, midas touch,
+  mind control, objective deny, x-ray, dash, fae magic, trap, jam, hook,
+  untouchable, chaos mind, banish, the world, random teleport, portal bench
+  furnace skills that use cooldowns).
+
+### Changed
+
+- Bat Form (`bat_form`): the disguise bat now has AI, is invulnerable and
+  audible (no longer silenced), still follows the player every tick including
+  dimension changes. The player is now invisible and shrunk to 0.5 blocks tall.
+
 ## 26.2-1.37.2 — 2026-11-10
 
 ### Changed
