@@ -98,6 +98,7 @@ import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.wolf.WolfVariant;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
@@ -122,6 +123,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
@@ -177,7 +179,9 @@ public final class HexEffects {
    private static final Map<UUID, Long> HOOK_COOLDOWN = new HashMap<>();
    private static final long HOOK_COOLDOWN_MS = 5000L;
    private static final Map<UUID, Long> DASH_COOLDOWN = new HashMap<>();
-   private static final long DASH_COOLDOWN_MS = 5000L;
+   private static final long DASH_COOLDOWN_MS = 15000L;
+   private static final long DASH_DURATION_MS = 8000L;
+   private static final Map<UUID, HexEffects.DashState> DASHING = new HashMap<>();
    private static final Map<UUID, HexEffects.SoulState> SOULS = new HashMap<>();
    private static final Set<UUID> VOYAGE_ACTIVE = new HashSet<>();
    private static final Map<UUID, Long> JAM_COOLDOWN = new HashMap<>();
@@ -793,6 +797,10 @@ public final class HexEffects {
          case "demon_pact":
             applyDemonPact(var0, var1, var2);
             break;
+         // 终极刷新
+         case "ultimate_refresh":
+            grantUltimateRefresh(var0);
+            break;
          // 工具箱
          case "toolbox":
             giveToolbox(var0);
@@ -956,6 +964,7 @@ public final class HexEffects {
       FAE_COOLDOWN.remove(var0.getUUID());
       HOOK_COOLDOWN.remove(var0.getUUID());
       DASH_COOLDOWN.remove(var0.getUUID());
+      DASHING.remove(var0.getUUID());
       JAM_COOLDOWN.remove(var0.getUUID());
       EYE_MARK.remove(var0.getUUID());
       VOYAGE_ACTIVE.remove(var0.getUUID());
@@ -1006,6 +1015,7 @@ public final class HexEffects {
       long var1 = System.currentTimeMillis();
       TEMP_DAMAGE.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
       TEMP_LIFESTEAL.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
+      tickDash(var0);
       tickTheWorld(var0);
       tickHexBees(var0);
       if (DAY_NIGHT_UNTIL > 0L && var1 >= DAY_NIGHT_UNTIL) {
@@ -4195,90 +4205,110 @@ public final class HexEffects {
          return true;
       }
 
-      if (!(var0.level() instanceof ServerLevel var4) || var0.isSpectator()) {
+      if (!(var0.level() instanceof ServerLevel) || var0.isSpectator() || DASHING.containsKey(var0.getUUID())) {
          return true;
       }
 
-      Vec3 var5 = var0.getLookAngle();
-      double var6 = var5.x;
-      double var8 = var5.z;
-      double var10 = Math.sqrt(var6 * var6 + var8 * var8);
-      if (var10 < 1.0E-4) {
+      Vec3 var4 = var0.getLookAngle();
+      double var5 = Math.sqrt(var4.x * var4.x + var4.z * var4.z);
+      if (var5 < 1.0E-4) {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.dash_none").withStyle(ChatFormatting.GRAY));
          return true;
       }
 
-      var6 /= var10;
-      var8 /= var10;
-      int perpBX = (int)Math.round(-var8);
-      int perpBZ = (int)Math.round(var6);
-      double var12 = var0.getX();
-      double var14 = var0.getY();
-      double var16 = var0.getZ();
-      int var18 = 0;
-      int var19 = 0;
-      int var20 = 0;
-      HashSet<UUID> var22 = new HashSet<>();
-      double var23 = var12;
-      double var25 = var16;
+      DASHING.put(var0.getUUID(), new HexEffects.DashState(var1 + DASH_DURATION_MS, var0.getY(), var4.x / var5, var4.z / var5));
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.dash_start").withStyle(ChatFormatting.GOLD));
+      return true;
+   }
 
-      for (int var27 = 1; var27 <= 3; var27++) {
-         int var28 = Mth.floor(var12 + var6 * var27);
-         int var29 = Mth.floor(var16 + var8 * var27);
-         int baseY = Mth.floor(var14 + 0.01);
-
-         boolean blocked = false;
-         for (int w = -1; w <= 1 && !blocked; w++) {
-            for (int h = 0; h <= 2; h++) {
-               BlockPos pos = new BlockPos(var28 + perpBX * w, baseY + h, var29 + perpBZ * w);
-               if (dashBlocked(var4.getBlockState(pos), var4, pos)) {
-                  blocked = true;
-                  break;
-               }
-            }
-         }
-         if (blocked) {
-            break;
-         }
-
-         for (int w = -1; w <= 1; w++) {
-            for (int h = 0; h <= 2; h++) {
-               BlockPos pos = new BlockPos(var28 + perpBX * w, baseY + h, var29 + perpBZ * w);
-               BlockState state = var4.getBlockState(pos);
-               if (!state.isAir()) {
-                  var4.destroyBlock(pos, true, var0);
-                  var18++;
-               }
-            }
-         }
-
-         AABB var34 = new AABB(var28 - 1, baseY, var29 - 1, var28 + 2, baseY + 3, var29 + 2).inflate(0.3);
-
-         for (LivingEntity var36 : var4.getEntitiesOfClass(LivingEntity.class, var34, var35x -> var35x != var0 && var35x.isAlive() && !var35x.isSpectator())) {
-            if (var22.add(var36.getUUID())) {
-               var36.hurtServer(var4, var0.damageSources().playerAttack(var0), 5.0F);
-               var20++;
-            }
-         }
-
-         var23 = var12 + var6 * var27;
-         var25 = var16 + var8 * var27;
-         var19 = var27;
+   private static void tickDash(MinecraftServer var0) {
+      if (DASHING.isEmpty()) {
+         return;
       }
 
-      if (var19 > 0) {
-         var0.teleportTo(var4, var23, var14, var25, Set.of(), var0.getYRot(), var0.getXRot(), false);
-         var0.resetFallDistance();
-      }
+      Iterator<Map.Entry<UUID, HexEffects.DashState>> var1 = DASHING.entrySet().iterator();
 
-      DASH_COOLDOWN.put(var0.getUUID(), var1 + DASH_COOLDOWN_MS);
+      while (var1.hasNext()) {
+         Map.Entry<UUID, HexEffects.DashState> var2 = var1.next();
+         HexEffects.DashState var3 = var2.getValue();
+         ServerPlayer var4 = var0.getPlayerList().getPlayer(var2.getKey());
+         if (var4 != null && hasHex(var4, "dash_charge") && var4.level() instanceof ServerLevel var5 && !var4.isSpectator() && !var4.isDeadOrDying()) {
+            long var6 = System.currentTimeMillis();
+            if (var6 >= var3.endsAt) {
+               var1.remove();
+               finishDash(var4, var3, var6);
+            } else {
+               Vec3 var8 = var4.getLookAngle();
+               double var9 = Math.sqrt(var8.x * var8.x + var8.z * var8.z);
+               if (var9 >= 1.0E-4) {
+                  var3.dirX = var8.x / var9;
+                  var3.dirZ = var8.z / var9;
+               }
+
+               double var11 = var4.getX() + var3.dirX * 0.6;
+               double var13 = var4.getZ() + var3.dirZ * 0.6;
+               int var15 = Mth.floor(var11);
+               int var16 = Mth.floor(var3.y);
+               int var17 = Mth.floor(var13);
+               boolean var18 = false;
+
+               for (int var19 = 0; var19 <= 1; var19++) {
+                  BlockPos var20 = new BlockPos(var15, var16 + var19, var17);
+                  BlockState var21 = var5.getBlockState(var20);
+                  if (dashBlocked(var21, var5, var20)) {
+                     var18 = true;
+                     break;
+                  }
+               }
+
+               if (var18) {
+                  var1.remove();
+                  var4.sendSystemMessage(Component.translatable("hexbingo.msg.dash_blocked").withStyle(ChatFormatting.GRAY));
+                  finishDash(var4, var3, var6);
+               } else {
+                  for (int var19 = 0; var19 <= 1; var19++) {
+                     BlockPos var20 = new BlockPos(var15, var16 + var19, var17);
+                     BlockState var21 = var5.getBlockState(var20);
+                     if (!var21.isAir() && var21.getFluidState().isEmpty()) {
+                        var5.destroyBlock(var20, true, var4);
+                        var3.blocks++;
+                     }
+                  }
+
+                  var4.teleportTo(var5, var11, var3.y, var13, Set.of(), var4.getYRot(), var4.getXRot(), false);
+                  var4.setDeltaMovement(Vec3.ZERO);
+                  var4.resetFallDistance();
+                  var3.moved += 0.6;
+                  AABB var24 = new AABB(var11 - 0.9, var3.y - 0.1, var13 - 0.9, var11 + 0.9, var3.y + 2.0, var13 + 0.9);
+
+                  for (LivingEntity var26 : var5.getEntitiesOfClass(LivingEntity.class, var24, var27 -> var27 != var4 && var27.isAlive() && !var27.isSpectator())) {
+                     if (var3.hit.add(var26.getUUID())) {
+                        var26.hurtServer(var5, var4.damageSources().playerAttack(var4), 10.0F);
+                        var3.mobs++;
+                     }
+                  }
+               }
+            }
+         } else {
+            var1.remove();
+         }
+      }
+   }
+
+   private static void finishDash(ServerPlayer var0, HexEffects.DashState var1, long var2) {
+      DASH_COOLDOWN.put(var0.getUUID(), var2 + DASH_COOLDOWN_MS);
+      var0.resetFallDistance();
       var0.sendSystemMessage(
          Component.translatable(
-               "hexbingo.msg.dash", new Object[]{Component.literal(Integer.toString(var19)), Component.literal(Integer.toString(var18)), Component.literal(Integer.toString(var20))}
+               "hexbingo.msg.dash",
+               new Object[]{
+                  Component.literal(Integer.toString(Math.round((float)var1.moved))),
+                  Component.literal(Integer.toString(var1.blocks)),
+                  Component.literal(Integer.toString(var1.mobs))
+               }
             )
             .withStyle(ChatFormatting.GOLD)
       );
-      return true;
    }
 
    private static boolean dashBlocked(BlockState var0, ServerLevel var1, BlockPos var2) {
@@ -5793,9 +5823,35 @@ public final class HexEffects {
             }
          }
 
+         if (var0.getEntity() instanceof EnderMan && hasHex(var1, "ender_slayer")) {
+            enderSlayerDrop(var1, var0, var2);
+         }
+
          if (LOUIS_PENDING.contains(var1.getUUID()) && hasHex(var1, "louis_xvi")) {
             louisXviDrop(var1, var0, var2);
          }
+      }
+   }
+
+   // 末影杀手：击杀末影人 1% 掉落附魔书（精准采集 0.2% / 经验修补 0.4% / 无限 0.4%）
+   private static void enderSlayerDrop(ServerPlayer var0, LivingDropsEvent var1, ServerLevel var2) {
+      ThreadLocalRandom var3 = ThreadLocalRandom.current();
+      if (var3.nextDouble() < 0.01) {
+         Registry<Enchantment> var4 = var0.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+         double var5 = var3.nextDouble();
+         Holder<Enchantment> var6;
+         if (var5 < 0.2) {
+            var6 = var4.wrapAsHolder((Enchantment)var4.getValueOrThrow(Enchantments.SILK_TOUCH));
+         } else if (var5 < 0.6) {
+            var6 = var4.wrapAsHolder((Enchantment)var4.getValueOrThrow(Enchantments.MENDING));
+         } else {
+            var6 = var4.wrapAsHolder((Enchantment)var4.getValueOrThrow(Enchantments.INFINITY));
+         }
+
+         ItemStack var7 = EnchantmentHelper.createBook(new EnchantmentInstance(var6, 1));
+         Entity var8 = var1.getEntity();
+         var1.getDrops().add(new ItemEntity(var2, var8.getX(), var8.getY() + 0.5, var8.getZ(), var7));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.ender_slayer", new Object[]{var7.getHoverName()}).withStyle(ChatFormatting.GOLD));
       }
    }
 
@@ -6640,28 +6696,31 @@ public final class HexEffects {
          var0.setHealth(var0.getMaxHealth());
       }
 
+      giveDemonPactArmor(var0);
       MinecraftServer var3 = var0.level().getServer();
       if (var3 != null) {
          Bingo var4 = Bingo.get(var3.overworld());
          Team var5 = var4.getTeam(var0);
          int var6 = var4.tasks().size();
          if (var5 != null && var6 > 0) {
-            ArrayList<Integer> var7 = new ArrayList<>();
+            int var7 = -1;
+            int var8 = -1;
 
-            for (int var8 = 0; var8 < var6; var8++) {
-               if (!var5.completed(var8)
-                  && !var5.locked(var8)
-                  && !var4.task(var8).getType().id().equals("bingo.empty")) {
-                  var7.add(var8);
+            for (int var9 = 0; var9 < var6; var9++) {
+               if (!var5.completed(var9)
+                  && !var5.locked(var9)
+                  && !var4.task(var9).getType().id().equals("bingo.empty")
+                  && var4.task(var9).weight() > var8) {
+                  var8 = var4.task(var9).weight();
+                  var7 = var9;
                }
             }
 
-            if (!var7.isEmpty()) {
-               int var9 = var7.get(ThreadLocalRandom.current().nextInt(var7.size()));
-               var5.complete(var9);
+            if (var7 >= 0) {
+               var5.complete(var7);
                var4.checkWin();
                var0.sendSystemMessage(
-                  Component.translatable("hexbingo.msg.demon_pact_task", new Object[]{var4.task(var9).contentName(var3)})
+                  Component.translatable("hexbingo.msg.demon_pact_task", new Object[]{var4.task(var7).contentName(var3)})
                      .withStyle(ChatFormatting.GOLD)
                );
             } else {
@@ -6674,11 +6733,98 @@ public final class HexEffects {
    }
 
    private static void applyDemonPactAttribute(ServerPlayer var0, String var1, int var2) {
-      applyNegativeAttribute(var0, var1, var2, Attributes.MAX_HEALTH, -15.0, Operation.ADD_VALUE);
+      applyNegativeAttribute(var0, var1, var2, Attributes.MAX_HEALTH, -10.0, Operation.ADD_VALUE);
+   }
+
+   private static void giveDemonPactArmor(ServerPlayer var0) {
+      Item[] var1 = new Item[]{Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS};
+
+      for (Item var5 : var1) {
+         var0.addItem(randomlyEnchantedArmor(var0, var5));
+      }
+
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.demon_pact_armor").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static ItemStack randomlyEnchantedArmor(ServerPlayer var0, Item var1) {
+      ItemStack var2 = new ItemStack(var1);
+      Registry<Enchantment> var3 = var0.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+      ArrayList<Holder<Enchantment>> var4 = new ArrayList<>();
+
+      for (Holder<Enchantment> var6 : var3.listElements().toList()) {
+         if (var6.value().canEnchant(var2)) {
+            var4.add(var6);
+         }
+      }
+
+      Collections.shuffle(var4, ThreadLocalRandom.current());
+      ArrayList<Holder<Enchantment>> var15 = new ArrayList<>();
+
+      for (Holder<Enchantment> var7 : var4) {
+         boolean var8 = true;
+
+         for (Holder<Enchantment> var10 : var15) {
+            if (!Enchantment.areCompatible(var10, var7)) {
+               var8 = false;
+               break;
+            }
+         }
+
+         if (var8) {
+            var15.add(var7);
+         }
+
+         if (var15.size() >= 2) {
+            break;
+         }
+      }
+
+      ItemEnchantments.Mutable var16 = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+
+      for (Holder<Enchantment> var18 : var15) {
+         var16.set(var18, 1 + ThreadLocalRandom.current().nextInt(Math.max(1, Math.min(3, var18.value().getMaxLevel()))));
+      }
+
+      EnchantmentHelper.setEnchantments(var2, var16.toImmutable());
+      return var2;
    }
 
    public static boolean isDemonPact(ServerPlayer var0) {
       return hasHex(var0, "demon_pact");
+   }
+
+   // 终极刷新：记录一次可用的刷新次数，并给 2 个原版战利品箱
+   private static void grantUltimateRefresh(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 != null) {
+         HexGameData.get(var1).addRefreshCharge(var0.getUUID());
+      }
+
+      for (int var2 = 0; var2 < 2; var2++) {
+         spawnVanillaLootChest(var0);
+      }
+
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.ultimate_refresh").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static void spawnVanillaLootChest(ServerPlayer var0) {
+      if (var0.level() instanceof ServerLevel var1) {
+         ThreadLocalRandom var2 = ThreadLocalRandom.current();
+         BlockPos var3 = var0.blockPosition();
+
+         for (int var4 = 0; var4 < 16; var4++) {
+            BlockPos var5 = var3.offset(var2.nextInt(5) - 2, var2.nextInt(3), var2.nextInt(5) - 2);
+            if (var1.getBlockState(var5).isAir()) {
+               var1.setBlockAndUpdate(var5, Blocks.CHEST.defaultBlockState());
+               if (var1.getBlockEntity(var5) instanceof ChestBlockEntity var6) {
+                  var6.setLootTable(randomVanillaLootTable(var2));
+                  var6.setLootTableSeed(var2.nextLong());
+                  var6.setChanged();
+                  return;
+               }
+            }
+         }
+      }
    }
 
    // 工具箱：随机发工作台/熔炉/铁砧/砂轮/切石机
@@ -6854,33 +7000,38 @@ public final class HexEffects {
       }
    }
 
+   private static final String[] VANILLA_LOOT_TABLES = new String[]{
+      "chests/simple_dungeon",
+      "chests/abandoned_mineshaft",
+      "chests/desert_pyramid",
+      "chests/jungle_temple",
+      "chests/nether_bridge",
+      "chests/stronghold_corridor",
+      "chests/stronghold_crossing",
+      "chests/stronghold_library",
+      "chests/village/village_armorer",
+      "chests/village/village_toolsmith",
+      "chests/village/village_weaponsmith",
+      "chests/end_city_treasure",
+      "chests/bastion_treasure",
+      "chests/ancient_city",
+      "chests/pillager_outpost",
+      "chests/shipwreck_supply",
+      "chests/buried_treasure",
+      "chests/woodland_mansion"
+   };
+
+   private static ResourceKey<LootTable> randomVanillaLootTable(ThreadLocalRandom var0) {
+      return ResourceKey.create(
+         Registries.LOOT_TABLE, Identifier.fromNamespaceAndPath("minecraft", VANILLA_LOOT_TABLES[var0.nextInt(VANILLA_LOOT_TABLES.length)])
+      );
+   }
+
    // 快递到了：头顶生成装有随机原版战利品箱的箱子
    private static void airdrop(ServerPlayer var0) {
       if (var0.level() instanceof ServerLevel var1) {
-         String[] var2 = new String[]{
-            "chests/simple_dungeon",
-            "chests/abandoned_mineshaft",
-            "chests/desert_pyramid",
-            "chests/jungle_temple",
-            "chests/nether_bridge",
-            "chests/stronghold_corridor",
-            "chests/stronghold_crossing",
-            "chests/stronghold_library",
-            "chests/village/village_armorer",
-            "chests/village/village_toolsmith",
-            "chests/village/village_weaponsmith",
-            "chests/end_city_treasure",
-            "chests/bastion_treasure",
-            "chests/ancient_city",
-            "chests/pillager_outpost",
-            "chests/shipwreck_supply",
-            "chests/buried_treasure",
-            "chests/woodland_mansion"
-         };
          ThreadLocalRandom var3 = ThreadLocalRandom.current();
-         ResourceKey<LootTable> var4 = ResourceKey.create(
-            Registries.LOOT_TABLE, Identifier.fromNamespaceAndPath("minecraft", var2[var3.nextInt(var2.length)])
-         );
+         ResourceKey<LootTable> var4 = randomVanillaLootTable(var3);
          BlockPos var5 = var0.blockPosition().above(5);
          var1.setBlockAndUpdate(var5, Blocks.CHEST.defaultBlockState());
          if (var1.getBlockEntity(var5) instanceof ChestBlockEntity var6) {
@@ -6950,6 +7101,24 @@ public final class HexEffects {
          this.entity = var1;
          this.direction = var2;
          this.ticks = var3;
+      }
+   }
+
+   private static final class DashState {
+      private final long endsAt;
+      private final double y;
+      private double dirX;
+      private double dirZ;
+      private double moved;
+      private int blocks;
+      private int mobs;
+      private final Set<UUID> hit = new HashSet<>();
+
+      private DashState(long var1, double var3, double var5, double var7) {
+         this.endsAt = var1;
+         this.y = var3;
+         this.dirX = var5;
+         this.dirZ = var7;
       }
    }
 

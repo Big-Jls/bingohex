@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **100 个海克斯强化**：40 银色 / 30 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **102 个海克斯强化**：40 银色 / 32 金色 / 30 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -31,7 +31,7 @@
 | Minecraft | 26.2 |
 | NeoForge | 26.2.0.93 或更高 |
 | Java | 25 |
-| ReBongo（`modId = bongo`） | 26.2-1.0.0-port.1 或更高 |
+| ReBongo（`modId = bongo`） | 26.2-1.0.0-port.2 或更高 |
 | LibX | 26.2-8.0.0（官方版） |
 
 ReBongo：https://github.com/Big-Jls/rebongo
@@ -39,8 +39,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.1.jar`）。
-3. 把 `HexBingo-26.2-1.32.20.jar` 放入客户端与服务端的 `mods`。
+2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.2.jar`）。
+3. 把 `HexBingo-26.2-1.33.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -64,7 +64,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（100）
+## 海克斯一览（102）
 
 ### 银色（40）
 
@@ -111,7 +111,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 昼夜颠倒 | `day_night_flip` | 立即切换昼夜，之后 10 分钟内时间不再自然变化。 |
 | 工具箱 | `toolbox` | 随机获得工作台、熔炉、铁砧、砂轮、切石机中的 1 个。 |
 
-### 金色（30）
+### 金色（32）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -145,6 +145,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 快递到了 | `airdrop` | 在你头顶空投一个装有随机战利品箱奖励的箱子。 |
 | 海神 | `sea_god` | 获得一把附魔三叉戟（忠诚 III、引雷 I、经验修补 I），掷出后自动回收。 |
 | 图腾批发 | `totem_bulk` | 获得 3 个不死图腾；手持不死图腾时可受到伤害，用于完成不死图腾成就。 |
+| 末影杀手 | `ender_slayer` | 击杀末影人时有 1% 概率掉落一本附魔书：精准采集 I、经验修补 I 或无限 I。 |
+| 终极刷新 | `ultimate_refresh` | 下次海克斯选择可以额外刷新一次，并随机获得 2 个战利品箱。 |
 
 ### 彩色（30）
 
@@ -228,7 +230,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Day-Night Flip | `day_night_flip` | Instantly flip day and night; time will not change naturally for the next 10 minutes. |
 | Toolbox | `toolbox` | Gain 1 random crafting table, furnace, anvil, grindstone or stonecutter. |
 
-### Gold (30)
+### Gold (32)
 
 | Name | id | Effect |
 |---|---|---|
@@ -262,6 +264,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Delivery Arrived | `airdrop` | Airdrop a chest above you filled with loot from a random vanilla chest loot table. |
 | Sea God | `sea_god` | Gain an enchanted trident (Loyalty III, Channeling I, Mending I) that returns when thrown. |
 | Totem Wholesale | `totem_bulk` | Gain 3 Totems of Undying. While holding one, you can take damage, so the 'Postmortal' advancement can be completed. |
+| Ender Slayer | `ender_slayer` | Killing an Enderman has a 1% chance to drop an enchanted book: Silk Touch I, Mending I or Infinity I. |
+| Ultimate Refresh | `ultimate_refresh` | Your next hex selection can be refreshed one extra time, and you immediately gain 2 loot chests. |
 
 ### Prismatic (30)
 
@@ -311,11 +315,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.32.20 `
+.\build.ps1 -Version 26.2-1.33.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
-  -LibXJar "D:\minecraft\.minecraft\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.1.jar"
+  -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
+  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.2.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。

@@ -1018,6 +1018,24 @@
                                           "type":  "totem_bulk"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "ender_slayer",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "ender_slayer"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ultimate_refresh",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "ultimate_refresh"
+                                      }
+                                  ]
                   }
               ]
 }

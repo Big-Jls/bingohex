@@ -11,6 +11,7 @@ import com.castbingo.hexbingo.network.HexListPayload;
 import com.castbingo.hexbingo.network.HexOfferPayload;
 import com.castbingo.hexbingo.network.HexPickPayload;
 import com.castbingo.hexbingo.network.HexRosterPayload;
+import com.castbingo.hexbingo.network.HexRefreshPayload;
 import com.castbingo.hexbingo.network.HexRosterRequestPayload;
 import com.castbingo.hexbingo.network.HexSelectPayload;
 import com.castbingo.hexbingo.network.HexSpiderTogglePayload;
@@ -53,7 +54,9 @@ public final class HexBingo {
    private void registerPayloads(RegisterPayloadHandlersEvent var1) {
       var1.registrar("1")
          .playToClient(
-            HexOfferPayload.TYPE, HexOfferPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexClient.open(var0.rewardIndex(), var0.ids()))
+            HexOfferPayload.TYPE,
+            HexOfferPayload.STREAM_CODEC,
+            (var0, var1x) -> var1x.enqueueWork(() -> HexClient.open(var0.rewardIndex(), var0.ids(), var0.refreshAvailable()))
          )
          .playToServer(HexSelectPayload.TYPE, HexSelectPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
@@ -75,6 +78,11 @@ public final class HexBingo {
          .playToServer(HexSpiderTogglePayload.TYPE, HexSpiderTogglePayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
                HexEffects.toggleSpiderClimb(var2);
+            }
+         }))
+         .playToServer(HexRefreshPayload.TYPE, HexRefreshPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
+            if (var1x.player() instanceof ServerPlayer var2) {
+               HexManager.refresh(var2);
             }
          }));
    }

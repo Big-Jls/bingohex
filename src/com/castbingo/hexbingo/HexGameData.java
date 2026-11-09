@@ -34,6 +34,7 @@ public class HexGameData extends SavedData {
    private final Map<UUID, HexGameData.Offer> offers = new HashMap<>();
    private final Map<String, int[]> teams = new HashMap<>();
    private final Set<UUID> extraChoice = new HashSet<>();
+   private final Map<UUID, Integer> refreshCharges = new HashMap<>();
    private final Map<UUID, Integer> qualityUp = new HashMap<>();
    private final Set<UUID> hexLocked = new HashSet<>();
    private boolean hexesLocked;
@@ -167,6 +168,28 @@ public class HexGameData extends SavedData {
       }
    }
 
+   public int refreshCharges(UUID var1) {
+      return this.refreshCharges.getOrDefault(var1, 0);
+   }
+
+   public void addRefreshCharge(UUID var1) {
+      this.refreshCharges.merge(var1, 1, Integer::sum);
+      this.setDirty();
+   }
+
+   public void consumeRefreshCharge(UUID var1) {
+      int var2 = this.refreshCharges(var1);
+      if (var2 > 0) {
+         if (var2 == 1) {
+            this.refreshCharges.remove(var1);
+         } else {
+            this.refreshCharges.put(var1, var2 - 1);
+         }
+
+         this.setDirty();
+      }
+   }
+
    public int qualityUp(UUID var1) {
       return this.qualityUp.getOrDefault(var1, 0);
    }
@@ -238,6 +261,7 @@ public class HexGameData extends SavedData {
       this.offers.clear();
       this.teams.clear();
       this.extraChoice.clear();
+      this.refreshCharges.clear();
       this.qualityUp.clear();
       this.hexLocked.clear();
       this.hexesLocked = false;
@@ -286,6 +310,9 @@ public class HexGameData extends SavedData {
       this.teams.forEach(var5::putIntArray);
       var1.put("teams", var5);
       var1.putString("extraChoice", String.join(",", this.extraChoice.stream().map(UUID::toString).toList()));
+      CompoundTag refreshTag = new CompoundTag();
+      this.refreshCharges.forEach((var1x, var2x) -> refreshTag.putInt(var1x.toString(), var2x));
+      var1.put("refreshes", refreshTag);
       CompoundTag var6 = new CompoundTag();
       this.qualityUp.forEach((var1x, var2x) -> var6.putInt(var1x.toString(), var2x));
       var1.put("qualityUp", var6);
@@ -301,6 +328,7 @@ public class HexGameData extends SavedData {
       this.offers.clear();
       this.teams.clear();
       this.extraChoice.clear();
+      this.refreshCharges.clear();
       this.qualityUp.clear();
       this.hexLocked.clear();
       this.hexesLocked = false;
@@ -415,6 +443,18 @@ public class HexGameData extends SavedData {
          UUID var44 = parseUuid(var40);
          if (var44 != null) {
             this.extraChoice.add(var44);
+         }
+      }
+
+      CompoundTag refreshTag = var1.getCompoundOrEmpty("refreshes");
+
+      for (String var50 : refreshTag.keySet()) {
+         UUID var51 = parseUuid(var50);
+         if (var51 != null) {
+            int var52 = refreshTag.getIntOr(var50, 0);
+            if (var52 > 0) {
+               this.refreshCharges.put(var51, var52);
+            }
          }
       }
 

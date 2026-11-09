@@ -14,18 +14,18 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 
 public final class HexClient {
-   public static void open(int var0, List<String> var1) {
-      ArrayList var2 = new ArrayList(3);
+   public static void open(int var0, List<String> var1, boolean var2) {
+      ArrayList var3 = new ArrayList(3);
 
-      for (String var4 : var1) {
-         Hex var5 = HexRegistry.byId(var4);
-         if (var5 != null) {
-            var2.add(var5);
+      for (String var5 : var1) {
+         Hex var6 = HexRegistry.byId(var5);
+         if (var6 != null) {
+            var3.add(var6);
          }
       }
 
-      if (var2.size() >= 3) {
-         Minecraft.getInstance().setScreenAndShow(new HexSelectScreen(var0, var2));
+      if (var3.size() >= 3) {
+         Minecraft.getInstance().setScreenAndShow(new HexSelectScreen(var0, var3, var2));
       }
    }
 

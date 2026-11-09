@@ -7,6 +7,7 @@ package com.castbingo.hexbingo.client;
 
 import com.castbingo.hexbingo.Hex;
 import com.castbingo.hexbingo.HexColor;
+import com.castbingo.hexbingo.network.HexRefreshPayload;
 import com.castbingo.hexbingo.network.HexSelectPayload;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -26,12 +27,15 @@ public class HexSelectScreen extends Screen {
    private static final int BUTTON_H = 18;
    private final int rewardIndex;
    private final List<Hex> hexes;
+   private final boolean refreshAvailable;
+   private boolean refreshSent;
    private int selected = -1;
 
-   public HexSelectScreen(int var1, List<Hex> var2) {
+   public HexSelectScreen(int var1, List<Hex> var2, boolean var3) {
       super(Component.translatable("hexbingo.select.title"));
       this.rewardIndex = var1;
       this.hexes = var2;
+      this.refreshAvailable = var3;
    }
 
    public boolean isPauseScreen() {
@@ -79,6 +83,7 @@ public class HexSelectScreen extends Screen {
       }
 
       this.drawConfirmButton(var1, var2, var3);
+      this.drawRefreshButton(var1, var2, var3);
       if (var8 >= 0) {
          this.drawTooltip(var1, var2, var3, this.hexes.get(var8));
       }
@@ -99,6 +104,22 @@ public class HexSelectScreen extends Screen {
       var1.fill(var4, var5, var4 + 1, var5 + 18, var9);
       var1.fill(var4 + 100 - 1, var5, var4 + 100, var5 + 18, var9);
       var1.centeredText(this.font, Component.translatable("hexbingo.select.confirm"), this.width / 2, var5 + 5, var6 ? -1 : -8947849);
+   }
+
+   private void drawRefreshButton(GuiGraphicsExtractor var1, int var2, int var3) {
+      if (this.refreshAvailable && !this.refreshSent) {
+         int var4 = this.refreshX();
+         int var5 = this.buttonY();
+         boolean var6 = var2 >= var4 && var2 < var4 + 64 && var3 >= var5 && var3 < var5 + 18;
+         int var7 = var6 ? -12677570 : -13669585;
+         int var8 = -10027162;
+         var1.fill(var4, var5, var4 + 64, var5 + 18, var7);
+         var1.fill(var4, var5, var4 + 64, var5 + 1, var8);
+         var1.fill(var4, var5 + 18 - 1, var4 + 64, var5 + 18, var8);
+         var1.fill(var4, var5, var4 + 1, var5 + 18, var8);
+         var1.fill(var4 + 64 - 1, var5, var4 + 64, var5 + 18, var8);
+         var1.centeredText(this.font, Component.translatable("hexbingo.select.refresh"), var4 + 32, var5 + 5, -1);
+      }
    }
 
    private void drawTooltip(GuiGraphicsExtractor var1, int var2, int var3, Hex var4) {
@@ -122,6 +143,12 @@ public class HexSelectScreen extends Screen {
             this.onClose();
             return true;
          }
+
+         if (this.refreshAvailable && !this.refreshSent && this.isOverRefresh(var1.x(), var1.y())) {
+            ClientPacketDistributor.sendToServer(new HexRefreshPayload(), new CustomPacketPayload[0]);
+            this.refreshSent = true;
+            return true;
+         }
       }
 
       return super.mouseClicked(var1, var2);
@@ -131,6 +158,12 @@ public class HexSelectScreen extends Screen {
       int var5 = this.buttonX();
       int var6 = this.buttonY();
       return var1 >= var5 && var1 < var5 + 100 && var3 >= var6 && var3 < var6 + 18;
+   }
+
+   private boolean isOverRefresh(double var1, double var3) {
+      int var5 = this.refreshX();
+      int var6 = this.buttonY();
+      return var1 >= var5 && var1 < var5 + 64 && var3 >= var6 && var3 < var6 + 18;
    }
 
    private int hoveredCard(double var1, double var3) {
@@ -162,5 +195,9 @@ public class HexSelectScreen extends Screen {
 
    private int buttonY() {
       return Math.min(this.height - 42, this.cardY() + 138 + 10);
+   }
+
+   private int refreshX() {
+      return this.width / 2 + 54;
    }
 }

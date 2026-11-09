@@ -13,6 +13,7 @@ import io.github.noeppi_noeppi.mods.bongo.data.Team;
 import io.github.noeppi_noeppi.mods.bongo.data.TeamCompletion;
 import io.github.noeppi_noeppi.mods.bongo.event.BingoTaskEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -332,24 +333,7 @@ public final class HexManager {
          while (!var3.isEmpty()) {
             int var4 = (Integer)var3.remove(0);
             int var5 = var4 < 2 ? var1.qualityUp(var2) : 0;
-            List<Hex> var6;
-            if (var4 == 3) {
-               // 第四档海克斯固定为纯彩色，但静水监狱不能出现在最后一个海克斯中
-               var6 = HexRegistry.offerPrismatic(var1.hexes(var2), var1.hasExtraChoice(var2), "still_water");
-            } else if (var1.allPrismatic()) {
-               var6 = HexRegistry.offerPrismatic(var1.hexes(var2), var1.hasExtraChoice(var2));
-               if (var6.size() < 3) {
-                  var6 = HexRegistry.offer(var4, var1.hexes(var2), var1.hasExtraChoice(var2), var5);
-               }
-            } else if (var4 >= 2 && !ownsPrismatic(var1, var2)) {
-               var6 = HexRegistry.offerPrismatic(var1.hexes(var2), var1.hasExtraChoice(var2));
-               if (var6.size() < 3) {
-                  var6 = HexRegistry.offer(var4, var1.hexes(var2), var1.hasExtraChoice(var2), var5);
-               }
-            } else {
-               var6 = HexRegistry.offer(var4, var1.hexes(var2), var1.hasExtraChoice(var2), var5);
-            }
-
+            List<Hex> var6 = rollOffer(var1, var2, var4, var1.hexes(var2));
             if (var6.size() >= 3) {
                if (var5 > 0) {
                   var1.clearQualityUp(var2);
@@ -362,12 +346,68 @@ public final class HexManager {
                }
 
                var1.setOffer(var2, var4, var7);
-               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var4, var7), new CustomPacketPayload[0]);
+               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var4, var7, var1.refreshCharges(var2) > 0), new CustomPacketPayload[0]);
                return;
             }
          }
 
          var1.setDirty();
+      }
+   }
+
+   private static List<Hex> rollOffer(HexGameData var0, UUID var1, int var2, Collection<String> var3) {
+      int var4 = var2 < 2 ? var0.qualityUp(var1) : 0;
+      List<Hex> var5;
+      if (var2 == 3) {
+         // 第四档海克斯固定为纯彩色，但静水监狱不能出现在最后一个海克斯中
+         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), "still_water");
+      } else if (var0.allPrismatic()) {
+         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1));
+         if (var5.size() < 3) {
+            var5 = HexRegistry.offer(var2, var3, var0.hasExtraChoice(var1), var4);
+         }
+      } else if (var2 >= 2 && !ownsPrismatic(var0, var1)) {
+         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1));
+         if (var5.size() < 3) {
+            var5 = HexRegistry.offer(var2, var3, var0.hasExtraChoice(var1), var4);
+         }
+      } else {
+         var5 = HexRegistry.offer(var2, var3, var0.hasExtraChoice(var1), var4);
+      }
+
+      return var5;
+   }
+
+   public static void refresh(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 != null) {
+         HexGameData var2 = HexGameData.get(var1);
+         UUID var3 = var0.getUUID();
+         HexGameData.Offer var4 = var2.offer(var3);
+         if (var4 != null && !var2.isHexLocked(var3)) {
+            if (var2.refreshCharges(var3) <= 0) {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.refresh_none").withStyle(ChatFormatting.GRAY));
+               return;
+            }
+
+            ArrayList<String> var5 = new ArrayList<>(var2.hexes(var3));
+            var5.addAll(var4.ids());
+            List<Hex> var6 = rollOffer(var2, var3, var4.rewardIndex(), var5);
+            if (var6.size() < 3) {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.refresh_fail").withStyle(ChatFormatting.GRAY));
+               return;
+            }
+
+            var2.consumeRefreshCharge(var3);
+            ArrayList<String> var7 = new ArrayList<>(var6.size());
+
+            for (Hex var9 : var6) {
+               var7.add(var9.id());
+            }
+
+            var2.setOffer(var3, var4.rewardIndex(), var7);
+            PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var4.rewardIndex(), var7, var2.refreshCharges(var3) > 0), new CustomPacketPayload[0]);
+         }
       }
    }
 
@@ -579,7 +619,11 @@ public final class HexManager {
          } else {
             HexGameData.Offer var3 = var2.offer(var0.getUUID());
             if (var3 != null) {
-               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var3.rewardIndex(), var3.ids()), new CustomPacketPayload[0]);
+               PacketDistributor.sendToPlayer(
+                  var0,
+                  new HexOfferPayload(var3.rewardIndex(), var3.ids(), var2.refreshCharges(var0.getUUID()) > 0),
+                  new CustomPacketPayload[0]
+               );
                return true;
             } else if (!var2.pending(var0.getUUID()).isEmpty()) {
                presentNext(var0, var2);
@@ -636,7 +680,11 @@ public final class HexManager {
          if (var2.mayhem()) {
             HexGameData.Offer var3 = var2.offer(var0.getUUID());
             if (var3 != null) {
-               PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var3.rewardIndex(), var3.ids()), new CustomPacketPayload[0]);
+               PacketDistributor.sendToPlayer(
+                  var0,
+                  new HexOfferPayload(var3.rewardIndex(), var3.ids(), var2.refreshCharges(var0.getUUID()) > 0),
+                  new CustomPacketPayload[0]
+               );
             } else if (!var2.pending(var0.getUUID()).isEmpty()) {
                presentNext(var0, var2);
             }

@@ -13,7 +13,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type;
 import net.minecraft.resources.Identifier;
 
-public record HexOfferPayload(int rewardIndex, List<String> ids) implements CustomPacketPayload {
+public record HexOfferPayload(int rewardIndex, List<String> ids, boolean refreshAvailable) implements CustomPacketPayload {
    public static final Type<HexOfferPayload> TYPE = new Type(Identifier.fromNamespaceAndPath("hexbingo", "hex_offer"));
    public static final StreamCodec<RegistryFriendlyByteBuf, HexOfferPayload> STREAM_CODEC = StreamCodec.of((var0, var1) -> {
       var0.writeVarInt(var1.rewardIndex());
@@ -22,6 +22,8 @@ public record HexOfferPayload(int rewardIndex, List<String> ids) implements Cust
       for (String var3 : var1.ids()) {
          var0.writeUtf(var3);
       }
+
+      var0.writeBoolean(var1.refreshAvailable());
    }, var0 -> {
       int var1 = var0.readVarInt();
       int var2 = var0.readVarInt();
@@ -31,7 +33,7 @@ public record HexOfferPayload(int rewardIndex, List<String> ids) implements Cust
          var3.add(var0.readUtf());
       }
 
-      return new HexOfferPayload(var1, List.copyOf(var3));
+      return new HexOfferPayload(var1, List.copyOf(var3), var0.readBoolean());
    });
 
    public Type<? extends CustomPacketPayload> type() {
