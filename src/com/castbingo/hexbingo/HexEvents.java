@@ -367,7 +367,7 @@ public class HexEvents {
       } else if (var1.is(Items.SPYGLASS) && var2.equals("矿物透视")) {
          return HexEffects.castXray(var0);
       } else if (var1.is(Items.ECHO_SHARD) && var2.equals("镜像复制")) {
-         return HexEffects.castMirror(var0);
+         return HexEffects.castMirror(var0, var1);
       } else {
          return false;
       }
@@ -456,6 +456,7 @@ public class HexEvents {
 
    @SubscribeEvent
    public void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post var1) {
+      HexEffects.tickDash(var1.getServer());
       HexEffects.tickTrap(var1.getServer());
       HexEffects.tickFaeDisguises(var1.getServer());
       HexEffects.tickHomeguard(var1.getServer());

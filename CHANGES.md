@@ -1,5 +1,25 @@
 # Changelog
 
+## 26.2-1.37.0 — 2026-11-10
+
+### Fixed
+
+- Meteor (`meteor`): impacts now land on the real surface. The height is
+  queried after force-loading the target chunk, so unloaded terrain no longer
+  resolves to the world bottom (which made meteors carve into the bedrock
+  layer).
+- Rush Rush Rush (`dash_charge`): the dash now advances every server tick and
+  is fully automatic - the forward key is no longer needed, the view only
+  steers the direction. Blocks in a 3x3 area along the path are broken
+  (obsidian and bedrock excluded).
+- Mirror Hex (`mirror_hex`): the item is single use now. It is consumed as soon
+  as the selection list opens and is no longer re-granted automatically.
+
+### Notes
+
+- Pair with BingoLobby `26.2-1.0.0-port.2`, which stops automatically running
+  `bingo stop` after a game has been won.
+
 ## 26.2-1.36.1 — 2026-11-10
 
 ### Fixed

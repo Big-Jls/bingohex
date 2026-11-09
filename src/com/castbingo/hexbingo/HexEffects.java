@@ -247,6 +247,7 @@ public final class HexEffects {
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
    private static final long DICE_INTERVAL_MS = 300000L;
    private static final Set<UUID> LOUIS_PENDING = new HashSet<>();
+   private static final Set<UUID> MIRROR_USED = new HashSet<>();
    private static final Map<UUID, Long> GOLD_RUSH = new HashMap<>();
    private static final Set<UUID> HEX_BEES = new HashSet<>();
    private static final Map<UUID, UUID> BEE_TARGETS = new HashMap<>();
@@ -1110,6 +1111,7 @@ public final class HexEffects {
       var0.removeTag(BLACK_MARKET_USED_TAG);
       DICE_NEXT.remove(var0.getUUID());
       LOUIS_PENDING.remove(var0.getUUID());
+      MIRROR_USED.remove(var0.getUUID());
       restoreTransform(var0);
       TamableAnimal var13 = PETS.remove(var0.getUUID());
       if (var13 != null) {
@@ -1164,7 +1166,6 @@ public final class HexEffects {
       long var1 = System.currentTimeMillis();
       TEMP_DAMAGE.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
       TEMP_LIFESTEAL.entrySet().removeIf(var2 -> var2.getValue().until() < var1);
-      tickDash(var0);
       tickPortableFurnaces(var0);
       tickSmeltBoost(var0);
       tickTheWorld(var0);
@@ -4435,7 +4436,7 @@ public final class HexEffects {
       return true;
    }
 
-   private static void tickDash(MinecraftServer var0) {
+   public static void tickDash(MinecraftServer var0) {
       if (DASHING.isEmpty()) {
          return;
       }
@@ -4480,12 +4481,18 @@ public final class HexEffects {
                   var4.sendSystemMessage(Component.translatable("hexbingo.msg.dash_blocked").withStyle(ChatFormatting.GRAY));
                   finishDash(var4, var3, var6);
                } else {
-                  for (int var19 = 0; var19 <= 1; var19++) {
-                     BlockPos var20 = new BlockPos(var15, var16 + var19, var17);
-                     BlockState var21 = var5.getBlockState(var20);
-                     if (!var21.isAir() && var21.getFluidState().isEmpty()) {
-                        var5.destroyBlock(var20, true, var4);
-                        var3.blocks++;
+                  for (int var28 = -1; var28 <= 1; var28++) {
+                     for (int var29 = -1; var29 <= 1; var29++) {
+                        for (int var30 = 0; var30 <= 1; var30++) {
+                           BlockPos var31 = new BlockPos(var15 + var28, var16 + var30, var17 + var29);
+                           BlockState var32 = var5.getBlockState(var31);
+                           if (var32.isAir() || !var32.getFluidState().isEmpty() || dashBlocked(var32, var5, var31)) {
+                              continue;
+                           }
+
+                           var5.destroyBlock(var31, true, var4);
+                           var3.blocks++;
+                        }
                      }
                   }
 
@@ -5058,7 +5065,7 @@ public final class HexEffects {
          giveXrayItem(var0);
       }
 
-      if (hasHex(var0, "mirror_hex") && !hasNamedItem(var0, "镜像复制")) {
+      if (hasHex(var0, "mirror_hex") && !MIRROR_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "镜像复制")) {
          giveMirrorItem(var0);
       }
    }
@@ -7639,7 +7646,7 @@ public final class HexEffects {
             double var18 = 24.0 + var12.nextDouble() * 64.0;
             int var20 = Mth.floor(var5 + Math.cos(var16) * var18);
             int var21 = Mth.floor(var7 + Math.sin(var16) * var18);
-            int var22 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var20, var21);
+            int var22 = meteorSurfaceY(var3, var20, var21);
             int var23 = 2 + var12.nextInt(4);
             METEORS.add(new HexEffects.MeteorState(var3, var20 + 0.5, var22 + 72.0, var21 + 0.5, var22, var23, var0.getUUID()));
             MapItemSavedData.addTargetDecoration(var14, new BlockPos(var20, var22, var21), "meteor" + var15, MapDecorationTypes.RED_X);
@@ -7649,6 +7656,23 @@ public final class HexEffects {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.meteor", var13).withStyle(ChatFormatting.DARK_PURPLE));
          meteorQuake(var0, var4);
       }
+   }
+
+   // 目标点的地表高度：先前未加载的区块上 getHeight 会返回世界最低点，导致陨石砸进基岩层
+   private static int meteorSurfaceY(ServerLevel var0, int var1, int var2) {
+      var0.getChunk(var1 >> 4, var2 >> 4);
+      int var3 = var0.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var1, var2);
+      if (var3 > var0.getMinY() + 1) {
+         return var3;
+      }
+
+      for (int var4 = var0.getMaxY() - 1; var4 > var0.getMinY(); var4--) {
+         if (!var0.getBlockState(new BlockPos(var1, var4, var2)).isAir()) {
+            return var4 + 1;
+         }
+      }
+
+      return var3;
    }
 
    private static void meteorQuake(ServerPlayer var0, List<ServerPlayer> var1) {
@@ -8487,8 +8511,19 @@ public final class HexEffects {
       }
    }
 
-   public static boolean castMirror(ServerPlayer var0) {
-      return hasHex(var0, "mirror_hex") && HexManager.openMirror(var0);
+   public static boolean castMirror(ServerPlayer var0, ItemStack var1) {
+      if (!hasHex(var0, "mirror_hex") || MIRROR_USED.contains(var0.getUUID())) {
+         return true;
+      }
+
+      if (!HexManager.openMirror(var0)) {
+         return false;
+      }
+
+      // 一次性道具：选中列表弹出即消耗，之后不再补发
+      var1.shrink(1);
+      MIRROR_USED.add(var0.getUUID());
+      return true;
    }
 
    public static int killStacks(UUID var0) {

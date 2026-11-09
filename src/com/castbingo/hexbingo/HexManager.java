@@ -702,7 +702,7 @@ public final class HexManager {
 
       if (var12.isEmpty()) {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.mirror_none").withStyle(ChatFormatting.GRAY));
-         return true;
+         return false;
       }
 
       MIRROR_OPEN.add(var0.getUUID());
