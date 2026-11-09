@@ -3902,7 +3902,7 @@ public final class HexEffects {
                var7.addAll(HexRegistry.byColor(HexColor.SILVER));
                var7.addAll(HexRegistry.byColor(HexColor.GOLD));
                var7.addAll(HexRegistry.byColor(HexColor.PRISMATIC));
-               var7.removeIf(var1x -> var1x.id().equals("pandora") || var4.contains(var1x.id()));
+               var7.removeIf(var1x -> var1x.id().equals("pandora") || var1x.id().equals(HexRegistry.OFFER_UPGRADE) || var4.contains(var1x.id()));
                GRANT_DEPTH.set(GRANT_DEPTH.get() + 1);
                ArrayList<Component> var8 = new ArrayList<>();
 
@@ -6409,7 +6409,7 @@ public final class HexEffects {
             ArrayList var5 = new ArrayList();
 
             for (Hex var7 : HexRegistry.byColor(HexColor.byId(var1))) {
-               if (!var3.hexes(var4).contains(var7.id())) {
+               if (!var3.hexes(var4).contains(var7.id()) && !var7.id().equals(HexRegistry.OFFER_UPGRADE)) {
                   var5.add(var7);
                }
             }
@@ -6472,7 +6472,7 @@ public final class HexEffects {
 
          for (HexColor var8 : HexColor.values()) {
             for (Hex var10 : HexRegistry.byColor(var8)) {
-               if (!var2.hexes(var3).contains(var10.id())) {
+               if (!var2.hexes(var3).contains(var10.id()) && !var10.id().equals(HexRegistry.OFFER_UPGRADE)) {
                   var4.add(var10);
                }
             }
