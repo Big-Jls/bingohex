@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **119 个海克斯强化**：46 银色 / 37 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.36.1 修复
+
+- 需要 ReBongo `26.2-1.0.0-port.4` 或更高。该版本补上了命令参数类型注册，修复进入世界/服务器时因 `Unrecognized argument type: GameTasksArgument` 被踢出并提示「无效的玩家数据」的问题。
+
 ### 1.36.0 更新摘要
 
 - 新增金色 **凝视深渊**（`gaze_abyss`）：传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点。
@@ -91,8 +95,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.3.jar`）。
-3. 把 `HexBingo-26.2-1.36.0.jar` 放入客户端与服务端的 `mods`。
+2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.4.jar`）。
+3. 把 `HexBingo-26.2-1.36.1.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -402,11 +406,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.36.0 `
+.\build.ps1 -Version 26.2-1.36.1 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.3.jar"
+  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.4.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。

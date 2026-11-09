@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.36.1 — 2026-11-10
+
+### Fixed
+
+- Requires ReBongo `26.2-1.0.0-port.4` or newer. That ReBongo build registers
+  its command argument types with `ArgumentTypeInfos`, which fixes players
+  being disconnected with "Invalid player data"
+  (`Unrecognized argument type: GameTasksArgument`) when joining a world or
+  server.
+
 ## 26.2-1.36.0 — 2026-11-10
 
 ### Added
