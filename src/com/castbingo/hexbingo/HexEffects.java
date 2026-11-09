@@ -5647,28 +5647,35 @@ public final class HexEffects {
    private static void ensureFaeDisguise(ServerPlayer var0) {
       if (var0.level() instanceof ServerLevel var1) {
          Mob var5 = FAE_DISGUISES.get(var0.getUUID());
-         if (var5 == null || !var5.isAlive() || var5.level() != var1) {
-            if (var5 != null) {
-               var5.discard();
+         if (var5 != null && var5.isAlive()) {
+            // 已有伪装：跨维度时直接带过去，避免在旧维度遗留无 AI 生物
+            if (var5.level() != var1) {
+               var5.teleportTo(var1, var0.getX(), var0.getY(), var0.getZ(), Set.of(), var0.getYRot(), var0.getXRot(), false);
             }
 
-            EntityType var3 = FAE_TYPES.get(ThreadLocalRandom.current().nextInt(FAE_TYPES.size()));
-            Mob var4 = (Mob)var3.create(var1, EntitySpawnReason.MOB_SUMMONED);
-            if (var4 != null) {
-               var4.setPos(var0.getX(), var0.getY(), var0.getZ());
-               var4.setYRot(var0.getYRot());
-               var4.setYHeadRot(var0.getYHeadRot());
-               var4.setNoAi(true);
-               var4.setNoGravity(true);
-               var4.setInvulnerable(true);
-               var4.setSilent(true);
-               var4.setPersistenceRequired();
-               var4.noPhysics = true;
-               var4.setCustomName(Component.literal("精怪魔法"));
-               var4.setCustomNameVisible(false);
-               var1.addFreshEntity(var4);
-               FAE_DISGUISES.put(var0.getUUID(), var4);
-            }
+            return;
+         }
+
+         if (var5 != null) {
+            var5.discard();
+         }
+
+         EntityType var3 = FAE_TYPES.get(ThreadLocalRandom.current().nextInt(FAE_TYPES.size()));
+         Mob var4 = (Mob)var3.create(var1, EntitySpawnReason.MOB_SUMMONED);
+         if (var4 != null) {
+            var4.setPos(var0.getX(), var0.getY(), var0.getZ());
+            var4.setYRot(var0.getYRot());
+            var4.setYHeadRot(var0.getYHeadRot());
+            var4.setNoAi(true);
+            var4.setNoGravity(true);
+            var4.setInvulnerable(true);
+            var4.setSilent(true);
+            var4.setPersistenceRequired();
+            var4.noPhysics = true;
+            var4.setCustomName(Component.literal("精怪魔法"));
+            var4.setCustomNameVisible(false);
+            var1.addFreshEntity(var4);
+            FAE_DISGUISES.put(var0.getUUID(), var4);
          }
       }
    }
@@ -5689,7 +5696,12 @@ public final class HexEffects {
 
                FAE_UNTIL.remove(var4);
             } else if (var6 != null && var1 < var6) {
-               if (var7 != null && var7.isAlive() && var7.level() == var5.level()) {
+               if (var7 != null && var7.isAlive()) {
+                  if (var7.level() != var5.level()) {
+                     // 跨维度时把伪装一起带过去，避免旧维度留下无 AI 生物
+                     var7.teleportTo((ServerLevel)var5.level(), var5.getX(), var5.getY(), var5.getZ(), Set.of(), var5.getYRot(), var5.getXRot(), false);
+                  }
+
                   var7.setPos(var5.getX(), var5.getY(), var5.getZ());
                   var7.setYRot(var5.getYRot());
                   var7.setYHeadRot(var5.getYHeadRot());
@@ -8447,6 +8459,15 @@ public final class HexEffects {
 
       PETS.clear();
       PET_TIMER.clear();
+
+      // 清理历史上遗留在世界里的精怪魔法伪装
+      for (ServerLevel var2 : var0.getAllLevels()) {
+         for (Entity var4 : var2.getAllEntities()) {
+            if (var4.getCustomName() != null && var4.getCustomName().getString().equals("精怪魔法")) {
+               var4.discard();
+            }
+         }
+      }
    }
 
    private HexEffects() {

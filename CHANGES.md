@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.35.5 — 2026-11-09
+
+### Fixed
+
+- **Fae Magic** (`fae_magic`): cross-dimension teleports now move the disguise
+  with the player instead of discarding it and spawning a replacement, so no
+  no-AI critter is left behind in the old dimension.
+- Stray `精怪魔法` disguise mobs in loaded chunks are cleaned up when a game is
+  reset or stopped.
+
 ## 26.2-1.35.4 — 2026-11-09
 
 ### Fixed
