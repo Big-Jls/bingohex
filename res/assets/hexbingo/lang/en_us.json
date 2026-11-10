@@ -545,5 +545,19 @@
     "hexbingo.msg.gaze_abyss_none":  "Gaze Into the Abyss: no deep dark biome found nearby.",
     "hexbingo.hex.cutting_edge.name":  "Cutting Edge Inventor",
     "hexbingo.hex.cutting_edge.desc":  "All skill-type hex cooldowns are reduced by 30%.",
-    "hexbingo.msg.cutting_edge":  "Cutting Edge Inventor: your skill hex cooldowns are 30% shorter."
+    "hexbingo.msg.cutting_edge":  "Cutting Edge Inventor: your skill hex cooldowns are 30% shorter.",
+    "hexbingo.hex.pillager_outpost.name":  "Who Is the Pillager Now",
+    "hexbingo.hex.pillager_outpost.desc":  "Teleport to the nearest pillager outpost; if there is none nearby, one is generated 200 blocks away.",
+    "hexbingo.msg.pillager_outpost":  "Who Is the Pillager Now: teleported to the nearest pillager outpost.",
+    "hexbingo.msg.pillager_outpost_gen":  "Who Is the Pillager Now: no outpost nearby, generated one 200 blocks away.",
+    "hexbingo.msg.pillager_outpost_none":  "Who Is the Pillager Now: no suitable place to generate an outpost.",
+    "hexbingo.hex.cherry_grove.name":  "The Cherry Blossoms of My Hometown Have Bloomed",
+    "hexbingo.hex.cherry_grove.desc":  "Teleport to the nearest cherry grove biome.",
+    "hexbingo.msg.cherry_grove":  "The Cherry Blossoms of My Hometown Have Bloomed: teleported to a cherry grove.",
+    "hexbingo.msg.cherry_grove_none":  "The Cherry Blossoms of My Hometown Have Bloomed: no cherry grove found nearby.",
+    "hexbingo.hex.pale_garden_map.name":  "Red Light, Green Light",
+    "hexbingo.hex.pale_garden_map.desc":  "Receive a map pointing to the nearest pale garden biome.",
+    "hexbingo.msg.pale_garden_map":  "Red Light, Green Light: received a pale garden map.",
+    "hexbingo.msg.pale_garden_none":  "Red Light, Green Light: no pale garden found nearby.",
+    "hexbingo.item.pale_garden_map":  "Pale Garden Map"
 }

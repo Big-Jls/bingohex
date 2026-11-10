@@ -74,6 +74,7 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.Container;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -345,6 +346,8 @@ public final class HexEffects {
    private static final Map<UUID, Integer> KILL_STACKS = new HashMap<>();
    // 陨石：正在坠落的陨石
    private static final List<HexEffects.MeteorState> METEORS = new ArrayList<>();
+   // 陨石引发的地震：逐格崩塌
+   private static final List<HexEffects.QuakeState> QUAKES = new ArrayList<>();
    // 致盲
    private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
    // 结束了？：被放逐到末地外岛
@@ -370,6 +373,8 @@ public final class HexEffects {
    private static final Map<String, Set<Task>> TASK_SHIELDS = new HashMap<>();
    private static final Map<UUID, HexEffects.TransformState> TRANSFORMS = new HashMap<>();
    private static final Map<UUID, TamableAnimal> PETS = new HashMap<>();
+   // 被 /kill 移除的宠物不再自动补发，直到下一局重新获得该海克斯
+   private static final Set<UUID> PET_DISMISSED = new HashSet<>();
    private static final Map<UUID, BlockPos> BEACONS = new HashMap<>();
    private static final Map<UUID, HexEffects.BoomerangState> BOOMERANGS = new HashMap<>();
    private static final Map<UUID, Long> FAE_UNTIL = new HashMap<>();
@@ -689,6 +694,18 @@ public final class HexEffects {
          // 凝视深渊：传送到最近的 deep_dark 群系
          case "gaze_abyss":
             gazeAbyss(var0);
+            break;
+         // 谁才是掠夺者：传送到最近的掠夺者前哨站
+         case "pillager_outpost":
+            pillagerOutpost(var0);
+            break;
+         // 故乡的樱花开了：传送到最近的樱花群系
+         case "cherry_grove":
+            cherryGrove(var0);
+            break;
+         // 一二三木头人：给予最近苍白花园群系的地图
+         case "pale_garden_map":
+            givePaleGardenMap(var0);
             break;
          // 尖端发明家：技能型海克斯冷却缩短 30%
          case "cutting_edge":
@@ -1125,6 +1142,7 @@ public final class HexEffects {
       }
 
       PET_TIMER.remove(var0.getUUID());
+      PET_DISMISSED.remove(var0.getUUID());
       endBatForm(var0, false);
       endEndExile(var0, false);
       clearXrayMarkers(var0);
@@ -1937,8 +1955,8 @@ public final class HexEffects {
    }
 
    public static void incomingDamage(LivingIncomingDamageEvent var0) {
-      // 无敌小宠物：创造模式玩家与 /kill 等可绕过原版无敌，这里统一拦截
-      if (isProtectedPet(var0.getEntity())) {
+      // 无敌小宠物：拦截创造模式等绕过无敌的伤害，但放行 /kill（generic_kill）
+      if (isProtectedPet(var0.getEntity()) && !var0.getSource().is(DamageTypes.GENERIC_KILL)) {
          var0.setCanceled(true);
          return;
       }
@@ -2665,6 +2683,147 @@ public final class HexEffects {
       }
 
       return carveSafeSpot(var0, var1);
+   }
+
+   // 谁才是掠夺者：传送到最近的掠夺者前哨站，找不到就在 8 个方向 200 格外生成一座
+   private static void pillagerOutpost(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      ServerLevel var2 = var1.overworld();
+      BlockPos var3 = var2.findNearestMapStructure(PILLAGER_OUTPOST, var0.blockPosition(), 100, false);
+      if (var3 != null) {
+         BlockPos var4 = safeSurfaceSpot(var2, var3);
+         if (var4 != null) {
+            teleportSurface(var0, var2, var4, "hexbingo.msg.pillager_outpost");
+            return;
+         }
+      }
+
+      BlockPos var5 = generatePillagerOutpostAt(var2, var0, 200);
+      if (var5 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pillager_outpost_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      BlockPos var6 = safeSurfaceSpot(var2, var5);
+      if (var6 == null) {
+         int var7 = Math.max(var2.getMinY() + 2, var5.getY() + 1);
+         var6 = carveSafeSpot(var2, new BlockPos(var5.getX(), var7, var5.getZ()));
+      }
+
+      teleportSurface(var0, var2, var6, "hexbingo.msg.pillager_outpost_gen");
+   }
+
+   // 兜底生成：按 8 个方位各 200 格寻找陆地，实在找不到再退化为任意地表
+   private static BlockPos generatePillagerOutpostAt(ServerLevel var2, ServerPlayer var0, int var1) {
+      MinecraftServer var3 = var2.getServer();
+      if (var3 == null) {
+         return null;
+      }
+
+      int var4 = var0.getBlockX();
+      int var5 = var0.getBlockZ();
+
+      for (int var6 = 0; var6 < 2; var6++) {
+         for (int var7 = 0; var7 < 8; var7++) {
+            double var8 = (Math.PI * 2.0) * (double)var7 / 8.0;
+            int var10 = var4 + (int)Math.round(Math.cos(var8) * (double)var1);
+            int var11 = var5 + (int)Math.round(Math.sin(var8) * (double)var1);
+            var2.getChunk(var10 >> 4, var11 >> 4);
+            int var12 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var10, var11);
+
+            if (var6 == 0) {
+               Holder<Biome> var13 = var2.getBiome(new BlockPos(var10, var12, var11));
+               if (var13.is(BiomeTags.IS_OCEAN) || var13.is(BiomeTags.IS_RIVER) || var13.is(BiomeTags.IS_BEACH)) {
+                  continue;
+               }
+
+               if (!var2.getBlockState(new BlockPos(var10, var12 - 1, var11)).getFluidState().isEmpty()) {
+                  continue;
+               }
+            }
+
+            BlockPos var16 = new BlockPos(var10, var12, var11);
+            CommandSourceStack var14 = var3.createCommandSourceStack().withLevel(var2).withPosition(Vec3.atCenterOf(var16)).withSuppressedOutput();
+            int var15;
+            try {
+               var15 = var3.getCommands()
+                  .getDispatcher()
+                  .execute("place structure minecraft:pillager_outpost " + var10 + " " + var12 + " " + var11, var14);
+            } catch (CommandSyntaxException var17) {
+               var15 = 0;
+            }
+
+            if (var15 > 0) {
+               return var16;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   // 故乡的樱花开了：传送到最近的樱花群系
+   private static void cherryGrove(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      ServerLevel var2 = var1.overworld();
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.CHERRY_GROVE), var0.blockPosition(), 6400, 32, 64);
+      if (var3 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.cherry_grove_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      BlockPos var4 = safeSurfaceSpot(var2, var3.getFirst());
+      if (var4 == null) {
+         int var5 = Math.max(var2.getMinY() + 2, var3.getFirst().getY());
+         var4 = carveSafeSpot(var2, new BlockPos(var3.getFirst().getX(), var5, var3.getFirst().getZ()));
+      }
+
+      teleportSurface(var0, var2, var4, "hexbingo.msg.cherry_grove");
+   }
+
+   // 一二三木头人：给予一张指向最近苍白花园群系的地图
+   private static void givePaleGardenMap(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      ServerLevel var2 = var1.overworld();
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.PALE_GARDEN), var0.blockPosition(), 6400, 32, 64);
+      if (var3 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      BlockPos var4 = var3.getFirst();
+      var2.getChunk(var4.getX() >> 4, var4.getZ() >> 4);
+      ItemStack var5 = MapItem.create(var2, var4.getX(), var4.getZ(), (byte)1, true, true);
+      var5.set(DataComponents.CUSTOM_NAME, Component.translatable("hexbingo.item.pale_garden_map"));
+      int var6 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var4.getX(), var4.getZ());
+      MapItemSavedData.addTargetDecoration(var5, new BlockPos(var4.getX(), var6, var4.getZ()), "+", MapDecorationTypes.RED_X);
+      var0.addItem(var5);
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_map").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static BlockPos safeSurfaceSpot(ServerLevel var0, BlockPos var1) {
+      var0.getChunk(var1.getX() >> 4, var1.getZ() >> 4);
+      int var2 = var0.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var1.getX(), var1.getZ());
+      int var3 = safeGroundY(var0, var1.getX(), var1.getZ(), var2 + 2);
+      return var3 < 0 ? null : new BlockPos(var1.getX(), var3, var1.getZ());
+   }
+
+   private static void teleportSurface(ServerPlayer var0, ServerLevel var1, BlockPos var2, String var3) {
+      var0.teleportTo(var1, var2.getX() + 0.5, var2.getY(), var2.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+      var0.resetFallDistance();
+      var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GOLD));
    }
 
    private static void summonTravelFrog(ServerPlayer var0) {
@@ -4165,6 +4324,7 @@ public final class HexEffects {
    }
 
    private static void summonPet(ServerPlayer var0) {
+      PET_DISMISSED.remove(var0.getUUID());
       // 先清理旧宠物，避免传送后重复生成
       TamableAnimal var2 = PETS.remove(var0.getUUID());
       if (var2 != null) {
@@ -4204,9 +4364,18 @@ public final class HexEffects {
    }
 
    private static void tickPet(ServerPlayer var0, HexEffect var1) {
+      if (PET_DISMISSED.contains(var0.getUUID())) {
+         return;
+      }
+
       TamableAnimal var2 = PETS.get(var0.getUUID());
-      if (var2 == null || !var2.isAlive()) {
+      if (var2 == null) {
          summonPet(var0);
+      } else if (!var2.isAlive()) {
+         // 已被 /kill 等方式杀死：不再自动补发
+         PETS.remove(var0.getUUID());
+         PET_DISMISSED.add(var0.getUUID());
+         return;
       } else if (var2.level() != var0.level() || var2.distanceToSqr(var0) > 1024.0) {
          // 玩家传送或跨维度后把宠物一并带过去，避免在旧位置遗留后再生成第二只
          var2.teleportTo((ServerLevel)var0.level(), var0.getX(), var0.getY(), var0.getZ(), Set.of(), var0.getYRot(), var0.getXRot(), false);
@@ -7727,15 +7896,50 @@ public final class HexEffects {
    private static void quakeBreak(ServerPlayer var0) {
       if (var0.level() instanceof ServerLevel var1) {
          BlockPos var2 = var0.blockPosition();
+         List<BlockPos> var3 = new ArrayList<>();
 
-         for (int var3 = -5; var3 < 5; var3++) {
-            for (int var4 = -5; var4 < 5; var4++) {
-               for (int var5 = 0; var5 >= -2; var5--) {
-                  BlockPos var6 = var2.offset(var3, var5, var4);
-                  BlockState var7 = var1.getBlockState(var6);
-                  if (!var7.isAir() && var7.getDestroySpeed(var1, var6) >= 0.0F) {
-                     var1.setBlockAndUpdate(var6, Blocks.AIR.defaultBlockState());
+         for (int var4 = -5; var4 < 5; var4++) {
+            for (int var5 = -5; var5 < 5; var5++) {
+               for (int var6 = 0; var6 >= -2; var6--) {
+                  BlockPos var7 = var2.offset(var4, var6, var5);
+                  BlockState var8 = var1.getBlockState(var7);
+                  if (!var8.isAir() && var8.getDestroySpeed(var1, var7) >= 0.0F) {
+                     var3.add(var7);
                   }
+               }
+            }
+         }
+
+         if (!var3.isEmpty()) {
+            // 打乱顺序后逐 tick 崩塌，模拟真实地震
+            Collections.shuffle(var3, ThreadLocalRandom.current());
+            QUAKES.add(new HexEffects.QuakeState(var1, var3));
+         }
+      }
+   }
+
+   public static void tickQuakes(MinecraftServer var0) {
+      if (!QUAKES.isEmpty()) {
+         Iterator<HexEffects.QuakeState> var1 = QUAKES.iterator();
+
+         while (var1.hasNext()) {
+            HexEffects.QuakeState var2 = var1.next();
+            if (var2.index >= var2.blocks.size()) {
+               var1.remove();
+               continue;
+            }
+
+            BlockPos var3 = var2.blocks.get(var2.index++);
+            BlockState var4 = var2.level.getBlockState(var3);
+            if (!var4.isAir() && var4.getDestroySpeed(var2.level, var3) >= 0.0F) {
+               var2.level.setBlockAndUpdate(var3, Blocks.AIR.defaultBlockState());
+               if (var2.index % 8 == 0) {
+                  var2.level.sendParticles(
+                     ParticleTypes.POOF, var3.getX() + 0.5, var3.getY() + 0.5, var3.getZ() + 0.5, 2, 0.3, 0.3, 0.3, 0.0
+                  );
+                  var2.level.playSound(
+                     null, var3.getX(), var3.getY(), var3.getZ(), SoundEvents.GRAVEL_BREAK, SoundSource.BLOCKS, 0.5F, 0.6F
+                  );
                }
             }
          }
@@ -8670,6 +8874,8 @@ public final class HexEffects {
 
       PETS.clear();
       PET_TIMER.clear();
+      PET_DISMISSED.clear();
+      QUAKES.clear();
 
       // 清理历史上遗留在世界里的精怪魔法伪装
       for (ServerLevel var2 : var0.getAllLevels()) {
@@ -8702,6 +8908,17 @@ public final class HexEffects {
          this.targetY = var4;
          this.radius = var5;
          this.owner = var6;
+      }
+   }
+
+   private static final class QuakeState {
+      private final ServerLevel level;
+      private final List<BlockPos> blocks;
+      private int index;
+
+      private QuakeState(ServerLevel var0, List<BlockPos> var1) {
+         this.level = var0;
+         this.blocks = var1;
       }
    }
 

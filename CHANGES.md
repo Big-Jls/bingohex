@@ -1,14 +1,34 @@
 # Changelog
 
+## 26.2-1.39.0 — 2026-11-10
+
+### Added
+
+- **Who Is the Pillager Now** (`pillager_outpost`, silver): teleport to the
+  nearest pillager outpost. If none is found, generate one 200 blocks away in
+  one of 8 directions, preferring a suitable land biome.
+- **The Cherry Blossoms of My Hometown Have Bloomed** (`cherry_grove`, silver):
+  teleport to the nearest cherry grove biome.
+- **Red Light, Green Light** (`pale_garden_map`, silver): receive a map
+  pointing to the nearest pale garden biome.
+
+### Changed
+
+- Pet Master (`pet_companion`): `/kill` now removes the invulnerable pet for
+  good (it no longer respawns automatically). Creative-mode and other
+  invulnerability-bypassing damage is still blocked.
+- Meteor (`meteor`): the earthquake now crumbles blocks one at a time in
+  random order instead of clearing the whole area instantly.
+
 ## 26.2-1.38.1 — 2026-11-10
 
 ### Fixed
 
 - Pet Master (`pet_companion`): the invulnerable companion can no longer be
   killed. Vanilla invulnerability is bypassed by creative-mode players (and by
-  damage that bypasses invulnerability, such as `/kill`), which previously
-  killed the pet. Incoming damage to the pet is now cancelled outright, and
-  the pet's invulnerability and health are re-asserted every tick.
+  damage that bypasses invulnerability), which previously killed the pet.
+  Incoming damage to the pet is now cancelled outright, and the pet's
+  invulnerability and health are re-asserted every tick.
 
 ## 26.2-1.38.0 — 2026-11-10
 

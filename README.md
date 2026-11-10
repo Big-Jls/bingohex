@@ -11,11 +11,19 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **120 个海克斯强化**：46 银色 / 38 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **123 个海克斯强化**：49 银色 / 38 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.39.0 更新摘要
+
+- 新增银色 **谁才是掠夺者**（`pillager_outpost`）：传送到最近的掠夺者前哨站；附近没有时在 8 个方位 200 格外寻找陆地进行生成。
+- 新增银色 **故乡的樱花开了**（`cherry_grove`）：传送到最近的樱花群系。
+- 新增银色 **一二三木头人**（`pale_garden_map`）：获得一张指向最近苍白花园群系的地图。
+- **仆从大师**：`/kill` 现在可以正常移除无敌小宠物，且不会自动补发；创造模式等绕过无敌的伤害仍会被拦截。
+- **陨石**：地震改为随机逐格崩塌，不再瞬间清空整个区域。
 
 ### 1.38.1 修复
 
-- **仆从大师**：无敌小宠物现在免疫所有伤害来源，包括创造模式玩家和可绕过原版无敌的伤害；每 tick 兜底维持无敌并回满生命。
+- **仆从大师**：无敌小宠物现在免疫所有伤害来源，包括创造模式玩家和可绕过原版无敌的伤害；每 tick 兜底维持无敌并回满生命。`/kill` 仍可正常移除，且不会被自动补发（1.39.0 起）。
 
 ### 1.38.0 更新摘要
 
@@ -123,7 +131,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.5.jar`）。
-3. 把 `HexBingo-26.2-1.38.1.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.39.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -148,9 +156,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（120）
+## 海克斯一览（123）
 
-### 银色（46）
+### 银色（49）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -196,10 +204,13 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 鱼神 | `dolphin_dash` | 在水中获得永久的海豚的恩惠 II。 |
 | 便携熔炉 | `portable_furnace` | 获得「便携熔炉」：右键随时打开熔炉界面，熔炼速度受「烧制加速」影响。 |
 | 烧制加速 | `smelt_speed` | 附近的熔炉、高炉、烟熏炉烧制速度翻倍。 |
-| 陨石 | `meteor` | 计算所有队伍玩家的平均位置，召唤 5-10 颗大小不一的紫水晶陨石坠落；其他队伍玩家脚下 10×10 方块被震碎并减速 III，并获得标记落点的地图。 |
+| 陨石 | `meteor` | 计算所有队伍玩家的平均位置，召唤 5-10 颗大小不一的紫水晶陨石坠落；其他队伍玩家被减速 III，脚下地块会像真实地震一样逐格崩塌，并获得标记落点的地图。 |
 | 品质提升 | `offer_upgrade` | 下一次海克斯选择必定出现至少 1 个彩色；只会在第一次海克斯选择中出现。 |
 | 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
 | 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
+| 谁才是掠夺者 | `pillager_outpost` | 传送到最近的掠夺者前哨站；附近没有时在 8 个方位 200 格外生成一座。 |
+| 故乡的樱花开了 | `cherry_grove` | 传送到最近的樱花群系。 |
+| 一二三木头人 | `pale_garden_map` | 获得一张指向最近苍白花园群系的地图。 |
 
 ### 金色（38）
 
@@ -287,7 +298,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 ## Hex list (English)
 
-### Silver (46)
+### Silver (49)
 
 | Name | id | Effect |
 |---|---|---|
@@ -333,10 +344,13 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Fish God | `dolphin_dash` | Gain permanent Dolphin's Grace II while in water. |
 | Portable Furnace | `portable_furnace` | Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Its smelting speed is affected by Smelting Speed. |
 | Smelting Speed | `smelt_speed` | Nearby furnaces, blast furnaces and smokers smelt twice as fast. |
-| Meteor | `meteor` | Average all teams' positions and call down 5-10 amethyst meteors of varying size. Enemy players have a 10x10 area under their feet shattered and get Slowness III; you gain a map marking every impact point. |
+| Meteor | `meteor` | Average all teams' positions and call down 5-10 amethyst meteors of varying size. Enemy players get Slowness III while the ground under them crumbles block by block like a real earthquake; you gain a map marking every impact point. |
 | Quality Upgrade | `offer_upgrade` | Your next hex selection is guaranteed to contain at least 1 prismatic hex. Only offered during the first hex selection. |
 | Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
 | Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
+| Who Is the Pillager Now | `pillager_outpost` | Teleport to the nearest pillager outpost; if none is nearby, one is generated 200 blocks away in one of 8 directions. |
+| The Cherry Blossoms of My Hometown Have Bloomed | `cherry_grove` | Teleport to the nearest cherry grove biome. |
+| Red Light, Green Light | `pale_garden_map` | Receive a map pointing to the nearest pale garden biome. |
 
 ### Gold (38)
 
@@ -435,7 +449,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.38.1 `
+.\build.ps1 -Version 26.2-1.39.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

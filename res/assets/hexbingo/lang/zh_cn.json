@@ -545,5 +545,19 @@
     "hexbingo.msg.gaze_abyss_none":  "凝视深渊：附近没有找到深暗之域群系。",
     "hexbingo.hex.cutting_edge.name":  "尖端发明家",
     "hexbingo.hex.cutting_edge.desc":  "所有技能型海克斯的冷却时间缩短 30%。",
-    "hexbingo.msg.cutting_edge":  "尖端发明家：你的技能型海克斯冷却缩短 30%。"
+    "hexbingo.msg.cutting_edge":  "尖端发明家：你的技能型海克斯冷却缩短 30%。",
+    "hexbingo.hex.pillager_outpost.name":  "谁才是掠夺者",
+    "hexbingo.hex.pillager_outpost.desc":  "传送到最近的掠夺者前哨站；附近没有时在 200 格外生成一座。",
+    "hexbingo.msg.pillager_outpost":  "谁才是掠夺者：已传送到最近的掠夺者前哨站。",
+    "hexbingo.msg.pillager_outpost_gen":  "谁才是掠夺者：附近没有前哨站，已在 200 格外生成一座。",
+    "hexbingo.msg.pillager_outpost_none":  "谁才是掠夺者：没有找到合适的位置生成前哨站。",
+    "hexbingo.hex.cherry_grove.name":  "故乡的樱花开了",
+    "hexbingo.hex.cherry_grove.desc":  "传送到最近的樱花群系。",
+    "hexbingo.msg.cherry_grove":  "故乡的樱花开了：已传送到樱花群系。",
+    "hexbingo.msg.cherry_grove_none":  "故乡的樱花开了：附近没有找到樱花群系。",
+    "hexbingo.hex.pale_garden_map.name":  "一二三木头人",
+    "hexbingo.hex.pale_garden_map.desc":  "获得一张指向最近苍白花园群系的地图。",
+    "hexbingo.msg.pale_garden_map":  "一二三木头人：已获得苍白花园地图。",
+    "hexbingo.msg.pale_garden_none":  "一二三木头人：附近没有找到苍白花园群系。",
+    "hexbingo.item.pale_garden_map":  "苍白花园地图"
 }

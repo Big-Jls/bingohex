@@ -1217,6 +1217,33 @@
                                           "type":  "cutting_edge"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "pillager_outpost",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "pillager_outpost"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "cherry_grove",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "cherry_grove"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "pale_garden_map",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "pale_garden_map"
+                                      }
+                                  ]
                   }
               ]
 }

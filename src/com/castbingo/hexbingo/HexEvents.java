@@ -464,6 +464,7 @@ public class HexEvents {
       HexEffects.tickFaeDisguises(var1.getServer());
       HexEffects.tickHomeguard(var1.getServer());
       HexEffects.tickMeteors(var1.getServer());
+      HexEffects.tickQuakes(var1.getServer());
    }
 
    @SubscribeEvent
