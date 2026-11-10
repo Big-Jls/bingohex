@@ -103,7 +103,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.animal.feline.Cat;
@@ -117,6 +116,7 @@ import net.minecraft.world.entity.animal.wolf.WolfVariant;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
@@ -362,7 +362,7 @@ public final class HexEffects {
    // 预支胜利：临时点亮的格子
    private static final List<HexEffects.AdvanceState> ADVANCES = new ArrayList<>();
    // 驯龙高手：环绕玩家的幼龙
-   private static final Map<UUID, EnderDragon> DRAGON_PETS = new HashMap<>();
+   private static final Map<UUID, Phantom> DRAGON_PETS = new HashMap<>();
    private static final Map<UUID, Double> DRAGON_ANGLES = new HashMap<>();
    private static final Map<UUID, Integer> DRAGON_SOUND_TIMER = new HashMap<>();
    private static final List<HexEffects.EggIncubation> INCUBATIONS = new ArrayList<>();
@@ -1199,7 +1199,7 @@ public final class HexEffects {
 
       PET_TIMER.remove(var0.getUUID());
       PET_DISMISSED.remove(var0.getUUID());
-      EnderDragon var14 = DRAGON_PETS.remove(var0.getUUID());
+      Phantom var14 = DRAGON_PETS.remove(var0.getUUID());
       if (var14 != null) {
          var14.discard();
       }
@@ -8009,21 +8009,25 @@ public final class HexEffects {
          return false;
       }
 
-      EnderDragon var3 = (EnderDragon)EntityTypes.ENDER_DRAGON.create(var2, EntitySpawnReason.MOB_SUMMONED);
+      Phantom var3 = (Phantom)EntityTypes.PHANTOM.create(var2, EntitySpawnReason.MOB_SUMMONED);
       if (var3 == null) {
          return false;
       }
 
       var3.setPos(var1.getX() + 0.5, var1.getY() + 1.0, var1.getZ() + 0.5);
+      var3.setPhantomSize(0);
       var3.setNoAi(true);
       var3.setSilent(true);
       var3.setInvulnerable(true);
       var3.setPersistenceRequired();
+      var3.setNoGravity(true);
+      var3.noPhysics = true;
       var3.setCustomName(Component.literal("幼龙"));
       var3.setCustomNameVisible(true);
+      // 幻翼支持缩放；末影龙会被原版强制保持 1.0 大小
       AttributeInstance var4 = var3.getAttribute(Attributes.SCALE);
       if (var4 != null) {
-         var4.setBaseValue(0.35);
+         var4.setBaseValue(0.5);
       }
 
       var2.addFreshEntity(var3);
@@ -8031,7 +8035,7 @@ public final class HexEffects {
       DRAGON_PETS.put(var0.getUUID(), var3);
       DRAGON_ANGLES.put(var0.getUUID(), 0.0);
       DRAGON_SOUND_TIMER.put(var0.getUUID(), 40);
-      var2.playSound(null, var1, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.NEUTRAL, 1.0F, 1.4F);
+      var2.playSound(null, var1, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.NEUTRAL, 0.5F, 1.4F);
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_hatched").withStyle(ChatFormatting.GOLD));
       MinecraftServer var5 = var2.getServer();
       Team var6 = team(var0);
@@ -8051,73 +8055,89 @@ public final class HexEffects {
 
    public static void tickDragons(MinecraftServer var0) {
       if (!DRAGON_PETS.isEmpty()) {
-         Iterator<Map.Entry<UUID, EnderDragon>> var1 = DRAGON_PETS.entrySet().iterator();
+         Iterator<Map.Entry<UUID, Phantom>> var1 = DRAGON_PETS.entrySet().iterator();
 
          while (var1.hasNext()) {
-            Map.Entry<UUID, EnderDragon> var2 = var1.next();
-            ServerPlayer var3 = var0.getPlayerList().getPlayer(var2.getKey());
-            EnderDragon var4 = var2.getValue();
-            if (var4 == null || !var4.isAlive() || var4.isRemoved()) {
+            Map.Entry<UUID, Phantom> var2 = var1.next();
+            Phantom var3 = var2.getValue();
+            if (var3 == null || !var3.isAlive() || var3.isRemoved()) {
                var1.remove();
                DRAGON_ANGLES.remove(var2.getKey());
-            } else if (var3 != null) {
-               ServerLevel var5 = (ServerLevel)var3.level();
-               if (var4.level() != var5) {
-                  var4.teleportTo(var5, var3.getX(), var3.getY() + 2.0, var3.getZ(), Set.of(), var4.getYRot(), var4.getXRot(), false);
+               DRAGON_SOUND_TIMER.remove(var2.getKey());
+            }
+         }
+      }
+   }
+
+   /** 在幼龙自己的 tick 结束后移动它，确保位置能正常同步给客户端。 */
+   public static void tickDragonPet(Entity var0) {
+      if (var0 instanceof Phantom var1 && !var1.level().isClientSide()) {
+         MinecraftServer var2 = var1.level().getServer();
+         if (var2 == null) {
+            return;
+         }
+
+         UUID var3 = null;
+
+         for (Map.Entry<UUID, Phantom> var5 : DRAGON_PETS.entrySet()) {
+            if (var5.getValue() == var1) {
+               var3 = var5.getKey();
+               break;
+            }
+         }
+
+         if (var3 != null) {
+            ServerPlayer var4 = var2.getPlayerList().getPlayer(var3);
+            if (var4 != null) {
+               ServerLevel var6 = (ServerLevel)var4.level();
+               var1.setRemainingFireTicks(0);
+               if (var1.level() != var6) {
+                  var1.teleportTo(var6, var4.getX(), var4.getY() + 1.5, var4.getZ(), Set.of(), var1.getYRot(), var1.getXRot(), false);
                }
 
-               double var6 = DRAGON_ANGLES.getOrDefault(var3.getUUID(), 0.0) + 0.07;
-               DRAGON_ANGLES.put(var3.getUUID(), var6);
-               double var8 = var3.getX() + Math.cos(var6) * 4.0;
-               double var10 = var3.getZ() + Math.sin(var6) * 4.0;
-               double var12 = var3.getY() + 2.2 + Math.sin(var6 * 2.0) * 0.4;
-               float var14 = (float)(Math.toDegrees(Math.atan2(var3.getX() - var8, var3.getZ() - var10)));
-               var4.setPos(var8, var12, var10);
-               var4.setDeltaMovement(Vec3.ZERO);
-               var4.setYRot(var14);
-               var4.setYHeadRot(var14);
+               double var7 = DRAGON_ANGLES.getOrDefault(var3, 0.0) + 0.07;
+               DRAGON_ANGLES.put(var3, var7);
+               double var9 = var4.getX() + Math.cos(var7) * 4.0;
+               double var11 = var4.getZ() + Math.sin(var7) * 4.0;
+               double var13 = var4.getY() + 1.6 + Math.sin(var7 * 2.0) * 0.35;
+               float var15 = (float)Math.toDegrees(Math.atan2(var4.getX() - var9, var4.getZ() - var11));
+               var1.setPos(var9, var13, var11);
+               var1.setDeltaMovement(Vec3.ZERO);
+               var1.setYRot(var15);
+               var1.setYHeadRot(var15);
 
-               int soundWait = DRAGON_SOUND_TIMER.getOrDefault(var3.getUUID(), 40);
-               if (--soundWait <= 0) {
-                  var5.playSound(
-                     null,
-                     var8,
-                     var12,
-                     var10,
-                     BABY_DRAGON_SOUND,
-                     SoundSource.NEUTRAL,
-                     0.7F,
-                     0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F
-                  );
-                  soundWait = 80 + ThreadLocalRandom.current().nextInt(80);
+               int var16 = DRAGON_SOUND_TIMER.getOrDefault(var3, 40);
+               if (--var16 <= 0) {
+                  var6.playSound(null, var9, var13, var11, BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
+                  var16 = 80 + ThreadLocalRandom.current().nextInt(80);
                }
 
-               DRAGON_SOUND_TIMER.put(var3.getUUID(), soundWait);
+               DRAGON_SOUND_TIMER.put(var3, var16);
 
-               if ((var3.tickCount & 1) == 0) {
-                  int var15 = 0;
+               if ((var4.tickCount & 1) == 0) {
+                  int var17 = 0;
 
-                  for (BlockPos var17 : BlockPos.betweenClosed(
-                     Mth.floor(var8) - 1, Mth.floor(var12) - 1, Mth.floor(var10) - 1, Mth.floor(var8) + 1, Mth.floor(var12) + 1, Mth.floor(var10) + 1
+                  for (BlockPos var19 : BlockPos.betweenClosed(
+                     Mth.floor(var9) - 1, Mth.floor(var13) - 1, Mth.floor(var11) - 1, Mth.floor(var9) + 1, Mth.floor(var13) + 1, Mth.floor(var11) + 1
                   )) {
-                     BlockState var18 = var5.getBlockState(var17);
-                     if (!var18.isAir() && var18.getDestroySpeed(var5, var17) >= 0.0F) {
-                        var5.destroyBlock(var17.immutable(), true, var3);
-                        if (++var15 >= 6) {
+                     BlockState var20 = var6.getBlockState(var19);
+                     if (!var20.isAir() && var20.getDestroySpeed(var6, var19) >= 0.0F) {
+                        var6.destroyBlock(var19.immutable(), true, var4);
+                        if (++var17 >= 6) {
                            break;
                         }
                      }
                   }
                }
 
-               AABB var19 = new AABB(var8 - 2.0, var12 - 1.5, var10 - 2.0, var8 + 2.0, var12 + 1.5, var10 + 2.0);
+               AABB var23 = new AABB(var9 - 2.0, var13 - 1.5, var11 - 2.0, var9 + 2.0, var13 + 1.5, var11 + 2.0);
 
-               for (LivingEntity var22 : var5.getEntitiesOfClass(
-                  LivingEntity.class, var19, var21 -> var21.isAlive() && var21 != var3 && !(var21 instanceof EnderDragon) && !isDragonProtected(var3, var21)
+               for (LivingEntity var24 : var6.getEntitiesOfClass(
+                  LivingEntity.class, var23, var21 -> var21.isAlive() && var21 != var4 && !(var21 instanceof Phantom) && !isDragonProtected(var4, var21)
                )) {
-                  DamageSource var20 = var5.damageSources().mobAttack(var4);
-                  var22.hurtServer(var5, var20, 4.0F);
-                  var22.knockback(0.8, var8 - var22.getX(), var10 - var22.getZ(), var20, 4.0F);
+                  DamageSource var25 = var6.damageSources().mobAttack(var1);
+                  var24.hurtServer(var6, var25, 4.0F);
+                  var24.knockback(0.8, var9 - var24.getX(), var11 - var24.getZ(), var25, 4.0F);
                }
             }
          }
@@ -9971,7 +9991,7 @@ public final class HexEffects {
       BLANK_USED.clear();
       ADVANCES.clear();
 
-      for (EnderDragon var5 : DRAGON_PETS.values()) {
+      for (Phantom var5 : DRAGON_PETS.values()) {
          var5.discard();
       }
 

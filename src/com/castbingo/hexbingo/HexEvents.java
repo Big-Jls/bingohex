@@ -459,6 +459,11 @@ public class HexEvents {
    }
 
    @SubscribeEvent
+   public void entityTick(net.neoforged.neoforge.event.tick.EntityTickEvent.Post var1) {
+      HexEffects.tickDragonPet(var1.getEntity());
+   }
+
+   @SubscribeEvent
    public void serverTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post var1) {
       HexEffects.tickDash(var1.getServer());
       HexEffects.tickBatForms(var1.getServer());

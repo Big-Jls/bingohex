@@ -1,5 +1,18 @@
 # Changelog
 
+## 26.2-1.42.7 — 2026-11-11
+
+### Fixed
+
+- **Dragon Tamer** (`dragon_rider`): the baby dragon now uses a Phantom
+  instead of an EnderDragon. Vanilla `EnderDragon.sanitizeScale()` always
+  returns 1.0 and the dragon has its own boss flight phases, so it cannot be
+  scaled or used as a normal pet.
+- The orbit movement now runs after the pet's own entity tick, so position
+  updates reach the client and the dragon visibly circles the player.
+- Baby dragon sound volume halved (0.7 -> 0.35); hatch growl reduced from 1.0
+  to 0.5. The pet is also much smaller (Phantom size 0, scaled to 0.5).
+
 ## 26.2-1.42.6 — 2026-11-11
 
 ### Fixed
