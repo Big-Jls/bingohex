@@ -793,7 +793,7 @@ public final class HexManager {
          return;
       }
 
-      Bingo var4 = Bingo.get(var0.level());
+      Bingo var4 = Bingo.get(var2.overworld());
       Team var5 = var4.getTeam(var0);
       if ("deny".equals(var1)) {
          if (!HexEffects.denyReady(var0)) {
@@ -826,7 +826,7 @@ public final class HexManager {
       }
 
       TASK_PICK_MODE.put(var0.getUUID(), var1);
-      PacketDistributor.sendToPlayer(var0, new HexTaskListPayload(List.copyOf(var6)), new CustomPacketPayload[0]);
+      PacketDistributor.sendToPlayer(var0, new HexTaskListPayload(var1, List.copyOf(var6)), new CustomPacketPayload[0]);
    }
 
    public static void denyTaskPick(ServerPlayer var0, int var1) {

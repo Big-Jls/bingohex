@@ -14,6 +14,7 @@ import io.github.noeppi_noeppi.mods.bongo.data.task.GameTasks;
 import io.github.noeppi_noeppi.mods.bongo.event.BingoTaskEvent;
 import io.github.noeppi_noeppi.mods.bongo.task.Task;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskType;
+import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeAdvancement;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeItem;
 import io.github.noeppi_noeppi.mods.bongo.util.TagWithCount;
 import java.lang.reflect.Field;
@@ -36,6 +37,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -81,6 +84,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.clock.ServerClockManager;
 import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.clock.WorldClocks;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -98,7 +102,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.bee.Bee;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.feline.CatVariant;
 import net.minecraft.world.entity.animal.frog.Frog;
@@ -359,6 +362,11 @@ public final class HexEffects {
    private static final Map<UUID, Integer> DRAGON_SOUND_TIMER = new HashMap<>();
    private static final List<HexEffects.EggIncubation> INCUBATIONS = new ArrayList<>();
    private static final long DRAGON_INCUBATION_MS = 180000L;
+   // TextDisplay 的 setText 等在 26.2 中是 private，只能用反射调用
+   private static Method TEXT_DISPLAY_SET_TEXT;
+   private static Method TEXT_DISPLAY_SET_BACKGROUND;
+   private static Method TEXT_DISPLAY_SET_FLAGS;
+   private static Method DISPLAY_SET_BILLBOARD;
    private static final SoundEvent BABY_DRAGON_SOUND = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("hexbingo", "baby_dragon"));
    // 致盲
    private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
@@ -5043,7 +5051,8 @@ public final class HexEffects {
             if (var3 == null) {
                HexGameData.get(var0).setPortableFurnace(var2.getKey(), var4.save());
                var1.remove();
-            } else if (var3.containerMenu == var4.menu && var4.menu != null) {
+            } else {
+               // 关闭界面后仍继续烧制：不再要求 containerMenu 与记录一致
                tickPortableFurnace(var3, var4);
                if (++var4.saveTicks >= 100) {
                   var4.saveTicks = 0;
@@ -7782,20 +7791,47 @@ public final class HexEffects {
          }
       }
 
-      ArmorStand var8 = (ArmorStand)EntityTypes.ARMOR_STAND.create(var2, EntitySpawnReason.MOB_SUMMONED);
-      if (var8 != null) {
-         var8.setPos(var1.getX() + 0.5, var1.getY() + 1.1, var1.getZ() + 0.5);
-         var8.setInvisible(true);
-         var8.setNoGravity(true);
-         var8.setInvulnerable(true);
-         var8.setSilent(true);
-         var8.setCustomName(incubationName(DRAGON_INCUBATION_MS));
-         var8.setCustomNameVisible(true);
-         var2.addFreshEntity(var8);
-      }
-
+      // 用文字展示实体显示倒计时，隐形盔甲架的名字标签在隐形时不会渲染
+      Display.TextDisplay var8 = createIncubationDisplay(var2, var1, incubationName(DRAGON_INCUBATION_MS));
       INCUBATIONS.add(new HexEffects.EggIncubation(var0.getUUID(), var2, var1.immutable(), System.currentTimeMillis() + DRAGON_INCUBATION_MS, var8));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_start").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static Display.TextDisplay createIncubationDisplay(ServerLevel var0, BlockPos var1, Component var2) {
+      Display.TextDisplay var3 = (Display.TextDisplay)EntityTypes.TEXT_DISPLAY.create(var0, EntitySpawnReason.MOB_SUMMONED);
+      if (var3 == null) {
+         return null;
+      }
+
+      var3.setPos(var1.getX() + 0.5, var1.getY() + 1.15, var1.getZ() + 0.5);
+      var3.setNoGravity(true);
+      var3.setInvulnerable(true);
+      var3.setSilent(true);
+      applyIncubationText(var3, var2);
+      var0.addFreshEntity(var3);
+      return var3;
+   }
+
+   private static void applyIncubationText(Display.TextDisplay var0, Component var1) {
+      try {
+         if (TEXT_DISPLAY_SET_TEXT == null) {
+            TEXT_DISPLAY_SET_TEXT = Display.TextDisplay.class.getDeclaredMethod("setText", Component.class);
+            TEXT_DISPLAY_SET_TEXT.setAccessible(true);
+            TEXT_DISPLAY_SET_BACKGROUND = Display.TextDisplay.class.getDeclaredMethod("setBackgroundColor", int.class);
+            TEXT_DISPLAY_SET_BACKGROUND.setAccessible(true);
+            TEXT_DISPLAY_SET_FLAGS = Display.TextDisplay.class.getDeclaredMethod("setFlags", byte.class);
+            TEXT_DISPLAY_SET_FLAGS.setAccessible(true);
+            DISPLAY_SET_BILLBOARD = Display.class.getDeclaredMethod("setBillboardConstraints", Display.BillboardConstraints.class);
+            DISPLAY_SET_BILLBOARD.setAccessible(true);
+         }
+
+         TEXT_DISPLAY_SET_TEXT.invoke(var0, var1);
+         TEXT_DISPLAY_SET_BACKGROUND.invoke(var0, 0x66000000);
+         TEXT_DISPLAY_SET_FLAGS.invoke(var0, (byte)(Display.TextDisplay.FLAG_SHADOW | Display.TextDisplay.FLAG_SEE_THROUGH));
+         DISPLAY_SET_BILLBOARD.invoke(var0, Display.BillboardConstraints.CENTER);
+      } catch (ReflectiveOperationException var3) {
+         HexBingo.LOGGER.warn("Failed to configure dragon incubation text display", var3);
+      }
    }
 
    private static Component incubationName(long var0) {
@@ -7843,11 +7879,16 @@ public final class HexEffects {
                var3.remove();
                hatchDragon(var5, var4.pos);
             } else {
+               // 区块重载后实体引用会失效，重新生成倒计时文字
+               if (var4.display == null || var4.display.isRemoved()) {
+                  var4.display = createIncubationDisplay(var4.level, var4.pos, incubationName(var6));
+               }
+
                int var8 = (int)((var6 + 999L) / 1000L);
                if (var8 != var4.lastSecond) {
                   var4.lastSecond = var8;
                   if (var4.display != null && !var4.display.isRemoved()) {
-                     var4.display.setCustomName(incubationName(var6));
+                     applyIncubationText(var4.display, incubationName(var6));
                   }
                }
             }
@@ -9240,7 +9281,7 @@ public final class HexEffects {
          Bat var2 = BAT_DISGUISES.get(var0.getUUID());
          if (var2 != null && var2.isAlive()) {
             if (var2.level() != var1) {
-               var2.teleportTo(var1, var0.getX(), var0.getY() + 0.6, var0.getZ(), Set.of(), var0.getYRot(), 0.0F, false);
+               var2.teleportTo(var1, var0.getX(), batFootY(var0), var0.getZ(), Set.of(), var0.getYRot(), 0.0F, false);
             }
 
             return;
@@ -9252,7 +9293,7 @@ public final class HexEffects {
 
          Bat var3 = EntityTypes.BAT.create(var1, EntitySpawnReason.MOB_SUMMONED);
          if (var3 != null) {
-            var3.setPos(var0.getX(), var0.getY() + 0.6, var0.getZ());
+            var3.setPos(var0.getX(), batFootY(var0), var0.getZ());
             var3.setYRot(var0.getYRot());
             var3.setYHeadRot(var0.getYHeadRot());
             var3.setResting(false);
@@ -9260,12 +9301,22 @@ public final class HexEffects {
             var3.setInvulnerable(true);
             var3.setPersistenceRequired();
             var3.noPhysics = true;
+            // 缩到约 0.4 格，贴在玩家脚边，避免第一人称时糊在镜头上
+            AttributeInstance var4 = var3.getAttribute(Attributes.SCALE);
+            if (var4 != null) {
+               var4.addOrUpdateTransientModifier(new AttributeModifier(modifierId("bat_form", 0), -0.55, Operation.ADD_MULTIPLIED_BASE));
+            }
             var3.setCustomName(Component.literal("蝙蝠形态"));
             var3.setCustomNameVisible(false);
             var1.addFreshEntity(var3);
             BAT_DISGUISES.put(var0.getUUID(), var3);
          }
       }
+   }
+
+   /** 蝙蝠贴地位置：玩家脚部（略微抬高避免卡进地面）。 */
+   private static double batFootY(ServerPlayer var0) {
+      return var0.getY() + 0.02;
    }
 
    public static boolean isBatForm(ServerPlayer var0) {
@@ -9288,7 +9339,7 @@ public final class HexEffects {
                ensureBatDisguise(var5);
                Bat var7 = BAT_DISGUISES.get(var4);
                if (var7 != null && var7.isAlive()) {
-                  double var8 = var5.getY() + 0.6;
+                  double var8 = batFootY(var5);
                   if (var7.level() != var5.level()) {
                      var7.teleportTo((ServerLevel)var5.level(), var5.getX(), var8, var5.getZ(), Set.of(), var5.getYRot(), 0.0F, false);
                   }
@@ -9509,6 +9560,93 @@ public final class HexEffects {
       }
 
       return true;
+   }
+
+   // 海克斯发放的道具（鞘翅、龙蛋等）触发的成就不计入 Bingo 成就任务，但成就本身照常显示
+   public static boolean handleHexItemAdvancement(BingoTaskEvent var0) {
+      if (var0.getTask().getType() != TaskTypeAdvancement.INSTANCE) {
+         return false;
+      }
+
+      MinecraftServer var1 = var0.getLevel().getServer();
+      if (var1 == null) {
+         return false;
+      }
+
+      Object var2 = taskElement(var0.getTask());
+      if (!(var2 instanceof Identifier var3)) {
+         return false;
+      }
+
+      AdvancementHolder var4 = var1.getAdvancements().get(var3);
+      if (var4 == null) {
+         return false;
+      }
+
+      Optional<DisplayInfo> var5 = var4.value().display();
+      if (var5.isEmpty()) {
+         return false;
+      }
+
+      ItemStack var6 = var5.get().getIcon().create();
+      ServerPlayer var7 = var0.getPlayer();
+      if (var6.isEmpty() || !hasHexGrantedItem(var7, var6.getItem())) {
+         return false;
+      }
+
+      Bingo var8 = var0.getBingo();
+      Team var9 = var8.getTeam(var7);
+      int var10 = var8.tasks().indexOf(var0.getTask());
+      if (var9 == null || var10 < 0 || !var9.completed(var10) || isTaskShielded(var9, var8, var10)) {
+         return false;
+      }
+
+      uncompleteSlot(var1, var8, var9, var10);
+      releaseSlotLocks(var8, var10);
+      Component var11 = Component.translatable("hexbingo.msg.hex_item_advancement", var0.getTask().contentName(var1)).withStyle(ChatFormatting.GRAY);
+
+      for (ServerPlayer var13 : var1.getPlayerList().getPlayers()) {
+         var13.sendSystemMessage(var11);
+      }
+
+      return true;
+   }
+
+   /** 退回完成时同时解除其它队伍因占点/锁王模式被连带锁定的该格。 */
+   private static void releaseSlotLocks(Bingo var0, int var1) {
+      for (DyeColor var2 : DyeColor.values()) {
+         Team var3 = var0.getTeam(var2);
+         if (var3 == null || var3.isEmpty() || !var3.locked(var1)) {
+            continue;
+         }
+
+         ArrayList<Integer> var4 = new ArrayList<>();
+
+         for (int var5 = 0; var5 < 25; var5++) {
+            if (var3.locked(var5)) {
+               var4.add(var5);
+            }
+         }
+
+         var3.resetLocked();
+
+         for (int var6 : var4) {
+            if (var6 != var1) {
+               var3.lock(var6);
+            }
+         }
+      }
+   }
+
+   private static boolean hasHexGrantedItem(ServerPlayer var0, Item var1) {
+      for (int var2 = 0; var2 < var0.getInventory().getContainerSize(); var2++) {
+         ItemStack var3 = var0.getInventory().getItem(var2);
+         if (!var3.isEmpty() && var3.is(var1) && isHexGranted(var3)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    // 透视：右键 20 秒矿物透视（用发光物品实体标出附近矿石）
@@ -9823,10 +9961,10 @@ public final class HexEffects {
       private final ServerLevel level;
       private final BlockPos pos;
       private final long readyAt;
-      private final ArmorStand display;
+      private Display.TextDisplay display;
       private int lastSecond = -1;
 
-      private EggIncubation(UUID var0, ServerLevel var1, BlockPos var2, long var3, ArmorStand var5) {
+      private EggIncubation(UUID var0, ServerLevel var1, BlockPos var2, long var3, Display.TextDisplay var5) {
          this.owner = var0;
          this.level = var1;
          this.pos = var2;

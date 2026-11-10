@@ -13,6 +13,14 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.0 更新摘要
+
+- **便携熔炉**：关闭界面后仍会继续烧制，不再只在打开熔炉时工作。
+- **蝙蝠形态**：跟随的蝙蝠移到玩家脚边并缩小，第一人称视角不再糊在镜头前。
+- **驯龙高手**：龙蛋上方的孵化倒计时改用文字展示实体（TextDisplay），区块重载后会重新生成，不再是隐形的盔甲架。
+- **成就任务**：海克斯发放的道具（鞘翅、龙蛋、三叉戟等）触发的原版成就仍会正常显示，但不再点亮 Bingo 的成就类任务，并会提示「海克斯道具获得的成就不计入 Bingo 任务」。
+- **空白格 / 目标封锁**：选择界面改为与 Bingo 大地图（快捷键 Y）一致的大卡牌，直接点击对应格子选择任务；修复空白格读取任务不正确、容易点到其它任务的问题。
+
 ### 1.41.1 修复
 
 - **驯龙高手**：龙蛋放下后需要孵化 3 分钟，蛋上方显示倒计时；挖掉、被活塞推动或瞬移走都会重新计时。孵化出的幼龙不会攻击自己或其它拥有该海克斯的玩家，并加入 4 种随机幼龙叫声。
@@ -146,7 +154,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.41.1.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -217,7 +225,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 昼夜颠倒 | `day_night_flip` | 立即切换昼夜，之后 10 分钟内时间不再自然变化。 |
 | 工具箱 | `toolbox` | 随机获得工作台、熔炉、铁砧、砂轮、切石机中的 1 个。 |
 | 鱼神 | `dolphin_dash` | 在水中获得永久的海豚的恩惠 II。 |
-| 便携熔炉 | `portable_furnace` | 获得「便携熔炉」：右键随时打开熔炉界面，熔炼速度受「烧制加速」影响。 |
+| 便携熔炉 | `portable_furnace` | 获得「便携熔炉」：右键随时打开熔炉界面；关闭界面后仍会继续烧制，熔炼速度受「烧制加速」影响。 |
 | 烧制加速 | `smelt_speed` | 附近的熔炉、高炉、烟熏炉烧制速度翻倍。 |
 | 陨石 | `meteor` | 计算所有队伍玩家的平均位置，召唤 5-10 颗大小不一的紫水晶陨石坠落；其他队伍玩家被减速 III，脚下地块会像真实地震一样逐格崩塌，并获得标记落点的地图。 |
 | 品质提升 | `offer_upgrade` | 下一次海克斯选择必定出现至少 1 个彩色；只会在第一次海克斯选择中出现。 |
@@ -271,12 +279,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 自动熔炼 | `auto_smelt` | 挖掘矿物时自动烧炼掉落物，并额外获得经验。 |
 | 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
-| 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
+| 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，蝙蝠跟在玩家脚边；可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
 | 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点；附近没有时在 500 格外地下生成一处深暗洞穴。 |
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
-| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方显示倒计时，挖掉或移走会重新计时。孵化出的幼龙环绕你，经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害，且不会攻击你或其它拥有该海克斯的玩家。 |
+| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙环绕你，经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害，且不会攻击你或其它拥有该海克斯的玩家。 |
 
 ### 彩色（36）
 
@@ -312,12 +320,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 黑市开张 | `black_market` | 下次打开村民交易界面时，将该村民升到最高等级，并获得永久村庄英雄 II。 |
 | 恶魔契约 | `demon_pact` | 永久失去 10 点生命上限，但允许你受到伤害，获得一整套随机附魔铁套，并立即完成当前权重最高的 1 个 Bingo 任务。 |
 | 精神控制 | `mind_control` | 获得「精神控制」：右键控制一名敌人 15 秒的移动方向。冷却 5 分钟。 |
-| 目标封锁 | `objective_deny` | 获得「目标封锁」：右键指定一个任务，30 秒内所有队伍无法完成它。冷却 15 分钟。 |
+| 目标封锁 | `objective_deny` | 获得「目标封锁」：右键打开当前 Bingo 卡牌，点击一个任务，30 秒内所有队伍无法完成它。冷却 15 分钟。 |
 | 透视 | `xray` | 获得「矿物透视」：右键获得 20 秒矿物透视。冷却 5 分钟。 |
 | 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
 | 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。道具一次性，使用后消失。 |
-| 空白格 | `blank_cell` | 获得「空白格」：右键选择任意未完成任务并直接点亮，只有本队获得该格。道具一次性。 |
+| 空白格 | `blank_cell` | 获得「空白格」：右键打开当前 Bingo 卡牌，点击任意未完成任务并直接点亮，只有本队获得该格。道具一次性。 |
 
 ## Hex list (English)
 
@@ -365,7 +373,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Day-Night Flip | `day_night_flip` | Instantly flip day and night; time will not change naturally for the next 10 minutes. |
 | Toolbox | `toolbox` | Gain 1 random crafting table, furnace, anvil, grindstone or stonecutter. |
 | Fish God | `dolphin_dash` | Gain permanent Dolphin's Grace II while in water. |
-| Portable Furnace | `portable_furnace` | Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Its smelting speed is affected by Smelting Speed. |
+| Portable Furnace | `portable_furnace` | Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Smelting continues after closing the screen. Its smelting speed is affected by Smelting Speed. |
 | Smelting Speed | `smelt_speed` | Nearby furnaces, blast furnaces and smokers smelt twice as fast. |
 | Meteor | `meteor` | Average all teams' positions and call down 5-10 amethyst meteors of varying size. Enemy players get Slowness III while the ground under them crumbles block by block like a real earthquake; you gain a map marking every impact point. |
 | Quality Upgrade | `offer_upgrade` | Your next hex selection is guaranteed to contain at least 1 prismatic hex. Only offered during the first hex selection. |
@@ -419,12 +427,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Auto Smelt | `auto_smelt` | Mining ores automatically smelts the drops and grants extra experience. |
 | Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
-| Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). Cooldown 7 minutes. |
+| Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). The bat follows at your feet. Cooldown 7 minutes. |
 | Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves; if none is nearby, create an artificial deep dark cave 500 blocks away underground. |
 | Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
 | Destiny Dice | `destiny_dice` | Roll a die: complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
 | Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
-| Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
+| Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
 
 ### Prismatic (36)
 
@@ -460,12 +468,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
 | Demon Pact | `demon_pact` | Permanently lose 10 max health, but you can take damage; gain a full set of randomly enchanted iron armor and immediately complete the highest-weight Bingo task. |
 | Mind Control | `mind_control` | Gain 'Mind Control': right-click to control one enemy's movement direction for 15 seconds. Cooldown 5 minutes. |
-| Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click and pick a task; no team can complete it for 30 seconds. Cooldown 15 minutes. |
+| Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click to open the current Bingo card and click a task; no team can complete it for 30 seconds. Cooldown 15 minutes. |
 | X-Ray | `xray` | Gain 'Ore Vision': right-click for 20 seconds of ore x-ray. Cooldown 5 minutes. |
 | Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
 | Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
-| Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to choose any incomplete task and light it up for your team only. One-time item. |
+| Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to open the current Bingo card and click any incomplete task to light it up for your team only. One-time item. |
 
 <!-- HEX-TABLE-END -->
 
@@ -481,7 +489,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.41.1 `
+.\build.ps1 -Version 26.2-1.42.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

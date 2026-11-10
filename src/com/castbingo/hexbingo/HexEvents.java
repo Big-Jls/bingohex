@@ -540,6 +540,10 @@ public class HexEvents {
    public void taskCompleted(BingoTaskEvent var1) {
       MinecraftServer var2 = var1.getLevel().getServer();
       if (var2 != null && HexGameData.get(var2).mayhem()) {
+         if (HexEffects.handleHexItemAdvancement(var1)) {
+            return;
+         }
+
          if (HexEffects.handleObjectiveDeny(var1)) {
             return;
          }

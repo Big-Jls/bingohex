@@ -68,7 +68,7 @@ public final class HexClient {
 
    public static void openTasks(HexTaskListPayload var0) {
       if (!var0.tasks().isEmpty()) {
-         Minecraft.getInstance().setScreenAndShow(new HexTaskScreen(var0.tasks()));
+         Minecraft.getInstance().setScreenAndShow(new HexTaskScreen(var0));
       }
    }
 

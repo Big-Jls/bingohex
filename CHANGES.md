@@ -1,5 +1,23 @@
 # Changelog
 
+## 26.2-1.42.0 — 2026-11-11
+
+### Changed
+
+- **Portable Furnace** (`portable_furnace`): smelting continues while the
+  furnace screen is closed instead of only ticking while it is open.
+- **Bat Form** (`bat_form`): the following bat is now placed at the player's
+  feet and scaled down, so it no longer fills the first-person camera.
+- **Dragon Tamer** (`dragon_rider`): the incubation countdown now uses a
+  `text_display` entity instead of an invisible armor stand, and is recreated
+  after a chunk reload.
+- **Blank Cell / Objective Deny**: the task picker now renders the current
+  5×5 Bingo card like the Y-key big overlay; click a cell to choose it.
+  Fixes the blank cell reading the wrong task list.
+- Advancements earned from hex-granted items (elytra, dragon egg, trident,
+  etc.) still show normally but no longer complete advancement-type Bingo
+  tasks. A chat notice explains why.
+
 ## 26.2-1.41.1 — 2026-11-10
 
 ### Changed
