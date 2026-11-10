@@ -1,5 +1,31 @@
 # Changelog
 
+## 26.2-1.41.0 — 2026-11-10
+
+### Added
+
+- **Advance Victory** (`advance_victory`, silver): instantly light one cell for
+  5 minutes; it only stays if the team genuinely completes it in time.
+- **Steal the Sky** (`cell_swap`, silver): swap ownership of one completed cell
+  with an enemy team.
+- **Journey to the Core** (`journey_core`, silver): teleport to a cave at Y=-50.
+- **Ascetic** (`ascetic`, silver): clear all of your team's completed cells and
+  gain 2 random prismatic hexes. Only offered in the third hex selection and
+  excluded from every quality-shift/copy source.
+- **Destiny Dice** (`destiny_dice`, gold): roll a die to complete a cell, remove
+  an enemy cell, both complete a cell, or reshuffle all cards.
+- **Great Migration** (`great_migration`, gold): scatter every player across
+  the overworld within 1000 blocks of each other.
+- **Dragon Tamer** (`dragon_rider`, gold): a placeable dragon egg hatches a
+  small silent dragon that circles the owner, breaks blocks in its path with
+  drops, and knocks back creatures for 4 damage.
+- **Blank Cell** (`blank_cell`, prismatic): a team-exclusive wildcard item that
+  lets you pick any incomplete task and light it for your team only.
+
+### Changed
+
+- **Wildcard** (`wildcard`) moved from prismatic to gold.
+
 ## 26.2-1.40.0 — 2026-11-10
 
 ### Changed

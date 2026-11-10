@@ -49,6 +49,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickB
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -362,7 +363,10 @@ public class HexEvents {
       } else if (var1.is(Items.PRISMARINE_CRYSTALS) && var2.equals("精神控制")) {
          return HexEffects.castMindControl(var0);
       } else if (var1.is(Items.BARRIER) && var2.equals("目标封锁")) {
-         HexManager.openTaskPick(var0);
+         HexManager.openTaskPick(var0, "deny");
+         return true;
+      } else if (var1.is(Items.PAPER) && var2.equals("空白格")) {
+         HexManager.openTaskPick(var0, "blank");
          return true;
       } else if (var1.is(Items.SPYGLASS) && var2.equals("矿物透视")) {
          return HexEffects.castXray(var0);
@@ -465,6 +469,15 @@ public class HexEvents {
       HexEffects.tickHomeguard(var1.getServer());
       HexEffects.tickMeteors(var1.getServer());
       HexEffects.tickQuakes(var1.getServer());
+      HexEffects.tickAdvances(var1.getServer());
+      HexEffects.tickDragons(var1.getServer());
+   }
+
+   @SubscribeEvent
+   public void dragonEggPlaced(BlockEvent.EntityPlaceEvent var1) {
+      if (var1.getPlacedBlock().is(Blocks.DRAGON_EGG) && var1.getEntity() instanceof ServerPlayer var2) {
+         HexEffects.hatchDragon(var2, var1.getPos());
+      }
    }
 
    @SubscribeEvent

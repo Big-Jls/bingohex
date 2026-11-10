@@ -23,6 +23,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class HexRegistry {
    /** 只在第一次海克斯三选一出现的海克斯，不能被质变/自选列表获得。 */
    public static final String OFFER_UPGRADE = "offer_upgrade";
+   /** 只在第三次海克斯三选一出现的海克斯，不能被质变/复制/其它卡池获得。 */
+   public static final String ASCETIC = "ascetic";
    private static final Gson GSON = new Gson();
    private static final Map<String, Hex> BY_ID = new LinkedHashMap<>();
    private static final Map<HexColor, List<Hex>> BY_COLOR = new LinkedHashMap<>();
@@ -76,6 +78,7 @@ public final class HexRegistry {
 
    public static List<Hex> offer(int var0, Collection<String> var1, boolean var2, int var3) {
       int var4 = Math.min(2, var0 + Math.max(0, var3));
+      boolean var9 = var0 == 2;
       ArrayList var5 = new ArrayList(var2 ? 4 : 3);
       switch (var4) {
          case 0:
@@ -90,14 +93,15 @@ public final class HexRegistry {
          default:
             pick(HexColor.GOLD, 2, var1, var5);
             pick(HexColor.PRISMATIC, 1, var1, var5);
-            fill(var1, var5);
+            fill(var1, var5, null, var9);
+            maybeAddAscetic(var5, var1, var9);
       }
 
       if (var2) {
          if (var4 == 0) {
             pick(HexColor.GOLD, 1, var1, var5);
          } else {
-            pick(HexColor.PRISMATIC, 1, var1, var5);
+            pick(HexColor.PRISMATIC, 1, var1, var5, null, var9);
          }
       }
 
@@ -110,60 +114,86 @@ public final class HexRegistry {
    }
 
    public static List<Hex> offerPrismatic(Collection<String> var0, boolean var1, String var2) {
-      ArrayList var3 = new ArrayList(var1 ? 4 : 3);
-      pick(HexColor.PRISMATIC, var1 ? 4 : 3, var0, var3, var2);
-      if (var3.size() < 3) {
-         fill(var0, var3, var2);
+      return offerPrismatic(var0, var1, var2, false);
+   }
+
+   public static List<Hex> offerPrismatic(Collection<String> var0, boolean var1, String var2, boolean var3) {
+      ArrayList var4 = new ArrayList(var1 ? 4 : 3);
+      pick(HexColor.PRISMATIC, var1 ? 4 : 3, var0, var4, var2, var3);
+      if (var4.size() < 3) {
+         fill(var0, var4, var2, var3);
       }
 
-      Collections.shuffle(var3, ThreadLocalRandom.current());
-      return var3;
+      maybeAddAscetic(var4, var0, var3);
+      Collections.shuffle(var4, ThreadLocalRandom.current());
+      return var4;
+   }
+
+   private static void maybeAddAscetic(List<Hex> var0, Collection<String> var1, boolean var2) {
+      if (var2 && !var1.contains(ASCETIC) && !var0.isEmpty()) {
+         Hex var3 = BY_ID.get(ASCETIC);
+         if (var3 != null && !var0.contains(var3) && ThreadLocalRandom.current().nextDouble() < 0.35) {
+            var0.set(ThreadLocalRandom.current().nextInt(var0.size()), var3);
+         }
+      }
    }
 
    private static void pick(HexColor var0, int var1, Collection<String> var2, List<Hex> var3) {
-      pick(var0, var1, var2, var3, null);
+      pick(var0, var1, var2, var3, null, false);
    }
 
    private static void pick(HexColor var0, int var1, Collection<String> var2, List<Hex> var3, String var4) {
-      ArrayList var5 = new ArrayList();
+      pick(var0, var1, var2, var3, var4, false);
+   }
 
-      for (Hex var7 : BY_COLOR.get(var0)) {
-         if (!var2.contains(var7.id()) && !var3.contains(var7) && (var4 == null || !var4.equals(var7.id()))) {
-            var5.add(var7);
+   private static void pick(HexColor var0, int var1, Collection<String> var2, List<Hex> var3, String var4, boolean var5) {
+      ArrayList var6 = new ArrayList();
+
+      for (Hex var8 : BY_COLOR.get(var0)) {
+         if (!var2.contains(var8.id())
+            && !var3.contains(var8)
+            && (var4 == null || !var4.equals(var8.id()))
+            && (var5 || !var8.id().equals(ASCETIC))) {
+            var6.add(var8);
          }
       }
 
-      ThreadLocalRandom var8 = ThreadLocalRandom.current();
+      ThreadLocalRandom var10 = ThreadLocalRandom.current();
 
-      for (int var9 = 0; var9 < var1 && !var5.isEmpty(); var9++) {
-         var3.add((Hex)var5.remove(var8.nextInt(var5.size())));
+      for (int var11 = 0; var11 < var1 && !var6.isEmpty(); var11++) {
+         var3.add((Hex)var6.remove(var10.nextInt(var6.size())));
       }
    }
 
    private static void fill(Collection<String> var0, List<Hex> var1) {
-      fill(var0, var1, null);
+      fill(var0, var1, null, false);
    }
 
    private static void fill(Collection<String> var0, List<Hex> var1, String var2) {
-      ThreadLocalRandom var3 = ThreadLocalRandom.current();
+      fill(var0, var1, var2, false);
+   }
+
+   private static void fill(Collection<String> var0, List<Hex> var1, String var2, boolean var3) {
+      ThreadLocalRandom var4 = ThreadLocalRandom.current();
 
       while (var1.size() < 3) {
-         ArrayList var4 = new ArrayList();
+         ArrayList var5 = new ArrayList();
 
-         for (Hex var6 : BY_ID.values()) {
-            if (var6.color() != HexColor.SILVER
-               && !var0.contains(var6.id())
-               && !var1.contains(var6)
-               && (var2 == null || !var2.equals(var6.id()))) {
-               var4.add(var6);
+         for (Hex var7 : BY_ID.values()) {
+            if (var7.color() != HexColor.SILVER
+               && !var0.contains(var7.id())
+               && !var1.contains(var7)
+               && (var2 == null || !var2.equals(var7.id()))
+               && (var3 || !var7.id().equals(ASCETIC))) {
+               var5.add(var7);
             }
          }
 
-         if (var4.isEmpty()) {
+         if (var5.isEmpty()) {
             return;
          }
 
-         var1.add((Hex)var4.get(var3.nextInt(var4.size())));
+         var1.add((Hex)var5.get(var4.nextInt(var5.size())));
       }
    }
 
@@ -174,7 +204,10 @@ public final class HexRegistry {
       ArrayList var6 = new ArrayList();
 
       for (Hex var8 : BY_COLOR.get(var5)) {
-         if (!var0.contains(var8.id()) && !var1.contains(var8) && !var8.id().equals(OFFER_UPGRADE)) {
+         if (!var0.contains(var8.id())
+            && !var1.contains(var8)
+            && !var8.id().equals(OFFER_UPGRADE)
+            && !var8.id().equals(ASCETIC)) {
             var6.add(var8);
          }
       }
@@ -182,7 +215,10 @@ public final class HexRegistry {
       if (var6.isEmpty()) {
          for (HexColor var10 : HexColor.values()) {
             for (Hex var12 : BY_COLOR.get(var10)) {
-               if (!var0.contains(var12.id()) && !var1.contains(var12) && !var12.id().equals(OFFER_UPGRADE)) {
+               if (!var0.contains(var12.id())
+                  && !var1.contains(var12)
+                  && !var12.id().equals(OFFER_UPGRADE)
+                  && !var12.id().equals(ASCETIC)) {
                   var6.add(var12);
                }
             }
@@ -211,16 +247,27 @@ public final class HexRegistry {
       }
 
       if (!var7.isEmpty()) {
-         int var5 = 0;
+         int var5 = -1;
 
          for (int var8 = 0; var8 < var0.size(); var8++) {
-            if (var0.get(var8).color() == HexColor.SILVER) {
+            if (var0.get(var8).color() == HexColor.SILVER && !var0.get(var8).id().equals(ASCETIC)) {
                var5 = var8;
                break;
             }
          }
 
-         var0.set(var5, var7.get(ThreadLocalRandom.current().nextInt(var7.size())));
+         if (var5 < 0) {
+            for (int var9 = 0; var9 < var0.size(); var9++) {
+               if (!var0.get(var9).id().equals(ASCETIC)) {
+                  var5 = var9;
+                  break;
+               }
+            }
+         }
+
+         if (var5 >= 0) {
+            var0.set(var5, var7.get(ThreadLocalRandom.current().nextInt(var7.size())));
+         }
       }
    }
 

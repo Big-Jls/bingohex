@@ -11,7 +11,14 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **123 个海克斯强化**：49 银色 / 38 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.41.0 更新摘要
+
+- **万能牌**从彩色调整为金色。
+- 新增银色 **预支胜利**、**偷天换日**、**地心游记**、**苦行者**；苦行者只在第三次海克斯选择中出现，不会出现在任何质变/复制来源。
+- 新增金色 **命运骰子**、**随机大迁徙**、**驯龙高手**。
+- 新增彩色 **空白格**：专属本队的万能格，可自选任意未完成任务点亮。
 
 ### 1.40.0 更新摘要
 
@@ -135,7 +142,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.5.jar`）。
-3. 把 `HexBingo-26.2-1.40.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.41.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -160,9 +167,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（123）
+## 海克斯一览（131）
 
-### 银色（49）
+### 银色（53）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -215,8 +222,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 谁才是掠夺者 | `pillager_outpost` | 传送到最近的掠夺者前哨站；附近没有时在 8 个方位 200 格外生成一座。 |
 | 故乡的樱花开了 | `cherry_grove` | 传送到最近的樱花群系；附近没有时在 500 格外改造出一片樱花林。 |
 | 一二三木头人 | `pale_garden_map` | 获得一张指向最近苍白花园群系的地图；附近没有时在 500 格外改造一片并标记。 |
+| 预支胜利 | `advance_victory` | 立即点亮一格，但 5 分钟后熄灭，除非期间真正完成它。 |
+| 偷天换日 | `cell_swap` | 交换你与一名敌人的一个已完成格归属。 |
+| 地心游记 | `journey_core` | 传送到 Y=-50 的地下洞穴。 |
+| 苦行者 | `ascetic` | 清空本队所有已完成格，立即获得 2 个随机彩色海克斯。只在第三次海克斯选择中出现。 |
 
-### 金色（38）
+### 金色（42）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -258,6 +269,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
 | 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
 | 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点；附近没有时在 500 格外地下生成一处深暗洞穴。 |
+| 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
+| 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
+| 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
+| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋，放置后孵化一只环绕你的幼龙；幼龙经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害。 |
 
 ### 彩色（36）
 
@@ -288,7 +303,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 质变混沌 | `chaos_shift` | 随机获得两个随机种类的海克斯。 |
 | CV工程师 | `task_copy` | 随机复制一个对手已完成而你队未完成的任务；Lockout 模式下改为直接抢占该格。 |
 | 维度放逐 | `nether_banish` | 将其他每支队伍的一名玩家放逐到下界随机位置 1 分钟。冷却 8 分钟。 |
-| 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格。 |
 | The World！ | `the_world` | 获得「The World」时停技能：右键使用后时间停止 8 秒，只有你能移动。冷却 3 分钟。 |
 | 腐蚀背包 | `corrupt_inventory` | 除你所在队伍外，每队随机一名玩家的 5 个物品变成腐肉。 |
 | 黑市开张 | `black_market` | 下次打开村民交易界面时，将该村民升到最高等级，并获得永久村庄英雄 II。 |
@@ -299,10 +313,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
 | 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。道具一次性，使用后消失。 |
+| 空白格 | `blank_cell` | 获得「空白格」：右键选择任意未完成任务并直接点亮，只有本队获得该格。道具一次性。 |
 
 ## Hex list (English)
 
-### Silver (49)
+### Silver (53)
 
 | Name | id | Effect |
 |---|---|---|
@@ -355,8 +370,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Who Is the Pillager Now | `pillager_outpost` | Teleport to the nearest pillager outpost; if none is nearby, one is generated 200 blocks away in one of 8 directions. |
 | The Cherry Blossoms of My Hometown Have Bloomed | `cherry_grove` | Teleport to the nearest cherry grove biome; if none is nearby, create one 500 blocks away. |
 | Red Light, Green Light | `pale_garden_map` | Receive a map pointing to the nearest pale garden biome; if none is nearby, create one 500 blocks away and mark it. |
+| Advance Victory | `advance_victory` | Instantly light up one cell, but it goes out after 5 minutes unless you genuinely complete it in time. |
+| Steal the Sky | `cell_swap` | Swap ownership of one completed cell between you and an enemy team. |
+| Journey to the Core | `journey_core` | Teleport to a cave at Y=-50. |
+| Ascetic | `ascetic` | Clear all of your team's completed cells and immediately gain 2 random prismatic hexes. Only appears in the third hex selection. |
 
-### Gold (38)
+### Gold (42)
 
 | Name | id | Effect |
 |---|---|---|
@@ -398,6 +417,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
 | Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). Cooldown 7 minutes. |
 | Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves; if none is nearby, create an artificial deep dark cave 500 blocks away underground. |
+| Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
+| Destiny Dice | `destiny_dice` | Roll a die: complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
+| Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
+| Dragon Tamer | `dragon_rider` | Gain a dragon egg; placing it hatches a baby dragon that circles you, breaks blocks it passes through with drops, and knocks back creatures for 4 damage. |
 
 ### Prismatic (36)
 
@@ -428,7 +451,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Chaos Shift | `chaos_shift` | Gain two random hexes of random colors. |
 | CV Engineer | `task_copy` | Randomly copies a task an opponent has completed but your team has not; in Lockout mode, directly claims that slot instead. |
 | Dimensional Banish | `nether_banish` | Banish one player from each enemy team to a random place in the Nether for 1 minute. Cooldown: 8 minutes. |
-| Wildcard | `wildcard` | Randomly light up one cell on the Bingo card. |
 | The World! | `the_world` | Gain the "The World" time-stop skill; right-click to stop time for 8 seconds so only you can move. Cooldown: 3 minutes. |
 | Corrupt Backpacks | `corrupt_inventory` | For every team except yours, 5 random items of one random player turn into rotten flesh. |
 | Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
@@ -439,6 +461,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
 | Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
+| Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to choose any incomplete task and light it up for your team only. One-time item. |
 
 <!-- HEX-TABLE-END -->
 
@@ -453,7 +476,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.40.0 `
+.\build.ps1 -Version 26.2-1.41.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

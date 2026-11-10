@@ -95,6 +95,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.animal.feline.Cat;
@@ -250,6 +251,7 @@ public final class HexEffects {
    private static final long DICE_INTERVAL_MS = 300000L;
    private static final Set<UUID> LOUIS_PENDING = new HashSet<>();
    private static final Set<UUID> MIRROR_USED = new HashSet<>();
+   private static final Set<UUID> BLANK_USED = new HashSet<>();
    private static final Map<UUID, Long> GOLD_RUSH = new HashMap<>();
    private static final Set<UUID> HEX_BEES = new HashSet<>();
    private static final Map<UUID, UUID> BEE_TARGETS = new HashMap<>();
@@ -348,6 +350,11 @@ public final class HexEffects {
    private static final List<HexEffects.MeteorState> METEORS = new ArrayList<>();
    // 陨石引发的地震：逐格崩塌
    private static final List<HexEffects.QuakeState> QUAKES = new ArrayList<>();
+   // 预支胜利：临时点亮的格子
+   private static final List<HexEffects.AdvanceState> ADVANCES = new ArrayList<>();
+   // 驯龙高手：环绕玩家的幼龙
+   private static final Map<UUID, EnderDragon> DRAGON_PETS = new HashMap<>();
+   private static final Map<UUID, Double> DRAGON_ANGLES = new HashMap<>();
    // 致盲
    private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
    // 结束了？：被放逐到末地外岛
@@ -872,6 +879,38 @@ public final class HexEffects {
          case "wildcard":
             wildcard(var0);
             break;
+         // 预支胜利
+         case "advance_victory":
+            startAdvanceVictory(var0, Math.max(1, var3.seconds));
+            break;
+         // 偷天换日
+         case "cell_swap":
+            cellSwap(var0);
+            break;
+         // 地心游记
+         case "journey_core":
+            journeyCore(var0);
+            break;
+         // 苦行者
+         case "ascetic":
+            ascetic(var0, Math.max(1, var3.count));
+            break;
+         // 命运骰子
+         case "destiny_dice":
+            destinyDice(var0);
+            break;
+         // 随机大迁徙
+         case "great_migration":
+            greatMigration(var0, var3.radius > 0.0 ? var3.radius : 500.0);
+            break;
+         // 驯龙高手
+         case "dragon_rider":
+            giveDragonEgg(var0);
+            break;
+         // 空白格
+         case "blank_cell":
+            giveBlankCellItem(var0);
+            break;
          // The World！
          case "the_world":
             giveWorldItem(var0);
@@ -1135,6 +1174,7 @@ public final class HexEffects {
       DICE_NEXT.remove(var0.getUUID());
       LOUIS_PENDING.remove(var0.getUUID());
       MIRROR_USED.remove(var0.getUUID());
+      BLANK_USED.remove(var0.getUUID());
       restoreTransform(var0);
       TamableAnimal var13 = PETS.remove(var0.getUUID());
       if (var13 != null) {
@@ -1143,6 +1183,12 @@ public final class HexEffects {
 
       PET_TIMER.remove(var0.getUUID());
       PET_DISMISSED.remove(var0.getUUID());
+      EnderDragon var14 = DRAGON_PETS.remove(var0.getUUID());
+      if (var14 != null) {
+         var14.discard();
+      }
+
+      DRAGON_ANGLES.remove(var0.getUUID());
       endBatForm(var0, false);
       endEndExile(var0, false);
       clearXrayMarkers(var0);
@@ -1497,6 +1543,7 @@ public final class HexEffects {
             Team var5 = var4.getTeam(var1);
             if (var5 != null) {
                int var6 = var4.tasks().indexOf(var0.getTask());
+               markAdvanceGenuine(var5, var6);
                int var7 = var5.completion().count();
                List<ServerPlayer> var8 = onlineTeamPlayers(var2, var5);
                ThreadLocalRandom var9 = ThreadLocalRandom.current();
@@ -3591,7 +3638,9 @@ public final class HexEffects {
          ArrayList<Hex> var3 = new ArrayList<>();
 
          for (Hex var5 : HexRegistry.all()) {
-            if (!var2.hexes(var0.getUUID()).contains(var5.id())) {
+            if (!var2.hexes(var0.getUUID()).contains(var5.id())
+               && !var5.id().equals(HexRegistry.OFFER_UPGRADE)
+               && !var5.id().equals(HexRegistry.ASCETIC)) {
                var3.add(var5);
             }
          }
@@ -4316,7 +4365,12 @@ public final class HexEffects {
                var7.addAll(HexRegistry.byColor(HexColor.SILVER));
                var7.addAll(HexRegistry.byColor(HexColor.GOLD));
                var7.addAll(HexRegistry.byColor(HexColor.PRISMATIC));
-               var7.removeIf(var1x -> var1x.id().equals("pandora") || var1x.id().equals(HexRegistry.OFFER_UPGRADE) || var4.contains(var1x.id()));
+               var7.removeIf(
+                  var1x -> var1x.id().equals("pandora")
+                     || var1x.id().equals(HexRegistry.OFFER_UPGRADE)
+                     || var1x.id().equals(HexRegistry.ASCETIC)
+                     || var4.contains(var1x.id())
+               );
                GRANT_DEPTH.set(GRANT_DEPTH.get() + 1);
                ArrayList<Component> var8 = new ArrayList<>();
 
@@ -5438,6 +5492,10 @@ public final class HexEffects {
 
       if (hasHex(var0, "mirror_hex") && !MIRROR_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "镜像复制")) {
          giveMirrorItem(var0);
+      }
+
+      if (hasHex(var0, "blank_cell") && !BLANK_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "空白格")) {
+         giveBlankCellItem(var0);
       }
    }
 
@@ -6879,7 +6937,9 @@ public final class HexEffects {
             ArrayList var5 = new ArrayList();
 
             for (Hex var7 : HexRegistry.byColor(HexColor.byId(var1))) {
-               if (!var3.hexes(var4).contains(var7.id()) && !var7.id().equals(HexRegistry.OFFER_UPGRADE)) {
+               if (!var3.hexes(var4).contains(var7.id())
+                  && !var7.id().equals(HexRegistry.OFFER_UPGRADE)
+                  && !var7.id().equals(HexRegistry.ASCETIC)) {
                   var5.add(var7);
                }
             }
@@ -6942,7 +7002,9 @@ public final class HexEffects {
 
          for (HexColor var8 : HexColor.values()) {
             for (Hex var10 : HexRegistry.byColor(var8)) {
-               if (!var2.hexes(var3).contains(var10.id()) && !var10.id().equals(HexRegistry.OFFER_UPGRADE)) {
+               if (!var2.hexes(var3).contains(var10.id())
+                  && !var10.id().equals(HexRegistry.OFFER_UPGRADE)
+                  && !var10.id().equals(HexRegistry.ASCETIC)) {
                   var4.add(var10);
                }
             }
@@ -7383,6 +7445,498 @@ public final class HexEffects {
                var18.sendSystemMessage(var17);
             }
          }
+      }
+   }
+
+   // 预支胜利：临时点亮一格，5 分钟内真正完成才保留
+   private static void startAdvanceVictory(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return;
+      }
+
+      Bingo var3 = Bingo.get(var2.overworld());
+      Team var4 = var3.getTeam(var0);
+      if (var4 == null) {
+         return;
+      }
+
+      ArrayList<Integer> var5 = new ArrayList<>();
+
+      for (int var6 = 0; var6 < var3.tasks().size(); var6++) {
+         if (!var4.completed(var6) && !var4.locked(var6) && var3.task(var6) != Task.EMPTY) {
+            var5.add(var6);
+         }
+      }
+
+      if (var5.isEmpty()) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.advance_victory_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      int var9 = var5.get(ThreadLocalRandom.current().nextInt(var5.size()));
+      var4.complete(var9);
+      ADVANCES.add(new HexEffects.AdvanceState(var4, var9, System.currentTimeMillis() + (long)var1 * 1000L));
+      Component var7 = var3.task(var9).contentName(var2);
+      messageTeam(var2, var4, Component.translatable("hexbingo.msg.advance_victory", var7).withStyle(ChatFormatting.GOLD));
+   }
+
+   private static void markAdvanceGenuine(Team var0, int var1) {
+      for (HexEffects.AdvanceState var3 : ADVANCES) {
+         if (var3.team == var0 && var3.slot == var1) {
+            var3.genuine = true;
+         }
+      }
+   }
+
+   public static void tickAdvances(MinecraftServer var0) {
+      if (!ADVANCES.isEmpty()) {
+         long var1 = System.currentTimeMillis();
+         Bingo var3 = Bingo.get(var0.overworld());
+         Iterator<HexEffects.AdvanceState> var4 = ADVANCES.iterator();
+
+         while (var4.hasNext()) {
+            HexEffects.AdvanceState var5 = var4.next();
+            if (var1 >= var5.until) {
+               var4.remove();
+               if (!var5.genuine && var3.running()) {
+                  uncompleteSlot(var0, var3, var5.team, var5.slot);
+                  Component var6 = var3.task(var5.slot).contentName(var0);
+                  messageTeam(var0, var5.team, Component.translatable("hexbingo.msg.advance_victory_expire", var6).withStyle(ChatFormatting.GRAY));
+               }
+            }
+         }
+      }
+   }
+
+   private static void cellSwap(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      Bingo var2 = Bingo.get(var1.overworld());
+      Team var3 = var2.getTeam(var0);
+      if (var3 == null) {
+         return;
+      }
+
+      ArrayList<Integer> var4 = new ArrayList<>();
+
+      for (int var5 = 0; var5 < var2.tasks().size(); var5++) {
+         if (var3.completed(var5)) {
+            var4.add(var5);
+         }
+      }
+
+      ArrayList<Team> var5 = new ArrayList<>();
+
+      for (Team var7 : var2.getTeams()) {
+         if (var7 != var3 && !var7.getPlayers().isEmpty() && randomCompleted(var7) >= 0) {
+            var5.add(var7);
+         }
+      }
+
+      if (var4.isEmpty() || var5.isEmpty()) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.cell_swap_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      ThreadLocalRandom var11 = ThreadLocalRandom.current();
+      Team var7 = var5.get(var11.nextInt(var5.size()));
+      int var8 = -1;
+      int var9 = -1;
+
+      for (int var13 = 0; var13 < 32; var13++) {
+         int var14 = var4.get(var11.nextInt(var4.size()));
+         int var15 = randomCompleted(var7);
+         if (var15 >= 0 && var15 != var14) {
+            var8 = var14;
+            var9 = var15;
+            break;
+         }
+      }
+
+      if (var8 < 0 || var9 < 0) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.cell_swap_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      setTeamSlot(var3, var8, false);
+      setTeamSlot(var3, var9, true);
+      setTeamSlot(var7, var9, false);
+      setTeamSlot(var7, var8, true);
+      var2.markDirty(true);
+      var2.checkWin();
+      Component var10 = Component.translatable(
+         "hexbingo.msg.cell_swap", var2.task(var8).contentName(var1), var2.task(var9).contentName(var1)
+      ).withStyle(ChatFormatting.LIGHT_PURPLE);
+      broadcast(var1, var10);
+   }
+
+   private static void setTeamSlot(Team var0, int var1, boolean var2) {
+      try {
+         Field var3 = Team.class.getDeclaredField("completed");
+         var3.setAccessible(true);
+         int var4 = var3.getInt(var0);
+         int var5 = 1 << var1 % 25;
+         var3.setInt(var0, var2 ? var4 | var5 : var4 & ~var5);
+         Field var6 = Team.class.getDeclaredField("completion");
+         var6.setAccessible(true);
+         var6.set(var0, null);
+         var0.setDirty();
+      } catch (Exception var7) {
+         HexBingo.LOGGER.warn("Failed to update team completion", var7);
+      }
+   }
+
+   // 地心游记：传送到 Y=-50 附近的洞穴
+   private static void journeyCore(ServerPlayer var0) {
+      if (var0.level() instanceof ServerLevel var1) {
+         int var2 = var0.getBlockX();
+         int var3 = var0.getBlockZ();
+         BlockPos var4 = findCaveNear(var1, var2, var3, 24);
+
+         if (var4 == null) {
+            var4 = carveSafeSpot(var1, new BlockPos(var2, Math.max(var1.getMinY() + 2, -50), var3));
+         }
+
+         var0.teleportTo(var1, var4.getX() + 0.5, var4.getY(), var4.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+         var0.resetFallDistance();
+         var0.setRemainingFireTicks(0);
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.journey_core").withStyle(ChatFormatting.GOLD));
+      }
+   }
+
+   private static BlockPos findCaveNear(ServerLevel var0, int var1, int var2, int var3) {
+      for (int var4 = -var3; var4 <= var3; var4 += 4) {
+         for (int var5 = -var3; var5 <= var3; var5 += 4) {
+            int var6 = var1 + var4;
+            int var7 = var2 + var5;
+            var0.getChunk(var6 >> 4, var7 >> 4);
+            int var8 = safeGroundY(var0, var6, var7, -40);
+            if (var8 > var0.getMinY() + 1
+               && var8 <= -40
+               && var0.getBlockState(new BlockPos(var6, var8, var7)).getFluidState().isEmpty()) {
+               return new BlockPos(var6, var8, var7);
+            }
+         }
+      }
+
+      return null;
+   }
+
+   // 苦行者：清空本队已完成格，换取随机彩色海克斯
+   private static void ascetic(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return;
+      }
+
+      Bingo var3 = Bingo.get(var2.overworld());
+      Team var4 = var3.getTeam(var0);
+      if (var4 != null) {
+         var4.resetCompleted();
+         var3.markDirty(true);
+
+         for (int var5 = 0; var5 < var1; var5++) {
+            grantRandomHex(var0, "prismatic", "ascetic");
+         }
+
+         var3.checkWin();
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.ascetic").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   // 命运骰子
+   private static void destinyDice(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      Bingo var2 = Bingo.get(var1.overworld());
+      Team var3 = var2.getTeam(var0);
+      if (var3 == null) {
+         return;
+      }
+
+      int var4 = ThreadLocalRandom.current().nextInt(4) + 1;
+      Team var5 = randomEnemyTeam(var2, var3);
+      switch (var4) {
+         case 1: {
+            int var6 = randomIncomplete(var2, var3);
+            if (var6 < 0) {
+               broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_none").withStyle(ChatFormatting.GRAY));
+               return;
+            }
+
+            completeTask(var2, var3, var6);
+            broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_1").withStyle(ChatFormatting.LIGHT_PURPLE));
+            break;
+         }
+         case 2: {
+            int var7 = var5 == null ? -1 : randomCompleted(var5);
+            if (var7 < 0) {
+               broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_none").withStyle(ChatFormatting.GRAY));
+               return;
+            }
+
+            uncompleteSlot(var1, var2, var5, var7);
+            broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_2").withStyle(ChatFormatting.LIGHT_PURPLE));
+            break;
+         }
+         case 3: {
+            int var8 = randomIncomplete(var2, var3);
+            int var9 = var5 == null ? -1 : randomCompleted(var5);
+            if (var8 < 0 || var9 < 0) {
+               broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_none").withStyle(ChatFormatting.GRAY));
+               return;
+            }
+
+            completeTask(var2, var3, var8);
+            uncompleteSlot(var1, var2, var5, var9);
+            broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_3").withStyle(ChatFormatting.LIGHT_PURPLE));
+            break;
+         }
+         default:
+            cardShuffle(var0);
+            broadcast(var1, Component.translatable("hexbingo.msg.destiny_dice_4").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   private static Team randomEnemyTeam(Bingo var0, Team var1) {
+      ArrayList<Team> var2 = new ArrayList<>();
+
+      for (Team var4 : var0.getTeams()) {
+         if (var4 != var1 && !var4.getPlayers().isEmpty()) {
+            var2.add(var4);
+         }
+      }
+
+      return var2.isEmpty() ? null : var2.get(ThreadLocalRandom.current().nextInt(var2.size()));
+   }
+
+   // 随机大迁徙：所有玩家打散到主世界同一片区域
+   private static void greatMigration(ServerPlayer var0, double var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return;
+      }
+
+      ServerLevel var3 = var2.overworld();
+      ThreadLocalRandom var4 = ThreadLocalRandom.current();
+      double var5 = var0.getX();
+      double var6 = var0.getZ();
+
+      for (ServerPlayer var8 : var2.getPlayerList().getPlayers()) {
+         if (!var8.isSpectator()) {
+            double var9 = var4.nextDouble() * Math.PI * 2.0;
+            double var11 = 32.0 + var4.nextDouble() * Math.max(0.0, var1 - 32.0);
+            int var13 = Mth.floor(var5 + Math.cos(var9) * var11);
+            int var14 = Mth.floor(var6 + Math.sin(var9) * var11);
+            BlockPos var15 = safeSurfaceSpot(var3, new BlockPos(var13, 0, var14));
+            if (var15 == null) {
+               int var16 = var3.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var13, var14);
+               var15 = carveSafeSpot(var3, new BlockPos(var13, Math.max(var3.getMinY() + 2, var16), var14));
+            }
+
+            var8.teleportTo(var3, var15.getX() + 0.5, var15.getY(), var15.getZ() + 0.5, Set.of(), var8.getYRot(), var8.getXRot(), false);
+            var8.resetFallDistance();
+         }
+      }
+
+      broadcast(var2, Component.translatable("hexbingo.msg.great_migration").withStyle(ChatFormatting.LIGHT_PURPLE));
+   }
+
+   private static void giveDragonEgg(ServerPlayer var0) {
+      if (DRAGON_PETS.containsKey(var0.getUUID())) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_exists").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      if (!hasNamedItem(var0, "龙蛋")) {
+         var0.addItem(questItem(Items.DRAGON_EGG, "龙蛋", "hexbingo.item.dragon_egg.lore"));
+      }
+
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_egg").withStyle(ChatFormatting.GOLD));
+   }
+
+   public static boolean hatchDragon(ServerPlayer var0, BlockPos var1) {
+      if (!hasHex(var0, "dragon_rider")) {
+         return false;
+      }
+
+      if (DRAGON_PETS.containsKey(var0.getUUID())) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_exists").withStyle(ChatFormatting.GRAY));
+         return false;
+      }
+
+      if (!(var0.level() instanceof ServerLevel var2)) {
+         return false;
+      }
+
+      EnderDragon var3 = (EnderDragon)EntityTypes.ENDER_DRAGON.create(var2, EntitySpawnReason.MOB_SUMMONED);
+      if (var3 == null) {
+         return false;
+      }
+
+      var3.setPos(var1.getX() + 0.5, var1.getY() + 1.0, var1.getZ() + 0.5);
+      var3.setNoAi(true);
+      var3.setSilent(true);
+      var3.setInvulnerable(true);
+      var3.setPersistenceRequired();
+      var3.setCustomName(Component.literal("幼龙"));
+      var3.setCustomNameVisible(true);
+      AttributeInstance var4 = var3.getAttribute(Attributes.SCALE);
+      if (var4 != null) {
+         var4.setBaseValue(0.35);
+      }
+
+      var2.addFreshEntity(var3);
+      var2.removeBlock(var1, false);
+      DRAGON_PETS.put(var0.getUUID(), var3);
+      DRAGON_ANGLES.put(var0.getUUID(), 0.0);
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_hatched").withStyle(ChatFormatting.GOLD));
+      return true;
+   }
+
+   public static void tickDragons(MinecraftServer var0) {
+      if (!DRAGON_PETS.isEmpty()) {
+         Iterator<Map.Entry<UUID, EnderDragon>> var1 = DRAGON_PETS.entrySet().iterator();
+
+         while (var1.hasNext()) {
+            Map.Entry<UUID, EnderDragon> var2 = var1.next();
+            ServerPlayer var3 = var0.getPlayerList().getPlayer(var2.getKey());
+            EnderDragon var4 = var2.getValue();
+            if (var4 == null || !var4.isAlive() || var4.isRemoved()) {
+               var1.remove();
+               DRAGON_ANGLES.remove(var2.getKey());
+            } else if (var3 != null) {
+               ServerLevel var5 = (ServerLevel)var3.level();
+               if (var4.level() != var5) {
+                  var4.teleportTo(var5, var3.getX(), var3.getY() + 2.0, var3.getZ(), Set.of(), var4.getYRot(), var4.getXRot(), false);
+               }
+
+               double var6 = DRAGON_ANGLES.getOrDefault(var3.getUUID(), 0.0) + 0.07;
+               DRAGON_ANGLES.put(var3.getUUID(), var6);
+               double var8 = var3.getX() + Math.cos(var6) * 4.0;
+               double var10 = var3.getZ() + Math.sin(var6) * 4.0;
+               double var12 = var3.getY() + 2.2 + Math.sin(var6 * 2.0) * 0.4;
+               float var14 = (float)(Math.toDegrees(Math.atan2(var3.getX() - var8, var3.getZ() - var10)));
+               var4.setPos(var8, var12, var10);
+               var4.setDeltaMovement(Vec3.ZERO);
+               var4.setYRot(var14);
+               var4.setYHeadRot(var14);
+
+               if ((var3.tickCount & 1) == 0) {
+                  int var15 = 0;
+
+                  for (BlockPos var17 : BlockPos.betweenClosed(
+                     Mth.floor(var8) - 1, Mth.floor(var12) - 1, Mth.floor(var10) - 1, Mth.floor(var8) + 1, Mth.floor(var12) + 1, Mth.floor(var10) + 1
+                  )) {
+                     BlockState var18 = var5.getBlockState(var17);
+                     if (!var18.isAir() && var18.getDestroySpeed(var5, var17) >= 0.0F) {
+                        var5.destroyBlock(var17.immutable(), true, var3);
+                        if (++var15 >= 6) {
+                           break;
+                        }
+                     }
+                  }
+               }
+
+               AABB var19 = new AABB(var8 - 2.0, var12 - 1.5, var10 - 2.0, var8 + 2.0, var12 + 1.5, var10 + 2.0);
+
+               for (LivingEntity var22 : var5.getEntitiesOfClass(
+                  LivingEntity.class, var19, var21 -> var21.isAlive() && var21 != var3 && !(var21 instanceof EnderDragon) && !isTeammate(var3, var21)
+               )) {
+                  DamageSource var20 = var5.damageSources().mobAttack(var4);
+                  var22.hurtServer(var5, var20, 4.0F);
+                  var22.knockback(0.8, var8 - var22.getX(), var10 - var22.getZ(), var20, 4.0F);
+               }
+            }
+         }
+      }
+   }
+
+   private static boolean isTeammate(ServerPlayer var0, LivingEntity var1) {
+      if (var1 instanceof ServerPlayer var2) {
+         Team var3 = team(var0);
+         return var3 != null && var3.hasPlayer(var2);
+      } else {
+         return false;
+      }
+   }
+
+   private static void giveBlankCellItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "空白格")) {
+         var0.addItem(questItem(Items.PAPER, "空白格", "hexbingo.item.blank_cell.lore"));
+      }
+
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.blank_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+   }
+
+   public static boolean canUseBlankCell(ServerPlayer var0) {
+      return hasHex(var0, "blank_cell") && hasNamedItem(var0, "空白格");
+   }
+
+   public static void applyBlankCell(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return;
+      }
+
+      Bingo var3 = Bingo.get(var2.overworld());
+      Team var4 = var3.getTeam(var0);
+      if (!hasHex(var0, "blank_cell") || var4 == null || var1 < 0 || var1 >= var3.tasks().size()) {
+         return;
+      }
+
+      Task var5 = var3.task(var1);
+      if (var5 == Task.EMPTY || var4.completed(var1) || var4.locked(var1)) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.blank_invalid").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      TaskType<Object> var6 = (TaskType<Object>)var5.getType();
+      Object var7 = var5.getElement(var6).orElse(null);
+      if (var7 != null) {
+         ArrayList<Task> var8 = new ArrayList<>(var3.tasks());
+         var8.set(var1, new Task(var6, var7, var5.inverted(), WILDCARD_TEXTURE));
+         var3.setTasks(var8);
+      }
+
+      var4.complete(var1);
+      var3.markDirty(true);
+      var3.checkWin();
+      BLANK_USED.add(var0.getUUID());
+      consumeNamedItem(var0, "空白格");
+      Component var9 = var3.task(var1).contentName(var2);
+      messageTeam(var2, var4, Component.translatable("hexbingo.msg.blank_done", var9).withStyle(ChatFormatting.LIGHT_PURPLE));
+   }
+
+   private static void consumeNamedItem(ServerPlayer var0, String var1) {
+      for (int var2 = 0; var2 < var0.getInventory().getContainerSize(); var2++) {
+         ItemStack var3 = var0.getInventory().getItem(var2);
+         if (!var3.isEmpty() && var3.getHoverName().getString().equals(var1)) {
+            var3.shrink(1);
+            if (var3.isEmpty()) {
+               var0.getInventory().setItem(var2, ItemStack.EMPTY);
+            }
+            return;
+         }
+      }
+   }
+
+   private static void messageTeam(MinecraftServer var0, Team var1, Component var2) {
+      for (ServerPlayer var3 : onlineTeamPlayers(var0, var1)) {
+         var3.sendSystemMessage(var2);
+      }
+   }
+
+   private static void broadcast(MinecraftServer var0, Component var1) {
+      for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
+         var2.sendSystemMessage(var1);
       }
    }
 
@@ -9045,12 +9599,23 @@ public final class HexEffects {
       PET_TIMER.clear();
       PET_DISMISSED.clear();
       QUAKES.clear();
+      BLANK_USED.clear();
+      ADVANCES.clear();
+
+      for (EnderDragon var5 : DRAGON_PETS.values()) {
+         var5.discard();
+      }
+
+      DRAGON_PETS.clear();
+      DRAGON_ANGLES.clear();
 
       // 清理历史上遗留在世界里的精怪魔法伪装
       for (ServerLevel var2 : var0.getAllLevels()) {
          for (Entity var4 : var2.getAllEntities()) {
             if (var4.getCustomName() != null
-               && (var4.getCustomName().getString().equals("精怪魔法") || var4.getCustomName().getString().equals("蝙蝠形态"))) {
+               && (var4.getCustomName().getString().equals("精怪魔法")
+                  || var4.getCustomName().getString().equals("蝙蝠形态")
+                  || var4.getCustomName().getString().equals("幼龙"))) {
                var4.discard();
             }
          }
@@ -9088,6 +9653,19 @@ public final class HexEffects {
       private QuakeState(ServerLevel var0, List<BlockPos> var1) {
          this.level = var0;
          this.blocks = var1;
+      }
+   }
+
+   private static final class AdvanceState {
+      private final Team team;
+      private final int slot;
+      private final long until;
+      private boolean genuine;
+
+      private AdvanceState(Team var0, int var1, long var2) {
+         this.team = var0;
+         this.slot = var1;
+         this.until = var2;
       }
    }
 

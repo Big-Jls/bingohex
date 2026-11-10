@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +45,7 @@ public final class HexManager {
    private static final Set<UUID> FREE_PICK = new HashSet<>();
    private static final Set<UUID> BREAK_LOCK_SEEN = new HashSet<>();
    private static final Set<UUID> MIRROR_OPEN = new HashSet<>();
+   private static final Map<UUID, String> TASK_PICK_MODE = new HashMap<>();
 
    private static void updateBreakLock(MinecraftServer var0) {
       for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
@@ -152,6 +154,7 @@ public final class HexManager {
    private static void resetGame(MinecraftServer var0, boolean var1) {
       HexGameData var2 = HexGameData.get(var0);
       FREE_PICK.clear();
+      TASK_PICK_MODE.clear();
       HexEffects.clearJams();
       HexEffects.abortTrap(var0);
       HexEffects.resetSpy();
@@ -174,6 +177,7 @@ public final class HexManager {
    private static void endGame(MinecraftServer var0) {
       HexGameData var1 = HexGameData.get(var0);
       FREE_PICK.clear();
+      TASK_PICK_MODE.clear();
       HexEffects.clearJams();
       if (!var1.mayhem()) {
          var1.endGame();
@@ -394,12 +398,13 @@ public final class HexManager {
          // 第四档海克斯固定为纯彩色，但静水监狱不能出现在最后一个海克斯中
          var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), "still_water");
       } else if (var0.allPrismatic()) {
-         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1));
+         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), null, var2 == 2);
          if (var5.size() < 3) {
             var5 = HexRegistry.offer(var2, var3, var0.hasExtraChoice(var1), var4);
          }
       } else if (var2 >= 2 && !ownsPrismatic(var0, var1)) {
-         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1));
+         // 第三次海克斯池子允许出现苦行者，第四次仍然排除
+         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), null, var2 == 2);
          if (var5.size() < 3) {
             var5 = HexRegistry.offer(var2, var3, var0.hasExtraChoice(var1), var4);
          }
@@ -688,6 +693,7 @@ public final class HexManager {
             for (String var14 : var2.hexes(var11)) {
                if (!var2.hexes(var0.getUUID()).contains(var14)
                   && !var14.equals(HexRegistry.OFFER_UPGRADE)
+                  && !var14.equals(HexRegistry.ASCETIC)
                   && !var14.equals("mirror_hex")) {
                   var9.add(var14);
                }
@@ -734,7 +740,10 @@ public final class HexManager {
             }
 
             Hex var4 = HexRegistry.byId(var1);
-            if (var4 == null || var1.equals(HexRegistry.OFFER_UPGRADE) || var1.equals("mirror_hex")) {
+            if (var4 == null
+               || var1.equals(HexRegistry.OFFER_UPGRADE)
+               || var1.equals(HexRegistry.ASCETIC)
+               || var1.equals("mirror_hex")) {
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.mirror_invalid").withStyle(ChatFormatting.RED));
                return;
             }
@@ -772,26 +781,61 @@ public final class HexManager {
       return false;
    }
 
-   // 目标封锁：打开任务选择界面
-   public static void openTaskPick(ServerPlayer var0) {
-      MinecraftServer var1 = var0.level().getServer();
-      if (var1 != null && HexGameData.get(var1).mayhem() && HexEffects.denyReady(var0)) {
-         Bingo var2 = Bingo.get(var0.level());
-         ArrayList<HexTaskListPayload.Entry> var3 = new ArrayList<>();
-
-         for (int var4 = 0; var4 < var2.tasks().size(); var4++) {
-            Task var5 = var2.task(var4);
-            if (var5 != Task.EMPTY) {
-               var3.add(new HexTaskListPayload.Entry(var4, var5.contentName(var1)));
-            }
-         }
-
-         PacketDistributor.sendToPlayer(var0, new HexTaskListPayload(List.copyOf(var3)), new CustomPacketPayload[0]);
+   // 目标封锁 / 空白格：打开任务选择界面
+   public static void openTaskPick(ServerPlayer var0, String var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return;
       }
+
+      HexGameData var3 = HexGameData.get(var2);
+      if (!var3.mayhem()) {
+         return;
+      }
+
+      Bingo var4 = Bingo.get(var0.level());
+      Team var5 = var4.getTeam(var0);
+      if ("deny".equals(var1)) {
+         if (!HexEffects.denyReady(var0)) {
+            return;
+         }
+      } else if ("blank".equals(var1)) {
+         if (!HexEffects.canUseBlankCell(var0) || var5 == null) {
+            return;
+         }
+      } else {
+         return;
+      }
+
+      ArrayList<HexTaskListPayload.Entry> var6 = new ArrayList<>();
+
+      for (int var7 = 0; var7 < var4.tasks().size(); var7++) {
+         Task var8 = var4.task(var7);
+         if (var8 != Task.EMPTY) {
+            if ("blank".equals(var1) && (var5.completed(var7) || var5.locked(var7))) {
+               continue;
+            }
+
+            var6.add(new HexTaskListPayload.Entry(var7, var8.contentName(var2)));
+         }
+      }
+
+      if (var6.isEmpty()) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.blank_none").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      TASK_PICK_MODE.put(var0.getUUID(), var1);
+      PacketDistributor.sendToPlayer(var0, new HexTaskListPayload(List.copyOf(var6)), new CustomPacketPayload[0]);
    }
 
    public static void denyTaskPick(ServerPlayer var0, int var1) {
-      HexEffects.applyObjectiveDeny(var0, var1);
+      String var2 = TASK_PICK_MODE.remove(var0.getUUID());
+      if ("blank".equals(var2)) {
+         HexEffects.applyBlankCell(var0, var1);
+      } else {
+         HexEffects.applyObjectiveDeny(var0, var1);
+      }
    }
 
    public static boolean reopen(ServerPlayer var0) {

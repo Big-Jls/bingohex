@@ -895,7 +895,7 @@
                   },
                   {
                       "id":  "wildcard",
-                      "color":  "prismatic",
+                      "color":  "gold",
                       "effects":  [
                                       {
                                           "type":  "wildcard"
@@ -1242,6 +1242,81 @@
                       "effects":  [
                                       {
                                           "type":  "pale_garden_map"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "advance_victory",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "advance_victory",
+                                          "seconds":  300
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "cell_swap",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "cell_swap"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "journey_core",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "journey_core"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ascetic",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "ascetic",
+                                          "count":  2
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "destiny_dice",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "destiny_dice"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "great_migration",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "great_migration",
+                                          "radius":  500
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "dragon_rider",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "dragon_rider"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "blank_cell",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "blank_cell"
                                       }
                                   ]
                   }
