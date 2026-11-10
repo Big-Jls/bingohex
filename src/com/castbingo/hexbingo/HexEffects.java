@@ -16,6 +16,7 @@ import io.github.noeppi_noeppi.mods.bongo.task.Task;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskType;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeAdvancement;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeBiome;
+import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeEmpty;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeItem;
 import io.github.noeppi_noeppi.mods.bongo.util.TagWithCount;
 import java.lang.reflect.Field;
@@ -1471,7 +1472,7 @@ public final class HexEffects {
 
          for (int var9 : incompleteTasks(var4, var5)) {
             Task var10 = var4.task(var9);
-            if (var10.getType().id().equals("bingo.item")) {
+            if (var10.getType() == TaskTypeItem.INSTANCE) {
                ItemStack var11 = itemTaskStack(var10);
                if (var11 != null && holdsItem(var0, var11.getItem())) {
                   var7 = true;
@@ -2008,7 +2009,7 @@ public final class HexEffects {
    }
 
    private static ItemStack itemTaskStack(Task var0) {
-      if (!var0.getType().id().equals("bingo.item")) {
+      if (var0.getType() != TaskTypeItem.INSTANCE) {
          return null;
       } else {
          return taskElement(var0) instanceof ItemStack var1 ? var1 : null;
@@ -7451,14 +7452,14 @@ public final class HexEffects {
 
             for (int var6 = 0; var6 < var4; var6++) {
                Task var7 = var2.task(var6);
-               if (!var7.getType().id().equals("bingo.empty") && !var7.inverted() && var7.customTexture() == null) {
+               if (var7.getType() != TaskTypeEmpty.INSTANCE && !var7.inverted() && var7.customTexture() == null) {
                   var5.add(var6);
                }
             }
 
             if (var5.isEmpty()) {
                for (int var8 = 0; var8 < var4; var8++) {
-                  if (!var2.task(var8).getType().id().equals("bingo.empty")) {
+                  if (var2.task(var8).getType() != TaskTypeEmpty.INSTANCE) {
                      var5.add(var8);
                   }
                }
@@ -8429,7 +8430,7 @@ public final class HexEffects {
             for (int var9 = 0; var9 < var6; var9++) {
                if (!var5.completed(var9)
                   && !var5.locked(var9)
-                  && !var4.task(var9).getType().id().equals("bingo.empty")
+                  && var4.task(var9).getType() != TaskTypeEmpty.INSTANCE
                   && var4.task(var9).weight() > var8) {
                   var8 = var4.task(var9).weight();
                   var7 = var9;

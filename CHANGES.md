@@ -1,5 +1,20 @@
 # Changelog
 
+## 26.2-1.42.8 — 2026-11-11
+
+### Fixed
+
+- Removed leftover old-namespace task type checks:
+  - `"bingo.item"` is replaced with `TaskTypeItem.INSTANCE`
+    (holding-item speed, item task lookup).
+  - `"bingo.empty"` is replaced with `TaskTypeEmpty.INSTANCE`
+    (Wildcard cell picking, Demon Pact highest-weight task picking).
+  Those checks could never match the current `bongo.*` type ids, so the
+  related hex effects could silently fail or pick empty tasks.
+- Re-searched the whole source tree for `"bingo."` literals; only the custom
+  lang key `bingo.task.enchantment.name` (present in both languages) and the
+  `/bingo` command literal remain.
+
 ## 26.2-1.42.7 — 2026-11-11
 
 ### Fixed

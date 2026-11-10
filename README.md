@@ -13,6 +13,14 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.8 修复
+
+- 清理上次从 `bingo` 改名到 `bongo` 时残留的任务类型 id 判断：
+  - `"bingo.item"` → 直接比较 `TaskTypeItem.INSTANCE`（影响手持物品移速、物品任务取物品）；
+  - `"bingo.empty"` → 直接比较 `TaskTypeEmpty.INSTANCE`（影响万能牌选格、恶魔契约选最高权重任务）。
+  之前这些判断永远不成立，可能导致手持物品加速不触发、万能牌/恶魔契约选中空格或空任务。
+- 已全量搜索源码中的 `"bingo."` 字符串，剩余只有自定义语言键 `bingo.task.enchantment.name`（中英文件均有，功能正常）和 `/bingo` 命令字面量，不再有任务类型 id 残留。
+
 ### 1.42.7 修复
 
 - **驯龙高手**：幼龙改用幻翼实体。原版末影龙的 `sanitizeScale()` 会强制保持 1.0 大小，且自带 BOSS 飞行阶段逻辑，无法作为可缩放的普通宠物；幻翼支持缩放，且 NoAI 下可以被稳定移动。
@@ -189,7 +197,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.7.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.8.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -524,7 +532,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.7 `
+.\build.ps1 -Version 26.2-1.42.8 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
