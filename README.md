@@ -13,6 +13,11 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.3 修复
+
+- **驯龙高手**：龙蛋被活塞推动或原版随机瞬移后，会在新位置重新计时并重新显示倒计时；倒计时文字改用 NBT 初始化（始终面向玩家、可穿透方块、视距提升），各个角度都能看清。
+- **空白格**：点亮任务时不再把该格替换成万能牌图标，保留原任务图标，只为本队点亮。
+
 ### 1.42.2 修复
 
 - **蝙蝠形态**：飞行速度降低 35%，跟随的生物蝙蝠不会再被甩开。
@@ -165,7 +170,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.2.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.3.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -336,7 +341,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
 | 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。道具一次性，使用后消失。 |
-| 空白格 | `blank_cell` | 获得「空白格」：右键打开当前 Bingo 卡牌，点击任意未完成任务并直接点亮，只有本队获得该格。道具一次性。 |
+| 空白格 | `blank_cell` | 获得「空白格」：右键打开当前 Bingo 卡牌，点击任意未完成任务并直接点亮，只为本队点亮且保留原任务图标。道具一次性。 |
 
 ## Hex list (English)
 
@@ -484,7 +489,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
 | Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
-| Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to open the current Bingo card and click any incomplete task to light it up for your team only. One-time item. |
+| Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to open the current Bingo card and click any incomplete task to light it up for your team only, keeping its original icon. One-time item. |
 
 <!-- HEX-TABLE-END -->
 
@@ -500,7 +505,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.2 `
+.\build.ps1 -Version 26.2-1.42.3 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

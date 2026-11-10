@@ -1,5 +1,18 @@
 # Changelog
 
+## 26.2-1.42.3 — 2026-11-11
+
+### Fixed
+
+- **Dragon Tamer** (`dragon_rider`): when the egg is pushed by a piston or
+  teleported by vanilla, the incubation restarts at the new position and the
+  countdown is displayed again. The countdown text display now initialises its
+  billboard/see-through/view-range through NBT, so it is readable from any
+  angle.
+- **Blank Cell** (`blank_cell`): lighting a task no longer replaces its icon
+  with the Wildcard texture; the original task icon is kept and only your team
+  receives the cell.
+
 ## 26.2-1.42.2 — 2026-11-11
 
 ### Changed

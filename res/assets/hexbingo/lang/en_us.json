@@ -606,7 +606,7 @@
     "hexbingo.msg.dragon_incubation_broken":  "The dragon egg was moved or broken; incubation has been reset.",
     "hexbingo.item.dragon_egg.lore":  "Place it to incubate for 3 minutes; moving it resets the timer",
     "hexbingo.hex.blank_cell.name":  "Blank Cell",
-    "hexbingo.hex.blank_cell.desc":  "Gain a team-exclusive wildcard cell: open the current Bingo card and click any incomplete task to light it up.",
+    "hexbingo.hex.blank_cell.desc":  "Gain a team-exclusive extra cell: open the current Bingo card and click any incomplete task to light it up, keeping its original icon.",
     "hexbingo.msg.blank_item":  "Blank Cell: right-click to choose a task to complete.",
     "hexbingo.msg.blank_done":  "Blank Cell: lit up \"%s\".",
     "hexbingo.msg.blank_none":  "Blank Cell: no selectable task.",

@@ -52,7 +52,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -71,6 +73,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.Unit;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -166,6 +169,7 @@ import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -362,11 +366,8 @@ public final class HexEffects {
    private static final Map<UUID, Integer> DRAGON_SOUND_TIMER = new HashMap<>();
    private static final List<HexEffects.EggIncubation> INCUBATIONS = new ArrayList<>();
    private static final long DRAGON_INCUBATION_MS = 180000L;
-   // TextDisplay 的 setText 等在 26.2 中是 private，只能用反射调用
+   // TextDisplay 的 setText 在 26.2 中是 private，只能用反射调用
    private static Method TEXT_DISPLAY_SET_TEXT;
-   private static Method TEXT_DISPLAY_SET_BACKGROUND;
-   private static Method TEXT_DISPLAY_SET_FLAGS;
-   private static Method DISPLAY_SET_BILLBOARD;
    private static final SoundEvent BABY_DRAGON_SOUND = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("hexbingo", "baby_dragon"));
    // 致盲
    private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
@@ -7793,45 +7794,46 @@ public final class HexEffects {
       }
 
       // 用文字展示实体显示倒计时，隐形盔甲架的名字标签在隐形时不会渲染
-      Display.TextDisplay var8 = createIncubationDisplay(var2, var1, incubationName(DRAGON_INCUBATION_MS));
+      Display.TextDisplay var8 = createIncubationDisplay(var2, var1, DRAGON_INCUBATION_MS);
       INCUBATIONS.add(new HexEffects.EggIncubation(var0.getUUID(), var2, var1.immutable(), System.currentTimeMillis() + DRAGON_INCUBATION_MS, var8));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_start").withStyle(ChatFormatting.GOLD));
    }
 
-   private static Display.TextDisplay createIncubationDisplay(ServerLevel var0, BlockPos var1, Component var2) {
-      Display.TextDisplay var3 = (Display.TextDisplay)EntityTypes.TEXT_DISPLAY.create(var0, EntitySpawnReason.MOB_SUMMONED);
-      if (var3 == null) {
+   private static Display.TextDisplay createIncubationDisplay(ServerLevel var0, BlockPos var1, long var2) {
+      Display.TextDisplay var4 = (Display.TextDisplay)EntityTypes.TEXT_DISPLAY.create(var0, EntitySpawnReason.MOB_SUMMONED);
+      if (var4 == null) {
          return null;
       }
 
-      var3.setPos(var1.getX() + 0.5, var1.getY() + 1.15, var1.getZ() + 0.5);
-      var3.setNoGravity(true);
-      var3.setInvulnerable(true);
-      var3.setSilent(true);
-      applyIncubationText(var3, var2);
-      var0.addFreshEntity(var3);
-      return var3;
+      var4.setPos(var1.getX() + 0.5, var1.getY() + 1.15, var1.getZ() + 0.5);
+      var4.setNoGravity(true);
+      var4.setInvulnerable(true);
+      var4.setSilent(true);
+      // 用 NBT 初始化朝向/穿透/背景，避免反射设置 billboard 不生效
+      CompoundTag var5 = new CompoundTag();
+      var5.put("text", (Tag)ComponentSerialization.CODEC.encodeStart(NbtOps.INSTANCE, incubationName(var2)).getOrThrow());
+      var5.put("Pos", (Tag)Vec3.CODEC.encodeStart(NbtOps.INSTANCE, var4.position()).getOrThrow());
+      var5.putString("billboard", "center");
+      var5.putString("alignment", "center");
+      var5.putInt("background", 0x66000000);
+      var5.putByte("shadow", (byte)1);
+      var5.putByte("see_through", (byte)1);
+      var5.putFloat("view_range", 2.0F);
+      var4.load(TagValueInput.create(ProblemReporter.DISCARDING, var0.registryAccess(), var5));
+      var0.addFreshEntity(var4);
+      return var4;
    }
 
-   private static void applyIncubationText(Display.TextDisplay var0, Component var1) {
+   private static void applyIncubationText(Display.TextDisplay var0, long var1) {
       try {
          if (TEXT_DISPLAY_SET_TEXT == null) {
             TEXT_DISPLAY_SET_TEXT = Display.TextDisplay.class.getDeclaredMethod("setText", Component.class);
             TEXT_DISPLAY_SET_TEXT.setAccessible(true);
-            TEXT_DISPLAY_SET_BACKGROUND = Display.TextDisplay.class.getDeclaredMethod("setBackgroundColor", int.class);
-            TEXT_DISPLAY_SET_BACKGROUND.setAccessible(true);
-            TEXT_DISPLAY_SET_FLAGS = Display.TextDisplay.class.getDeclaredMethod("setFlags", byte.class);
-            TEXT_DISPLAY_SET_FLAGS.setAccessible(true);
-            DISPLAY_SET_BILLBOARD = Display.class.getDeclaredMethod("setBillboardConstraints", Display.BillboardConstraints.class);
-            DISPLAY_SET_BILLBOARD.setAccessible(true);
          }
 
-         TEXT_DISPLAY_SET_TEXT.invoke(var0, var1);
-         TEXT_DISPLAY_SET_BACKGROUND.invoke(var0, 0x66000000);
-         TEXT_DISPLAY_SET_FLAGS.invoke(var0, (byte)(Display.TextDisplay.FLAG_SHADOW | Display.TextDisplay.FLAG_SEE_THROUGH));
-         DISPLAY_SET_BILLBOARD.invoke(var0, Display.BillboardConstraints.CENTER);
+         TEXT_DISPLAY_SET_TEXT.invoke(var0, incubationName(var1));
       } catch (ReflectiveOperationException var3) {
-         HexBingo.LOGGER.warn("Failed to configure dragon incubation text display", var3);
+         HexBingo.LOGGER.warn("Failed to update dragon incubation text display", var3);
       }
    }
 
@@ -7862,8 +7864,19 @@ public final class HexEffects {
             }
 
             if (!var4.level.getBlockState(var4.pos).is(Blocks.DRAGON_EGG)) {
-               discardIncubationDisplay(var4);
-               var3.remove();
+               BlockPos var9 = findMovedEgg(var4);
+               if (var9 != null) {
+                  // 龙蛋被活塞推动或原版瞬移：在新位置重新计时并显示倒计时
+                  discardIncubationDisplay(var4);
+                  var4.pos = var9;
+                  var4.readyAt = System.currentTimeMillis() + DRAGON_INCUBATION_MS;
+                  var4.lastSecond = -1;
+                  var4.display = createIncubationDisplay(var4.level, var4.pos, DRAGON_INCUBATION_MS);
+               } else {
+                  discardIncubationDisplay(var4);
+                  var3.remove();
+               }
+
                if (var5 != null) {
                   var5.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_broken").withStyle(ChatFormatting.GRAY));
                }
@@ -7882,19 +7895,47 @@ public final class HexEffects {
             } else {
                // 区块重载后实体引用会失效，重新生成倒计时文字
                if (var4.display == null || var4.display.isRemoved()) {
-                  var4.display = createIncubationDisplay(var4.level, var4.pos, incubationName(var6));
+                  var4.display = createIncubationDisplay(var4.level, var4.pos, var6);
                }
 
                int var8 = (int)((var6 + 999L) / 1000L);
                if (var8 != var4.lastSecond) {
                   var4.lastSecond = var8;
                   if (var4.display != null && !var4.display.isRemoved()) {
-                     applyIncubationText(var4.display, incubationName(var6));
+                     applyIncubationText(var4.display, var6);
                   }
                }
             }
          }
       }
+   }
+
+   /** 在旧位置附近寻找被活塞或原版随机瞬移带走的龙蛋。 */
+   private static BlockPos findMovedEgg(HexEffects.EggIncubation var0) {
+      BlockPos var1 = null;
+      double var2 = Double.MAX_VALUE;
+
+      for (BlockPos var5 : BlockPos.betweenClosed(var0.pos.offset(-16, -8, -16), var0.pos.offset(16, 8, 16))) {
+         if (var0.level.getBlockState(var5).is(Blocks.DRAGON_EGG) && !var5.equals(var0.pos) && !isIncubatingAt(var0.level, var5)) {
+            double var6 = var5.distSqr(var0.pos);
+            if (var6 < var2) {
+               var2 = var6;
+               var1 = var5.immutable();
+            }
+         }
+      }
+
+      return var1;
+   }
+
+   private static boolean isIncubatingAt(ServerLevel var0, BlockPos var1) {
+      for (HexEffects.EggIncubation var3 : INCUBATIONS) {
+         if (var3.level == var0 && var3.pos.equals(var1)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private static void cancelIncubation(UUID var0, boolean var1) {
@@ -8092,21 +8133,14 @@ public final class HexEffects {
          return;
       }
 
-      TaskType<Object> var6 = (TaskType<Object>)var5.getType();
-      Object var7 = var5.getElement(var6).orElse(null);
-      if (var7 != null) {
-         ArrayList<Task> var8 = new ArrayList<>(var3.tasks());
-         var8.set(var1, new Task(var6, var7, var5.inverted(), WILDCARD_TEXTURE));
-         var3.setTasks(var8);
-      }
-
+      // 只为本队点亮该格，保留原任务图标，不替换成万能牌
       var4.complete(var1);
       var3.markDirty(true);
       var3.checkWin();
       BLANK_USED.add(var0.getUUID());
       consumeNamedItem(var0, "空白格");
-      Component var9 = var3.task(var1).contentName(var2);
-      messageTeam(var2, var4, Component.translatable("hexbingo.msg.blank_done", var9).withStyle(ChatFormatting.LIGHT_PURPLE));
+      Component var6 = var5.contentName(var2);
+      messageTeam(var2, var4, Component.translatable("hexbingo.msg.blank_done", var6).withStyle(ChatFormatting.LIGHT_PURPLE));
    }
 
    private static void consumeNamedItem(ServerPlayer var0, String var1) {
@@ -9982,8 +10016,8 @@ public final class HexEffects {
    private static final class EggIncubation {
       private final UUID owner;
       private final ServerLevel level;
-      private final BlockPos pos;
-      private final long readyAt;
+      private BlockPos pos;
+      private long readyAt;
       private Display.TextDisplay display;
       private int lastSecond = -1;
 
