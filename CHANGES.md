@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.38.1 — 2026-11-10
+
+### Fixed
+
+- Pet Master (`pet_companion`): the invulnerable companion can no longer be
+  killed. Vanilla invulnerability is bypassed by creative-mode players (and by
+  damage that bypasses invulnerability, such as `/kill`), which previously
+  killed the pet. Incoming damage to the pet is now cancelled outright, and
+  the pet's invulnerability and health are re-asserted every tick.
+
 ## 26.2-1.38.0 — 2026-11-10
 
 ### Added

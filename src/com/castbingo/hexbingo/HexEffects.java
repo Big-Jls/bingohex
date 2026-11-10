@@ -1937,6 +1937,12 @@ public final class HexEffects {
    }
 
    public static void incomingDamage(LivingIncomingDamageEvent var0) {
+      // 无敌小宠物：创造模式玩家与 /kill 等可绕过原版无敌，这里统一拦截
+      if (isProtectedPet(var0.getEntity())) {
+         var0.setCanceled(true);
+         return;
+      }
+
       if (var0.getEntity() instanceof ServerPlayer var1) {
          List<Hex> var19 = hexes(var1);
          if (!var19.isEmpty()) {
@@ -4184,6 +4190,19 @@ public final class HexEffects {
       }
    }
 
+   private static boolean isProtectedPet(Entity var0) {
+      if (!(var0 instanceof TamableAnimal)) {
+         return false;
+      }
+
+      if (PETS.containsValue(var0)) {
+         return true;
+      }
+
+      Component var1 = var0.getCustomName();
+      return var1 != null && "无敌小宠物".equals(var1.getString());
+   }
+
    private static void tickPet(ServerPlayer var0, HexEffect var1) {
       TamableAnimal var2 = PETS.get(var0.getUUID());
       if (var2 == null || !var2.isAlive()) {
@@ -4191,6 +4210,12 @@ public final class HexEffects {
       } else if (var2.level() != var0.level() || var2.distanceToSqr(var0) > 1024.0) {
          // 玩家传送或跨维度后把宠物一并带过去，避免在旧位置遗留后再生成第二只
          var2.teleportTo((ServerLevel)var0.level(), var0.getX(), var0.getY(), var0.getZ(), Set.of(), var0.getYRot(), var0.getXRot(), false);
+      } else {
+         // 兜底维持无敌状态，避免被绕过无敌的伤害击杀
+         var2.setInvulnerable(true);
+         if (var2.getHealth() < var2.getMaxHealth()) {
+            var2.setHealth(var2.getMaxHealth());
+         }
       }
 
       int var3 = Math.max(1, var1.interval);
