@@ -19,7 +19,7 @@ $javac = Join-Path $Jdk "bin\javac.exe"
 $jarTool = Join-Path $Jdk "bin\jar.exe"
 
 if (-not $LibXJar) { throw "Pass -LibXJar <path to LibX-26.2-8.0.0.jar>." }
-if (-not $BongoJar) { throw "Pass -BongoJar <path to Bingo-26.2-1.0.0-port.5.jar>." }
+if (-not $BongoJar) { throw "Pass -BongoJar <path to ReBongo-26.2-1.0.0-port.6.jar>." }
 foreach ($p in @($LibXJar, $BongoJar)) { if (-not (Test-Path $p)) { throw "Missing: $p" } }
 
 $gameJar = Join-Path $MinecraftDir "versions\$NeoForgeVersion\$NeoForgeVersion.jar"

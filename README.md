@@ -145,7 +145,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.5.jar`，文件名沿用上游 Bingo，`modId` 为 `bongo`）。
+2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
 3. 把 `HexBingo-26.2-1.41.1.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
@@ -485,7 +485,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\Bingo-26.2-1.0.0-port.5.jar"
+  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.6.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。
