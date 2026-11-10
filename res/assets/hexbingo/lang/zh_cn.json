@@ -239,8 +239,6 @@
     "hexbingo.hex.back_to_basics.desc":  "无法使用工作台，但获得的物品掉落翻倍（受抢夺加成），并永久获得速度 I。",
     "hexbingo.hex.archmage.name":  "大法师",
     "hexbingo.hex.archmage.desc":  "制作物品后，每个材料有 10% 概率返还。",
-    "hexbingo.hex.lone_hero.name":  "孤勇者",
-    "hexbingo.hex.lone_hero.desc":  "播放《孤勇者》，并获得一个随机永久增益。",
     "hexbingo.hex.dechi_song.name":  "得吃小曲",
     "hexbingo.hex.dechi_song.desc":  "播放村民版《得吃小曲》；期间获得随机幸运 III–V，背包里的镐子获得时运 II–III。",
     "hexbingo.hex.utopia.name":  "理想国",

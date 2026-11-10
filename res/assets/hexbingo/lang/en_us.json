@@ -239,8 +239,6 @@
     "hexbingo.hex.back_to_basics.desc":  "You cannot use a crafting table, but item drops are doubled (boosted by Looting) and you gain permanent Speed I.",
     "hexbingo.hex.archmage.name":  "Archmage",
     "hexbingo.hex.archmage.desc":  "After crafting, each material has a 10% chance to be refunded.",
-    "hexbingo.hex.lone_hero.name":  "Lone Hero",
-    "hexbingo.hex.lone_hero.desc":  "Plays the song and grants a random permanent buff.",
     "hexbingo.hex.dechi_song.name":  "Dechi Song",
     "hexbingo.hex.dechi_song.desc":  "Plays the villager version of the Dechi song; grants random Luck III-V during it, and all pickaxes in your inventory gain Fortune II-III.",
     "hexbingo.hex.utopia.name":  "Utopia",
