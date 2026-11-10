@@ -1,5 +1,12 @@
 # Changelog
 
+## 26.2-1.42.4 — 2026-11-11
+
+### Changed
+
+- **Objective Deny** (`objective_deny`): cooldown reduced from 15 minutes to
+  6 minutes.
+
 ## 26.2-1.42.3 — 2026-11-11
 
 ### Fixed

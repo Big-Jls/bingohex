@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.4 调整
+
+- **目标封锁**：冷却时间由 15 分钟缩短为 6 分钟。
+
 ### 1.42.3 修复
 
 - **驯龙高手**：龙蛋被活塞推动或原版随机瞬移后，会在新位置重新计时并重新显示倒计时；倒计时文字改用 NBT 初始化（始终面向玩家、可穿透方块、视距提升），各个角度都能看清。
@@ -170,7 +174,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.3.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.4.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -336,7 +340,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 黑市开张 | `black_market` | 下次打开村民交易界面时，将该村民升到最高等级，并获得永久村庄英雄 II。 |
 | 恶魔契约 | `demon_pact` | 永久失去 10 点生命上限，但允许你受到伤害，获得一整套随机附魔铁套，并立即完成当前权重最高的 1 个 Bingo 任务。 |
 | 精神控制 | `mind_control` | 获得「精神控制」：右键控制一名敌人 15 秒的移动方向。冷却 5 分钟。 |
-| 目标封锁 | `objective_deny` | 获得「目标封锁」：右键打开当前 Bingo 卡牌，点击一个任务，30 秒内所有队伍无法完成它。冷却 15 分钟。 |
+| 目标封锁 | `objective_deny` | 获得「目标封锁」：右键打开当前 Bingo 卡牌，点击一个任务，30 秒内所有队伍无法完成它。冷却 6 分钟。 |
 | 透视 | `xray` | 获得「矿物透视」：右键获得 20 秒矿物透视。冷却 5 分钟。 |
 | 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
@@ -484,7 +488,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
 | Demon Pact | `demon_pact` | Permanently lose 10 max health, but you can take damage; gain a full set of randomly enchanted iron armor and immediately complete the highest-weight Bingo task. |
 | Mind Control | `mind_control` | Gain 'Mind Control': right-click to control one enemy's movement direction for 15 seconds. Cooldown 5 minutes. |
-| Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click to open the current Bingo card and click a task; no team can complete it for 30 seconds. Cooldown 15 minutes. |
+| Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click to open the current Bingo card and click a task; no team can complete it for 30 seconds. Cooldown 6 minutes. |
 | X-Ray | `xray` | Gain 'Ore Vision': right-click for 20 seconds of ore x-ray. Cooldown 5 minutes. |
 | Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
@@ -505,7 +509,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.3 `
+.\build.ps1 -Version 26.2-1.42.4 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

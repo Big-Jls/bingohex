@@ -9568,7 +9568,7 @@ public final class HexEffects {
          Bingo var3 = Bingo.get(var2.overworld());
          if (var1 >= 0 && var1 < var3.tasks().size()) {
             OBJECTIVE_DENY = new HexEffects.DenyState(var1, System.currentTimeMillis() + 30000L);
-            DENY_COOLDOWN.put(var0.getUUID(), System.currentTimeMillis() + skillCooldown(var0, 900000L));
+            DENY_COOLDOWN.put(var0.getUUID(), System.currentTimeMillis() + skillCooldown(var0, 360000L));
             Component var4 = var3.task(var1).contentName(var2);
             Component var5 = Component.translatable("hexbingo.msg.deny_cast", var0.getDisplayName(), var4).withStyle(ChatFormatting.RED);
 
