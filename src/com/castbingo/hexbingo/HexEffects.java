@@ -377,6 +377,7 @@ public final class HexEffects {
    // 蝙蝠形态
    private static final Map<UUID, Long> BAT_UNTIL = new HashMap<>();
    private static final Map<UUID, Long> BAT_COOLDOWN = new HashMap<>();
+   private static final Map<UUID, Float> BAT_FLYING_SPEED = new HashMap<>();
    private static final Map<UUID, Bat> BAT_DISGUISES = new HashMap<>();
    // 精神控制
    private static final Map<UUID, HexEffects.MindState> MIND_CONTROL = new HashMap<>();
@@ -9275,6 +9276,10 @@ public final class HexEffects {
          var7.addOrUpdateTransientModifier(new AttributeModifier(modifierId("bat_form", 1), -14.0, Operation.ADD_VALUE));
       }
 
+      // 玩家飞行速度来自 Abilities，不能用 Attributes.FLYING_SPEED
+      BAT_FLYING_SPEED.put(var0.getUUID(), var0.getAbilities().getFlyingSpeed());
+      var0.getAbilities().setFlyingSpeed(var0.getAbilities().getFlyingSpeed() * 0.65F);
+
       var0.setHealth(Math.min(var0.getHealth(), 6.0F));
       var0.getAbilities().mayfly = true;
       var0.getAbilities().flying = false;
@@ -9388,6 +9393,12 @@ public final class HexEffects {
          AttributeInstance var3 = var0.getAttribute(Attributes.MAX_HEALTH);
          if (var3 != null) {
             var3.removeModifier(modifierId("bat_form", 1));
+         }
+
+         Float var8 = BAT_FLYING_SPEED.remove(var0.getUUID());
+         if (var8 != null) {
+            var0.getAbilities().setFlyingSpeed(var8);
+            var0.onUpdateAbilities();
          }
 
          if (!var0.isCreative() && !var0.isSpectator()) {

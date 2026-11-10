@@ -469,7 +469,7 @@
     "hexbingo.hex.midas_touch.name":  "点石成金",
     "hexbingo.hex.midas_touch.desc":  "按 G 键把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。",
     "hexbingo.hex.bat_form.name":  "蝙蝠形态",
-    "hexbingo.hex.bat_form.desc":  "获得「蝙蝠形态」。右键变成真正的蝙蝠 60 秒：本体隐形并缩小到 0.5 格高，脚边有一只缩小的真蝙蝠跟随；可飞行、无法攻击、血量变少，结束后获得 1 分钟缓降。冷却 7 分钟。",
+    "hexbingo.hex.bat_form.desc":  "获得「蝙蝠形态」。右键变成真正的蝙蝠 60 秒：本体隐形并缩小到 0.5 格高，脚边有一只缩小的真蝙蝠跟随；可飞行（飞行速度降低 35%）、无法攻击、血量变少，结束后获得 1 分钟缓降。冷却 7 分钟。",
     "hexbingo.hex.mind_control.name":  "精神控制",
     "hexbingo.hex.mind_control.desc":  "获得「精神控制」。右键控制一名敌人 15 秒的移动方向。冷却 5 分钟。",
     "hexbingo.hex.objective_deny.name":  "目标封锁",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 26.2-1.42.2 — 2026-11-11
+
+### Changed
+
+- **Bat Form** (`bat_form`): flight speed is reduced by 35% while in bat
+  form, so the following bat can keep up with the player.
+
 ## 26.2-1.42.1 — 2026-11-11
 
 ### Fixed
