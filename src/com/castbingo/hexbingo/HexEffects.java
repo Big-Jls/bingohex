@@ -104,6 +104,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.animal.feline.Cat;
@@ -122,6 +123,7 @@ import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.EyeOfEnder;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball;
@@ -370,6 +372,8 @@ public final class HexEffects {
    private static final long DRAGON_INCUBATION_MS = 180000L;
    // TextDisplay 的 setText 在 26.2 中是 private，只能用反射调用
    private static Method TEXT_DISPLAY_SET_TEXT;
+   // 幻翼的 moveTargetPoint 是 private，写入后交给原版 PhantomMoveControl 飞行
+   private static Field PHANTOM_MOVE_TARGET;
    private static final SoundEvent BABY_DRAGON_SOUND = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("hexbingo", "baby_dragon"));
    // 致盲
    private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
@@ -8017,7 +8021,10 @@ public final class HexEffects {
 
       var3.setPos(var1.getX() + 0.5, var1.getY() + 1.0, var1.getZ() + 0.5);
       var3.setPhantomSize(0);
-      var3.setNoAi(true);
+      // 开启幻翼 AI 以获得原版的飞行、转向和俯仰控制；同时清空全部 AI 目标，禁止它攻击玩家
+      var3.setNoAi(false);
+      var3.getGoalSelector().removeAllGoals(goal -> true);
+      stripPhantomTargetGoals(var3);
       var3.setSilent(true);
       var3.setInvulnerable(true);
       var3.setPersistenceRequired();
@@ -8031,6 +8038,7 @@ public final class HexEffects {
          var4.setBaseValue(0.5);
       }
 
+      setPhantomMoveTarget(var3, new Vec3(var1.getX() + 0.5, var1.getY() + 1.5, var1.getZ() + 0.5));
       var2.addFreshEntity(var3);
       var2.removeBlock(var1, false);
       DRAGON_PETS.put(var0.getUUID(), var3);
@@ -8092,6 +8100,7 @@ public final class HexEffects {
             if (var4 != null) {
                ServerLevel var6 = (ServerLevel)var4.level();
                var1.setRemainingFireTicks(0);
+               var1.setTarget(null);
                if (var1.level() != var6) {
                   var1.teleportTo(var6, var4.getX(), var4.getY() + 1.5, var4.getZ(), Set.of(), var1.getYRot(), var1.getXRot(), false);
                }
@@ -8101,15 +8110,16 @@ public final class HexEffects {
                double var9 = var4.getX() + Math.cos(var7) * 4.0;
                double var11 = var4.getZ() + Math.sin(var7) * 4.0;
                double var13 = var4.getY() + 1.6 + Math.sin(var7 * 2.0) * 0.35;
-               float var15 = (float)Math.toDegrees(Math.atan2(var4.getX() - var9, var4.getZ() - var11));
-               var1.setPos(var9, var13, var11);
-               var1.setDeltaMovement(Vec3.ZERO);
-               var1.setYRot(var15);
-               var1.setYHeadRot(var15);
+               if (var1.distanceToSqr(var4) > 1024.0) {
+                  var1.teleportTo(var6, var9, var13, var11, Set.of(), var1.getYRot(), var1.getXRot(), false);
+               }
+
+               // 只更新目标点，位置和朝向交给幻翼自己的 AI 平滑推进
+               setPhantomMoveTarget(var1, new Vec3(var9, var13, var11));
 
                int var16 = DRAGON_SOUND_TIMER.getOrDefault(var3, 40);
                if (--var16 <= 0) {
-                  var6.playSound(null, var9, var13, var11, BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
+                  var6.playSound(null, var1.getX(), var1.getY(), var1.getZ(), BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
                   var16 = 80 + ThreadLocalRandom.current().nextInt(80);
                }
 
@@ -8119,7 +8129,7 @@ public final class HexEffects {
                   int var17 = 0;
 
                   for (BlockPos var19 : BlockPos.betweenClosed(
-                     Mth.floor(var9) - 1, Mth.floor(var13) - 1, Mth.floor(var11) - 1, Mth.floor(var9) + 1, Mth.floor(var13) + 1, Mth.floor(var11) + 1
+                     Mth.floor(var1.getX()) - 1, Mth.floor(var1.getY()) - 1, Mth.floor(var1.getZ()) - 1, Mth.floor(var1.getX()) + 1, Mth.floor(var1.getY()) + 1, Mth.floor(var1.getZ()) + 1
                   )) {
                      BlockState var20 = var6.getBlockState(var19);
                      if (!var20.isAir() && var20.getDestroySpeed(var6, var19) >= 0.0F) {
@@ -8131,28 +8141,45 @@ public final class HexEffects {
                   }
                }
 
-               AABB var23 = new AABB(var9 - 2.0, var13 - 1.5, var11 - 2.0, var9 + 2.0, var13 + 1.5, var11 + 2.0);
+               AABB var23 = new AABB(var1.getX() - 2.0, var1.getY() - 1.5, var1.getZ() - 2.0, var1.getX() + 2.0, var1.getY() + 1.5, var1.getZ() + 2.0);
 
                for (LivingEntity var24 : var6.getEntitiesOfClass(
-                  LivingEntity.class, var23, var21 -> var21.isAlive() && var21 != var4 && !(var21 instanceof Phantom) && !isDragonProtected(var4, var21)
+                  LivingEntity.class, var23, var21 -> var21.isAlive() && !(var21 instanceof Player) && !(var21 instanceof Phantom)
                )) {
                   DamageSource var25 = var6.damageSources().mobAttack(var1);
                   var24.hurtServer(var6, var25, 4.0F);
-                  var24.knockback(0.8, var9 - var24.getX(), var11 - var24.getZ(), var25, 4.0F);
+                  var24.knockback(0.8, var1.getX() - var24.getX(), var1.getZ() - var24.getZ(), var25, 4.0F);
                }
+            } else {
+               setPhantomMoveTarget(var1, var1.position());
+               var1.setTarget(null);
             }
          }
       }
    }
 
-   private static boolean isDragonProtected(ServerPlayer var0, LivingEntity var1) {
-      if (var1 == var0) {
-         return true;
-      } else if (var1 instanceof ServerPlayer var2) {
-         Team var3 = team(var0);
-         return var3 != null && var3.hasPlayer(var2) || hasHex(var2, "dragon_rider");
-      } else {
-         return false;
+   /** 幻翼的 targetSelector 是 protected，清空目标才能保证它不会主动锁定玩家。 */
+   private static void stripPhantomTargetGoals(Phantom var0) {
+      try {
+         Field var1 = Mob.class.getDeclaredField("targetSelector");
+         var1.setAccessible(true);
+         ((GoalSelector)var1.get(var0)).removeAllGoals(var2 -> true);
+      } catch (Exception var2) {
+      }
+   }
+
+   /** 写入幻翼的环绕目标点；实际飞行由原版 PhantomMoveControl 完成。 */
+   private static void setPhantomMoveTarget(Phantom var0, Vec3 var1) {
+      try {
+         if (PHANTOM_MOVE_TARGET == null) {
+            PHANTOM_MOVE_TARGET = Phantom.class.getDeclaredField("moveTargetPoint");
+            PHANTOM_MOVE_TARGET.setAccessible(true);
+         }
+
+         PHANTOM_MOVE_TARGET.set(var0, var1);
+      } catch (Exception var2) {
+         var0.setPos(var1.x, var1.y, var1.z);
+         var0.setDeltaMovement(Vec3.ZERO);
       }
    }
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 26.2-1.42.9 — 2026-11-11
+
+### Changed
+
+- **Dragon Tamer** (`dragon_rider`): the baby dragon now keeps the vanilla
+  Phantom AI for flight/turning, but all of its goal and target goals are
+  removed on hatch, so it can no longer acquire or attack players. Its orbit
+  point is written into `Phantom.moveTargetPoint` every tick, letting the
+  vanilla `PhantomMoveControl` fly and bank toward it smoothly.
+- The pet no longer damages any player (previously it only spared the owner,
+  teammates and other Dragon Tamer owners); it still breaks blocks and knocks
+  back non-player mobs in its path.
+- If the owner is more than 32 blocks away (teleport / dimension change), the
+  pet is pulled to the orbit point and the AI continues from there.
+
 ## 26.2-1.42.8 — 2026-11-11
 
 ### Fixed

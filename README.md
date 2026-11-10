@@ -13,6 +13,13 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.9 调整
+
+- **驯龙高手**：幼龙保留幻翼原版 AI 的飞行与转向，但孵化时清空全部 AI 目标（goalSelector / targetSelector），不会再锁定或攻击玩家。
+- 每 tick 把环绕点写入幻翼的 `moveTargetPoint`，由原版 `PhantomMoveControl` 平滑飞行，不再用瞬移方式摆放位置。
+- 幼龙不再对任何玩家造成伤害（之前只保护自己、队友和同样拥有该海克斯的玩家），仍会破坏沿途方块、击退并伤害非玩家生物。
+- 玩家距离超过 32 格（传送、换维度）时，幼龙会被拉回环绕点继续跟随。
+
 ### 1.42.8 修复
 
 - 清理上次从 `bingo` 改名到 `bongo` 时残留的任务类型 id 判断：
@@ -197,7 +204,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.8.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.9.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -327,7 +334,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
-| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙环绕你，经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害，且不会攻击你或其它拥有该海克斯的玩家。 |
+| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，且不会攻击任何玩家。 |
 
 ### 彩色（36）
 
@@ -532,7 +539,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.8 `
+.\build.ps1 -Version 26.2-1.42.9 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
