@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.10 修复
+
+- **驯龙高手**：服务器重启后，脱离宠物表的旧幼龙会自动关闭 AI 并清空目标，避免它恢复成敌对幻翼攻击玩家。
+
 ### 1.42.9 调整
 
 - **驯龙高手**：幼龙保留幻翼原版 AI 的飞行与转向，但孵化时清空全部 AI 目标（goalSelector / targetSelector），不会再锁定或攻击玩家。
@@ -204,7 +208,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.9.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.10.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -539,7 +543,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.9 `
+.\build.ps1 -Version 26.2-1.42.10 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

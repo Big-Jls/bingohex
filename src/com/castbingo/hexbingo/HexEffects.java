@@ -8095,65 +8095,75 @@ public final class HexEffects {
             }
          }
 
-         if (var3 != null) {
-            ServerPlayer var4 = var2.getPlayerList().getPlayer(var3);
-            if (var4 != null) {
-               ServerLevel var6 = (ServerLevel)var4.level();
-               var1.setRemainingFireTicks(0);
+         if (var3 == null) {
+            // 服务器重启后旧幼龙不再受本模组控制：关掉 AI，避免它恢复成敌对幻翼攻击玩家
+            if (var1.getCustomName() != null && "幼龙".equals(var1.getCustomName().getString())) {
                var1.setTarget(null);
-               if (var1.level() != var6) {
-                  var1.teleportTo(var6, var4.getX(), var4.getY() + 1.5, var4.getZ(), Set.of(), var1.getYRot(), var1.getXRot(), false);
-               }
+               var1.setNoAi(true);
+               var1.getGoalSelector().removeAllGoals(goal -> true);
+               stripPhantomTargetGoals(var1);
+            }
 
-               double var7 = DRAGON_ANGLES.getOrDefault(var3, 0.0) + 0.07;
-               DRAGON_ANGLES.put(var3, var7);
-               double var9 = var4.getX() + Math.cos(var7) * 4.0;
-               double var11 = var4.getZ() + Math.sin(var7) * 4.0;
-               double var13 = var4.getY() + 1.6 + Math.sin(var7 * 2.0) * 0.35;
-               if (var1.distanceToSqr(var4) > 1024.0) {
-                  var1.teleportTo(var6, var9, var13, var11, Set.of(), var1.getYRot(), var1.getXRot(), false);
-               }
+            return;
+         }
 
-               // 只更新目标点，位置和朝向交给幻翼自己的 AI 平滑推进
-               setPhantomMoveTarget(var1, new Vec3(var9, var13, var11));
+         ServerPlayer var4 = var2.getPlayerList().getPlayer(var3);
+         if (var4 != null) {
+            ServerLevel var6 = (ServerLevel)var4.level();
+            var1.setRemainingFireTicks(0);
+            var1.setTarget(null);
+            if (var1.level() != var6) {
+               var1.teleportTo(var6, var4.getX(), var4.getY() + 1.5, var4.getZ(), Set.of(), var1.getYRot(), var1.getXRot(), false);
+            }
 
-               int var16 = DRAGON_SOUND_TIMER.getOrDefault(var3, 40);
-               if (--var16 <= 0) {
-                  var6.playSound(null, var1.getX(), var1.getY(), var1.getZ(), BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
-                  var16 = 80 + ThreadLocalRandom.current().nextInt(80);
-               }
+            double var7 = DRAGON_ANGLES.getOrDefault(var3, 0.0) + 0.07;
+            DRAGON_ANGLES.put(var3, var7);
+            double var9 = var4.getX() + Math.cos(var7) * 4.0;
+            double var11 = var4.getZ() + Math.sin(var7) * 4.0;
+            double var13 = var4.getY() + 1.6 + Math.sin(var7 * 2.0) * 0.35;
+            if (var1.distanceToSqr(var4) > 1024.0) {
+               var1.teleportTo(var6, var9, var13, var11, Set.of(), var1.getYRot(), var1.getXRot(), false);
+            }
 
-               DRAGON_SOUND_TIMER.put(var3, var16);
+            // 只更新目标点，位置和朝向交给幻翼自己的 AI 平滑推进
+            setPhantomMoveTarget(var1, new Vec3(var9, var13, var11));
 
-               if ((var4.tickCount & 1) == 0) {
-                  int var17 = 0;
+            int var16 = DRAGON_SOUND_TIMER.getOrDefault(var3, 40);
+            if (--var16 <= 0) {
+               var6.playSound(null, var1.getX(), var1.getY(), var1.getZ(), BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
+               var16 = 80 + ThreadLocalRandom.current().nextInt(80);
+            }
 
-                  for (BlockPos var19 : BlockPos.betweenClosed(
-                     Mth.floor(var1.getX()) - 1, Mth.floor(var1.getY()) - 1, Mth.floor(var1.getZ()) - 1, Mth.floor(var1.getX()) + 1, Mth.floor(var1.getY()) + 1, Mth.floor(var1.getZ()) + 1
-                  )) {
-                     BlockState var20 = var6.getBlockState(var19);
-                     if (!var20.isAir() && var20.getDestroySpeed(var6, var19) >= 0.0F) {
-                        var6.destroyBlock(var19.immutable(), true, var4);
-                        if (++var17 >= 6) {
-                           break;
-                        }
+            DRAGON_SOUND_TIMER.put(var3, var16);
+
+            if ((var4.tickCount & 1) == 0) {
+               int var17 = 0;
+
+               for (BlockPos var19 : BlockPos.betweenClosed(
+                  Mth.floor(var1.getX()) - 1, Mth.floor(var1.getY()) - 1, Mth.floor(var1.getZ()) - 1, Mth.floor(var1.getX()) + 1, Mth.floor(var1.getY()) + 1, Mth.floor(var1.getZ()) + 1
+               )) {
+                  BlockState var20 = var6.getBlockState(var19);
+                  if (!var20.isAir() && var20.getDestroySpeed(var6, var19) >= 0.0F) {
+                     var6.destroyBlock(var19.immutable(), true, var4);
+                     if (++var17 >= 6) {
+                        break;
                      }
                   }
                }
-
-               AABB var23 = new AABB(var1.getX() - 2.0, var1.getY() - 1.5, var1.getZ() - 2.0, var1.getX() + 2.0, var1.getY() + 1.5, var1.getZ() + 2.0);
-
-               for (LivingEntity var24 : var6.getEntitiesOfClass(
-                  LivingEntity.class, var23, var21 -> var21.isAlive() && !(var21 instanceof Player) && !(var21 instanceof Phantom)
-               )) {
-                  DamageSource var25 = var6.damageSources().mobAttack(var1);
-                  var24.hurtServer(var6, var25, 4.0F);
-                  var24.knockback(0.8, var1.getX() - var24.getX(), var1.getZ() - var24.getZ(), var25, 4.0F);
-               }
-            } else {
-               setPhantomMoveTarget(var1, var1.position());
-               var1.setTarget(null);
             }
+
+            AABB var23 = new AABB(var1.getX() - 2.0, var1.getY() - 1.5, var1.getZ() - 2.0, var1.getX() + 2.0, var1.getY() + 1.5, var1.getZ() + 2.0);
+
+            for (LivingEntity var24 : var6.getEntitiesOfClass(
+               LivingEntity.class, var23, var21 -> var21.isAlive() && !(var21 instanceof Player) && !(var21 instanceof Phantom)
+            )) {
+               DamageSource var25 = var6.damageSources().mobAttack(var1);
+               var24.hurtServer(var6, var25, 4.0F);
+               var24.knockback(0.8, var1.getX() - var24.getX(), var1.getZ() - var24.getZ(), var25, 4.0F);
+            }
+         } else {
+            setPhantomMoveTarget(var1, var1.position());
+            var1.setTarget(null);
          }
       }
    }

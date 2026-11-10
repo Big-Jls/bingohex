@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.42.10 — 2026-11-11
+
+### Fixed
+
+- **Dragon Tamer**: after a server restart an orphaned baby dragon (custom name
+  `幼龙`) is no longer controlled by the pet map. It now has its AI disabled
+  and goals cleared when ticked, so it cannot revert to a hostile Phantom and
+  attack players.
+
 ## 26.2-1.42.9 — 2026-11-11
 
 ### Changed
