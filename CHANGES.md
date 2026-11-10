@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.42.5 — 2026-11-11
+
+### Changed
+
+- Renamed the **Boomerang OK** hex and item to **OK Boomerang** (`ok回力镖`).
+- The boomerang now searches for the target biome with a radius of 12800. If
+  the biome still cannot be found, an artificial patch of that biome is
+  generated about 500 blocks ahead with `/fillbiome`, and the boomerang points
+  there.
+
 ## 26.2-1.42.4 — 2026-11-11
 
 ### Changed

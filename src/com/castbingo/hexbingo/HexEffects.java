@@ -252,7 +252,7 @@ public final class HexEffects {
    );
    private static final Map<UUID, Holder<MobEffect>> SONG_BUFFS = new HashMap<>();
    private static final Set<UUID> SPY_USED = new HashSet<>();
-   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "回力ok镖", "彩虹大作战", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智");
+   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "彩虹大作战", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智");
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
@@ -806,7 +806,7 @@ public final class HexEffects {
          case "reroll_tasks":
             rerollTasks(var0, var3.mode);
             break;
-         // 回力ok镖
+         // ok回力镖
          case "boomerang_biome":
             giveBoomerangItem(var0);
             break;
@@ -2946,6 +2946,25 @@ public final class HexEffects {
       return var16 == null ? new BlockPos(var7, var8, var9) : var16;
    }
 
+   // 回力镖兜底：任意群系都在 500 格外生成一块目标群系区域
+   private static BlockPos createArtificialBiomeGeneric(ServerLevel var0, ServerPlayer var1, String var2) {
+      MinecraftServer var3 = var0.getServer();
+      if (var3 == null) {
+         return null;
+      }
+
+      BlockPos var4 = findLandSpot(var0, var1, 500);
+      if (var4 == null) {
+         return null;
+      }
+
+      int var5 = var4.getX();
+      int var6 = var4.getY();
+      int var7 = var4.getZ();
+      runCommand(var3, var0, var4, "fillbiome " + (var5 - 16) + " " + (var6 - 8) + " " + (var7 - 16) + " " + (var5 + 15) + " " + (var6 + 8) + " " + (var7 + 15) + " " + var2);
+      return var4;
+   }
+
    private static BlockPos findLandSpot(ServerLevel var2, ServerPlayer var0, int var1) {
       for (int var3 = 0; var3 < 8; var3++) {
          double var4 = (Math.PI * 2.0) * (double)var3 / 8.0;
@@ -4761,14 +4780,14 @@ public final class HexEffects {
    }
 
    private static void giveBoomerangItem(ServerPlayer var0) {
-      var0.addItem(questItem(Items.NAUTILUS_SHELL, "回力ok镖", "hexbingo.item.boomerang.lore"));
+      var0.addItem(questItem(Items.NAUTILUS_SHELL, "ok回力镖", "hexbingo.item.boomerang.lore"));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_item"));
    }
 
    private static void consumeBoomerang(ServerPlayer var0) {
       for (int var1 = 0; var1 < var0.getInventory().getContainerSize(); var1++) {
          ItemStack var2 = var0.getInventory().getItem(var1);
-         if (!var2.isEmpty() && var2.getHoverName().getString().equals("回力ok镖")) {
+         if (!var2.isEmpty() && var2.getHoverName().getString().equals("ok回力镖")) {
             var2.shrink(1);
             return;
          }
@@ -4804,30 +4823,42 @@ public final class HexEffects {
          if (taskElement(var15.task(var16)) instanceof Identifier var6) {
             ResourceKey var17 = ResourceKey.create(Registries.BIOME, var6);
             Predicate<Holder<Biome>> var8 = var1x -> var1x.unwrapKey().map(var1xx -> var1xx.equals(var17)).orElse(false);
-            Pair var9 = var1.findClosestBiome3d(var8, var0.blockPosition(), 6400, 32, 64);
+            Pair var9 = var1.findClosestBiome3d(var8, var0.blockPosition(), 12800, 32, 96);
+            boolean var18 = false;
+            BlockPos var10;
             if (var9 == null) {
-               var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_none").withStyle(ChatFormatting.GRAY));
-               return true;
+               // 附近找不到时直接在原地生成一处目标群系，保证回力镖一定能指向
+               var10 = createArtificialBiomeGeneric(var1, var0, var6.toString());
+               if (var10 == null) {
+                  var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_none").withStyle(ChatFormatting.GRAY));
+                  return true;
+               }
+               var18 = true;
             } else {
-               BlockPos var10 = (BlockPos)var9.getFirst();
-               Vec3 var11 = new Vec3(var10.getX() + 0.5 - var0.getX(), 0.0, var10.getZ() + 0.5 - var0.getZ()).normalize();
-               ItemStack var12 = new ItemStack(Items.NAUTILUS_SHELL);
-               var12.set(DataComponents.CUSTOM_NAME, Component.literal("回力ok镖"));
-               ItemEntity var13 = new ItemEntity(var1, var0.getX(), var0.getEyeY(), var0.getZ(), var12);
-               var13.setNoGravity(true);
-               var13.setNeverPickUp();
-               var13.setUnlimitedLifetime();
-               var13.setDeltaMovement(var11.scale(1.5));
-               var1.addFreshEntity(var13);
-               BOOMERANGS.put(var0.getUUID(), new HexEffects.BoomerangState(var13, var11, 0));
-               consumeBoomerang(var0);
-               int var14 = (int)Math.sqrt(var0.distanceToSqr(var10.getX() + 0.5, var10.getY(), var10.getZ() + 0.5));
-               var0.sendSystemMessage(
-                  Component.translatable("hexbingo.msg.boomerang", new Object[]{Component.literal(var6.toString()), Component.literal(Integer.toString(var14))})
-                     .withStyle(ChatFormatting.AQUA)
-               );
-               return true;
+               var10 = (BlockPos)var9.getFirst();
             }
+
+            if (var18) {
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_gen", var6.toString()).withStyle(ChatFormatting.GOLD));
+            }
+
+            Vec3 var11 = new Vec3(var10.getX() + 0.5 - var0.getX(), 0.0, var10.getZ() + 0.5 - var0.getZ()).normalize();
+            ItemStack var12 = new ItemStack(Items.NAUTILUS_SHELL);
+            var12.set(DataComponents.CUSTOM_NAME, Component.literal("ok回力镖"));
+            ItemEntity var13 = new ItemEntity(var1, var0.getX(), var0.getEyeY(), var0.getZ(), var12);
+            var13.setNoGravity(true);
+            var13.setNeverPickUp();
+            var13.setUnlimitedLifetime();
+            var13.setDeltaMovement(var11.scale(1.5));
+            var1.addFreshEntity(var13);
+            BOOMERANGS.put(var0.getUUID(), new HexEffects.BoomerangState(var13, var11, 0));
+            consumeBoomerang(var0);
+            int var14 = (int)Math.sqrt(var0.distanceToSqr(var10.getX() + 0.5, var10.getY(), var10.getZ() + 0.5));
+            var0.sendSystemMessage(
+               Component.translatable("hexbingo.msg.boomerang", new Object[]{Component.literal(var6.toString()), Component.literal(Integer.toString(var14))})
+                  .withStyle(ChatFormatting.AQUA)
+            );
+            return true;
          } else {
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_none").withStyle(ChatFormatting.GRAY));
             return true;
@@ -5436,7 +5467,7 @@ public final class HexEffects {
          giveHookItem(var0);
       }
 
-      if (hasHex(var0, "boomerang_biome") && !hasNamedItem(var0, "回力ok镖")) {
+      if (hasHex(var0, "boomerang_biome") && !hasNamedItem(var0, "ok回力镖")) {
          giveBoomerangItem(var0);
       }
 

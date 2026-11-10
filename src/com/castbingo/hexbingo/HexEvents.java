@@ -329,7 +329,7 @@ public class HexEvents {
          var1.setCanceled(true);
       } else if (var1.getEntity() instanceof ServerPlayer var6
          && var1.getItemStack().is(Items.NAUTILUS_SHELL)
-         && var1.getItemStack().getHoverName().getString().equals("回力ok镖")
+         && var1.getItemStack().getHoverName().getString().equals("ok回力镖")
          && HexEffects.hasHex(var6, "boomerang_biome")
          && HexEffects.launchBoomerang(var6)) {
          var1.setCanceled(true);

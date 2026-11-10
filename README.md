@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.5 调整
+
+- **ok回力镖**（原「回力ok镖」）：已改名。搜索未完成群系任务时半径扩大到 12800；仍然找不到目标群系时，会在玩家前方约 500 格用 `/fillbiome` 生成一处目标群系，并把回力镖指向那里。
+
 ### 1.42.4 调整
 
 - **目标封锁**：冷却时间由 15 分钟缩短为 6 分钟。
@@ -174,7 +178,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.4.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.5.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -326,11 +330,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 仆从大师 | `pet_master` | 获得一只无敌宠物，每 8 秒从全物品池中随机给你一个物品（贵重物品概率较低）。 |
 | 尊我为王 | `crown_me_king` | 敌方位置出现信标光柱，抵达后获得一个彩色海克斯、一套随机附魔钻石盔甲、效率 IV 钻石镐与锋利 IV/火焰附加 I 钻石剑。 |
 | 掀桌子！ | `flip_table` | 重新随机所有未被任意队伍完成的任务。 |
-| 回力ok镖 | `boomerang_biome` | 获得回力ok镖：投掷后飞向一个未完成群系任务所在的群系并返回。 |
+| ok回力镖 | `boomerang_biome` | 获得ok回力镖：投掷后飞向一个未完成群系任务所在的群系并返回；搜索范围内找不到时自动在前方生成一处目标群系。 |
 | 和我一起困在这里 | `rainbow_duel` | 获得一个绑定锁链。右键与最近的敌人进入基岩决斗场并允许 PVP：先死亡者失败，死亡者复活后额外坐牢 20 秒；胜者立即出来；5 分钟无人交战则双方自动出来。冷却 3 分钟。 |
 | 精怪魔法 | `fae_magic` | 获得「精怪魔法」：右键把敌对队伍变成小动物 1 分钟，冷却 5 分钟。 |
 | 中国人会飞 | `chinese_can_fly` | 获得一个无限耐久的鞘翅，以及一个用掉后会自动补充的绑定烟花火箭。 |
-| 间谍 | `spy` | 使用 /bingo spy <队友> <敌人> 交换两人的位置和背包。钩爪、回力ok镖、彩虹大作战等绑定物品会留在原主人身上。整局只能使用一次。 |
+| 间谍 | `spy` | 使用 /bingo spy <队友> <敌人> 交换两人的位置和背包。钩爪、ok回力镖、彩虹大作战等绑定物品会留在原主人身上。整局只能使用一次。 |
 | 共同富裕 | `common_wealth` | 没收所有人的物品栏物品到公共池，然后随机重新分配。 |
 | 质变混沌 | `chaos_shift` | 随机获得两个随机种类的海克斯。 |
 | CV工程师 | `task_copy` | 随机复制一个对手已完成而你队未完成的任务；Lockout 模式下改为直接抢占该格。 |
@@ -474,7 +478,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Pet Master | `pet_master` | Gain an invincible pet that gives you a random item from the full item pool every 8s (valuable items are rarer). |
 | Crown Me King | `crown_me_king` | A beacon marks an enemy position. Reach it to gain a prismatic hex, a randomly enchanted diamond armor set, an Efficiency IV diamond pickaxe and a Sharpness IV / Fire Aspect I diamond sword. |
 | Flip the Table! | `flip_table` | Reroll every task that no team has completed. |
-| Boomerang OK | `boomerang_biome` | Gain a boomerang that flies toward an unfinished biome task and returns. |
+| OK Boomerang | `boomerang_biome` | Gain OK Boomerang: throw it toward an unfinished biome task and it returns; if the biome is not found nearby, one is generated ahead. |
 | Trapped With Me | `rainbow_duel` | Gain a bound chain. Right-click to enter a bedrock duel with the nearest enemy; PvP is allowed, whoever dies first loses, the winner leaves at once, and both leave after 5 minutes without PvP. 3 minute cooldown. |
 | Fey Magic | `fae_magic` | Gain Fey Magic: right-click to turn the enemy team into critters for 1 minute. 5 minute cooldown. |
 | Chinese Can Fly | `chinese_can_fly` | Gain an unbreakable elytra and one bound firework rocket that is always replenished. |
@@ -509,7 +513,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.4 `
+.\build.ps1 -Version 26.2-1.42.5 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
