@@ -6,5 +6,21 @@
         "stream": true
       }
     ]
+  },
+  "baby_dragon": {
+    "sounds": [
+      {
+        "name": "hexbingo:dragon_1"
+      },
+      {
+        "name": "hexbingo:dragon_2"
+      },
+      {
+        "name": "hexbingo:dragon_3"
+      },
+      {
+        "name": "hexbingo:dragon_4"
+      }
+    ]
   }
 }

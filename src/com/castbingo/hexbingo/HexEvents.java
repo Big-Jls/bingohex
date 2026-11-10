@@ -471,12 +471,13 @@ public class HexEvents {
       HexEffects.tickQuakes(var1.getServer());
       HexEffects.tickAdvances(var1.getServer());
       HexEffects.tickDragons(var1.getServer());
+      HexEffects.tickIncubations(var1.getServer());
    }
 
    @SubscribeEvent
    public void dragonEggPlaced(BlockEvent.EntityPlaceEvent var1) {
       if (var1.getPlacedBlock().is(Blocks.DRAGON_EGG) && var1.getEntity() instanceof ServerPlayer var2) {
-         HexEffects.hatchDragon(var2, var1.getPos());
+         HexEffects.startDragonIncubation(var2, var1.getPos());
       }
    }
 

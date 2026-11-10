@@ -98,6 +98,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.bee.Bee;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.feline.CatVariant;
 import net.minecraft.world.entity.animal.frog.Frog;
@@ -355,6 +356,10 @@ public final class HexEffects {
    // 驯龙高手：环绕玩家的幼龙
    private static final Map<UUID, EnderDragon> DRAGON_PETS = new HashMap<>();
    private static final Map<UUID, Double> DRAGON_ANGLES = new HashMap<>();
+   private static final Map<UUID, Integer> DRAGON_SOUND_TIMER = new HashMap<>();
+   private static final List<HexEffects.EggIncubation> INCUBATIONS = new ArrayList<>();
+   private static final long DRAGON_INCUBATION_MS = 180000L;
+   private static final SoundEvent BABY_DRAGON_SOUND = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("hexbingo", "baby_dragon"));
    // 致盲
    private static final Map<UUID, Long> BLIND_COOLDOWN = new HashMap<>();
    // 结束了？：被放逐到末地外岛
@@ -1189,6 +1194,8 @@ public final class HexEffects {
       }
 
       DRAGON_ANGLES.remove(var0.getUUID());
+      DRAGON_SOUND_TIMER.remove(var0.getUUID());
+      cancelIncubation(var0.getUUID(), false);
       endBatForm(var0, false);
       endEndExile(var0, false);
       clearXrayMarkers(var0);
@@ -7749,6 +7756,121 @@ public final class HexEffects {
       broadcast(var2, Component.translatable("hexbingo.msg.great_migration").withStyle(ChatFormatting.LIGHT_PURPLE));
    }
 
+   public static void startDragonIncubation(ServerPlayer var0, BlockPos var1) {
+      if (!hasHex(var0, "dragon_rider")) {
+         return;
+      }
+
+      if (DRAGON_PETS.containsKey(var0.getUUID())) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_exists").withStyle(ChatFormatting.GRAY));
+         return;
+      }
+
+      if (!(var0.level() instanceof ServerLevel var2)) {
+         return;
+      }
+
+      // 同一玩家重新放蛋时，取消旧孵化并清掉旧蛋
+      for (Iterator<HexEffects.EggIncubation> var3 = INCUBATIONS.iterator(); var3.hasNext();) {
+         HexEffects.EggIncubation var4 = var3.next();
+         if (var4.owner.equals(var0.getUUID())) {
+            discardIncubationDisplay(var4);
+            if (var4.level.getBlockState(var4.pos).is(Blocks.DRAGON_EGG)) {
+               var4.level.removeBlock(var4.pos, false);
+            }
+            var3.remove();
+         }
+      }
+
+      ArmorStand var8 = (ArmorStand)EntityTypes.ARMOR_STAND.create(var2, EntitySpawnReason.MOB_SUMMONED);
+      if (var8 != null) {
+         var8.setPos(var1.getX() + 0.5, var1.getY() + 1.1, var1.getZ() + 0.5);
+         var8.setInvisible(true);
+         var8.setNoGravity(true);
+         var8.setInvulnerable(true);
+         var8.setSilent(true);
+         var8.setCustomName(incubationName(DRAGON_INCUBATION_MS));
+         var8.setCustomNameVisible(true);
+         var2.addFreshEntity(var8);
+      }
+
+      INCUBATIONS.add(new HexEffects.EggIncubation(var0.getUUID(), var2, var1.immutable(), System.currentTimeMillis() + DRAGON_INCUBATION_MS, var8));
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_start").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static Component incubationName(long var0) {
+      long var2 = Math.max(0L, (var0 + 999L) / 1000L);
+      long var4 = var2 / 60L;
+      long var6 = var2 % 60L;
+      String var8 = (var4 < 10L ? "0" : "") + var4 + ":" + (var6 < 10L ? "0" : "") + var6;
+      return Component.translatable("hexbingo.msg.dragon_incubating", Component.literal(var8));
+   }
+
+   private static void discardIncubationDisplay(HexEffects.EggIncubation var0) {
+      if (var0.display != null && !var0.display.isRemoved()) {
+         var0.display.discard();
+      }
+   }
+
+   public static void tickIncubations(MinecraftServer var0) {
+      if (!INCUBATIONS.isEmpty()) {
+         long var1 = System.currentTimeMillis();
+         Iterator<HexEffects.EggIncubation> var3 = INCUBATIONS.iterator();
+
+         while (var3.hasNext()) {
+            HexEffects.EggIncubation var4 = var3.next();
+            ServerPlayer var5 = var0.getPlayerList().getPlayer(var4.owner);
+            if (!var4.level.isLoaded(var4.pos)) {
+               continue;
+            }
+
+            if (!var4.level.getBlockState(var4.pos).is(Blocks.DRAGON_EGG)) {
+               discardIncubationDisplay(var4);
+               var3.remove();
+               if (var5 != null) {
+                  var5.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_broken").withStyle(ChatFormatting.GRAY));
+               }
+               continue;
+            }
+
+            if (var5 == null) {
+               continue;
+            }
+
+            long var6 = var4.readyAt - var1;
+            if (var6 <= 0L) {
+               discardIncubationDisplay(var4);
+               var3.remove();
+               hatchDragon(var5, var4.pos);
+            } else {
+               int var8 = (int)((var6 + 999L) / 1000L);
+               if (var8 != var4.lastSecond) {
+                  var4.lastSecond = var8;
+                  if (var4.display != null && !var4.display.isRemoved()) {
+                     var4.display.setCustomName(incubationName(var6));
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   private static void cancelIncubation(UUID var0, boolean var1) {
+      Iterator<HexEffects.EggIncubation> var2 = INCUBATIONS.iterator();
+
+      while (var2.hasNext()) {
+         HexEffects.EggIncubation var3 = var2.next();
+         if (var3.owner.equals(var0)) {
+            discardIncubationDisplay(var3);
+            if (var1 && var3.level.getBlockState(var3.pos).is(Blocks.DRAGON_EGG)) {
+               var3.level.removeBlock(var3.pos, false);
+            }
+
+            var2.remove();
+         }
+      }
+   }
+
    private static void giveDragonEgg(ServerPlayer var0) {
       if (DRAGON_PETS.containsKey(var0.getUUID())) {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_exists").withStyle(ChatFormatting.GRAY));
@@ -7797,6 +7919,7 @@ public final class HexEffects {
       var2.removeBlock(var1, false);
       DRAGON_PETS.put(var0.getUUID(), var3);
       DRAGON_ANGLES.put(var0.getUUID(), 0.0);
+      DRAGON_SOUND_TIMER.put(var0.getUUID(), 40);
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_hatched").withStyle(ChatFormatting.GOLD));
       return true;
    }
@@ -7829,6 +7952,23 @@ public final class HexEffects {
                var4.setYRot(var14);
                var4.setYHeadRot(var14);
 
+               int soundWait = DRAGON_SOUND_TIMER.getOrDefault(var3.getUUID(), 40);
+               if (--soundWait <= 0) {
+                  var5.playSound(
+                     null,
+                     var8,
+                     var12,
+                     var10,
+                     BABY_DRAGON_SOUND,
+                     SoundSource.NEUTRAL,
+                     0.7F,
+                     0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F
+                  );
+                  soundWait = 80 + ThreadLocalRandom.current().nextInt(80);
+               }
+
+               DRAGON_SOUND_TIMER.put(var3.getUUID(), soundWait);
+
                if ((var3.tickCount & 1) == 0) {
                   int var15 = 0;
 
@@ -7848,7 +7988,7 @@ public final class HexEffects {
                AABB var19 = new AABB(var8 - 2.0, var12 - 1.5, var10 - 2.0, var8 + 2.0, var12 + 1.5, var10 + 2.0);
 
                for (LivingEntity var22 : var5.getEntitiesOfClass(
-                  LivingEntity.class, var19, var21 -> var21.isAlive() && var21 != var3 && !(var21 instanceof EnderDragon) && !isTeammate(var3, var21)
+                  LivingEntity.class, var19, var21 -> var21.isAlive() && var21 != var3 && !(var21 instanceof EnderDragon) && !isDragonProtected(var3, var21)
                )) {
                   DamageSource var20 = var5.damageSources().mobAttack(var4);
                   var22.hurtServer(var5, var20, 4.0F);
@@ -7859,10 +7999,12 @@ public final class HexEffects {
       }
    }
 
-   private static boolean isTeammate(ServerPlayer var0, LivingEntity var1) {
-      if (var1 instanceof ServerPlayer var2) {
+   private static boolean isDragonProtected(ServerPlayer var0, LivingEntity var1) {
+      if (var1 == var0) {
+         return true;
+      } else if (var1 instanceof ServerPlayer var2) {
          Team var3 = team(var0);
-         return var3 != null && var3.hasPlayer(var2);
+         return var3 != null && var3.hasPlayer(var2) || hasHex(var2, "dragon_rider");
       } else {
          return false;
       }
@@ -9608,6 +9750,13 @@ public final class HexEffects {
 
       DRAGON_PETS.clear();
       DRAGON_ANGLES.clear();
+      DRAGON_SOUND_TIMER.clear();
+
+      for (HexEffects.EggIncubation var6 : new ArrayList<>(INCUBATIONS)) {
+         cancelIncubation(var6.owner, true);
+      }
+
+      INCUBATIONS.clear();
 
       // 清理历史上遗留在世界里的精怪魔法伪装
       for (ServerLevel var2 : var0.getAllLevels()) {
@@ -9666,6 +9815,23 @@ public final class HexEffects {
          this.team = var0;
          this.slot = var1;
          this.until = var2;
+      }
+   }
+
+   private static final class EggIncubation {
+      private final UUID owner;
+      private final ServerLevel level;
+      private final BlockPos pos;
+      private final long readyAt;
+      private final ArmorStand display;
+      private int lastSecond = -1;
+
+      private EggIncubation(UUID var0, ServerLevel var1, BlockPos var2, long var3, ArmorStand var5) {
+         this.owner = var0;
+         this.level = var1;
+         this.pos = var2;
+         this.readyAt = var3;
+         this.display = var5;
       }
    }
 

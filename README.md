@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.41.1 修复
+
+- **驯龙高手**：龙蛋放下后需要孵化 3 分钟，蛋上方显示倒计时；挖掉、被活塞推动或瞬移走都会重新计时。孵化出的幼龙不会攻击自己或其它拥有该海克斯的玩家，并加入 4 种随机幼龙叫声。
+
 ### 1.41.0 更新摘要
 
 - **万能牌**从彩色调整为金色。
@@ -142,7 +146,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.5.jar`）。
-3. 把 `HexBingo-26.2-1.41.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.41.1.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -272,7 +276,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
-| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋，放置后孵化一只环绕你的幼龙；幼龙经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害。 |
+| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方显示倒计时，挖掉或移走会重新计时。孵化出的幼龙环绕你，经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害，且不会攻击你或其它拥有该海克斯的玩家。 |
 
 ### 彩色（36）
 
@@ -420,7 +424,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
 | Destiny Dice | `destiny_dice` | Roll a die: complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
 | Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
-| Dragon Tamer | `dragon_rider` | Gain a dragon egg; placing it hatches a baby dragon that circles you, breaks blocks it passes through with drops, and knocks back creatures for 4 damage. |
+| Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
 
 ### Prismatic (36)
 
@@ -468,6 +472,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 素材状态
 
 - `dechi_song.ogg` 为第三方录音，**不在本仓库许可范围内**，计划替换为自制音频；替换完成前请勿再分发该文件。
+- `sounds/dragon_1.ogg` ~ `dragon_4.ogg` 来自 freesoundsite.com 的 Dragon Purring 免费音效合集，站点声明免费、无需署名、可商用；已转成单声道 64kbps，单文件约 15–18 KB。
 - 海克斯名称与文案参考《英雄联盟》强化符文，仅作玩法致敬；《英雄联盟》为 Riot Games, Inc. 的商标，本项目与 Riot Games 无关。
 - 贴图与其余语言文件为本项目原创。
 
@@ -476,7 +481,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.41.0 `
+.\build.ps1 -Version 26.2-1.41.1 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

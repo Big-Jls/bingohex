@@ -1,5 +1,17 @@
 # Changelog
 
+## 26.2-1.41.1 — 2026-11-10
+
+### Changed
+
+- **Dragon Tamer** (`dragon_rider`): the placed dragon egg now incubates for
+  3 minutes with a floating countdown above it. Mining it, pushing it with a
+  piston, or causing it to teleport resets the timer.
+- The baby dragon no longer damages its owner or any player who owns Dragon
+  Tamer.
+- Added 4 random baby dragon sound variants (`hexbingo:baby_dragon`), mono
+  64 kbps OGG, roughly 15-18 KB each.
+
 ## 26.2-1.41.0 — 2026-11-10
 
 ### Added
