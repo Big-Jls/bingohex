@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **123 个海克斯强化**：49 银色 / 38 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.40.0 更新摘要
+
+- **群系兜底**：樱花群系、苍白花园、深暗之域的搜索半径从 6400 扩大到 12800；仍然找不到时，会在玩家 500 格外选一块合适位置，用 `/fillbiome` 改造成目标群系并补种对应植被（深暗为地下洞穴 + 幽匿块），保证海克斯一定能把玩家带到目标群系。
+
 ### 1.39.0 更新摘要
 
 - 新增银色 **谁才是掠夺者**（`pillager_outpost`）：传送到最近的掠夺者前哨站；附近没有时在 8 个方位 200 格外寻找陆地进行生成。
@@ -131,7 +135,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`Bingo-26.2-1.0.0-port.5.jar`）。
-3. 把 `HexBingo-26.2-1.39.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.40.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -209,8 +213,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
 | 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
 | 谁才是掠夺者 | `pillager_outpost` | 传送到最近的掠夺者前哨站；附近没有时在 8 个方位 200 格外生成一座。 |
-| 故乡的樱花开了 | `cherry_grove` | 传送到最近的樱花群系。 |
-| 一二三木头人 | `pale_garden_map` | 获得一张指向最近苍白花园群系的地图。 |
+| 故乡的樱花开了 | `cherry_grove` | 传送到最近的樱花群系；附近没有时在 500 格外改造出一片樱花林。 |
+| 一二三木头人 | `pale_garden_map` | 获得一张指向最近苍白花园群系的地图；附近没有时在 500 格外改造一片并标记。 |
 
 ### 金色（38）
 
@@ -253,7 +257,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
 | 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
-| 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点。 |
+| 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点；附近没有时在 500 格外地下生成一处深暗洞穴。 |
 
 ### 彩色（36）
 
@@ -349,8 +353,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
 | Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
 | Who Is the Pillager Now | `pillager_outpost` | Teleport to the nearest pillager outpost; if none is nearby, one is generated 200 blocks away in one of 8 directions. |
-| The Cherry Blossoms of My Hometown Have Bloomed | `cherry_grove` | Teleport to the nearest cherry grove biome. |
-| Red Light, Green Light | `pale_garden_map` | Receive a map pointing to the nearest pale garden biome. |
+| The Cherry Blossoms of My Hometown Have Bloomed | `cherry_grove` | Teleport to the nearest cherry grove biome; if none is nearby, create one 500 blocks away. |
+| Red Light, Green Light | `pale_garden_map` | Receive a map pointing to the nearest pale garden biome; if none is nearby, create one 500 blocks away and mark it. |
 
 ### Gold (38)
 
@@ -393,7 +397,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
 | Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). Cooldown 7 minutes. |
-| Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves. |
+| Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves; if none is nearby, create an artificial deep dark cave 500 blocks away underground. |
 
 ### Prismatic (36)
 
@@ -449,7 +453,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.39.0 `
+.\build.ps1 -Version 26.2-1.40.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

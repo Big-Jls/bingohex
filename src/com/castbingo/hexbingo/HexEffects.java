@@ -2649,9 +2649,17 @@ public final class HexEffects {
       }
 
       ServerLevel var2 = var1.overworld();
-      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.DEEP_DARK), var0.blockPosition(), 6400, 32, 64);
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.DEEP_DARK), var0.blockPosition(), 12800, 32, 96);
       if (var3 == null) {
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss_none").withStyle(ChatFormatting.GRAY));
+         BlockPos var5 = createArtificialDeepDark(var2, var0, 500);
+         if (var5 == null) {
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss_none").withStyle(ChatFormatting.GRAY));
+            return;
+         }
+
+         var0.teleportTo(var2, var5.getX() + 0.5, var5.getY(), var5.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+         var0.resetFallDistance();
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss_gen").withStyle(ChatFormatting.DARK_PURPLE));
          return;
       }
 
@@ -2774,9 +2782,15 @@ public final class HexEffects {
       }
 
       ServerLevel var2 = var1.overworld();
-      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.CHERRY_GROVE), var0.blockPosition(), 6400, 32, 64);
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.CHERRY_GROVE), var0.blockPosition(), 12800, 32, 96);
       if (var3 == null) {
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.cherry_grove_none").withStyle(ChatFormatting.GRAY));
+         BlockPos var6 = createArtificialBiome(var2, var0, 500, "minecraft:cherry_grove", "cherry");
+         if (var6 == null) {
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.cherry_grove_none").withStyle(ChatFormatting.GRAY));
+            return;
+         }
+
+         teleportSurface(var0, var2, var6, "hexbingo.msg.cherry_grove_gen");
          return;
       }
 
@@ -2797,20 +2811,175 @@ public final class HexEffects {
       }
 
       ServerLevel var2 = var1.overworld();
-      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.PALE_GARDEN), var0.blockPosition(), 6400, 32, 64);
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.PALE_GARDEN), var0.blockPosition(), 12800, 32, 96);
       if (var3 == null) {
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_none").withStyle(ChatFormatting.GRAY));
+         BlockPos var6 = createArtificialBiome(var2, var0, 500, "minecraft:pale_garden", "pale");
+         if (var6 == null) {
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_none").withStyle(ChatFormatting.GRAY));
+            return;
+         }
+
+         var0.addItem(paleGardenMap(var2, var6.getX(), var6.getZ()));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_gen").withStyle(ChatFormatting.GOLD));
          return;
       }
 
       BlockPos var4 = var3.getFirst();
-      var2.getChunk(var4.getX() >> 4, var4.getZ() >> 4);
-      ItemStack var5 = MapItem.create(var2, var4.getX(), var4.getZ(), (byte)1, true, true);
-      var5.set(DataComponents.CUSTOM_NAME, Component.translatable("hexbingo.item.pale_garden_map"));
-      int var6 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var4.getX(), var4.getZ());
-      MapItemSavedData.addTargetDecoration(var5, new BlockPos(var4.getX(), var6, var4.getZ()), "+", MapDecorationTypes.RED_X);
-      var0.addItem(var5);
+      var0.addItem(paleGardenMap(var2, var4.getX(), var4.getZ()));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_map").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static ItemStack paleGardenMap(ServerLevel var0, int var1, int var2) {
+      var0.getChunk(var1 >> 4, var2 >> 4);
+      ItemStack var3 = MapItem.create(var0, var1, var2, (byte)1, true, true);
+      var3.set(DataComponents.CUSTOM_NAME, Component.translatable("hexbingo.item.pale_garden_map"));
+      int var4 = var0.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var1, var2);
+      MapItemSavedData.addTargetDecoration(var3, new BlockPos(var1, var4, var2), "+", MapDecorationTypes.RED_X);
+      return var3;
+   }
+
+   // 群系兜底：在玩家 500 格外选一块陆地，改造成目标群系并补种对应植被
+   private static BlockPos createArtificialBiome(ServerLevel var2, ServerPlayer var0, int var1, String var3, String var4) {
+      MinecraftServer var5 = var2.getServer();
+      if (var5 == null) {
+         return null;
+      }
+
+      BlockPos var6 = findLandSpot(var2, var0, var1);
+      if (var6 == null) {
+         return null;
+      }
+
+      int var7 = var6.getX();
+      int var8 = var6.getY();
+      int var9 = var6.getZ();
+      int var10 = var7 - 16;
+      int var11 = var7 + 15;
+      int var12 = var9 - 16;
+      int var13 = var9 + 15;
+      // 先清掉地表植被和树木，给新树腾出空间
+      runCommand(var5, var2, var6, "fill " + var10 + " " + (var8 + 1) + " " + var12 + " " + var11 + " " + (var8 + 14) + " " + var13 + " air");
+      // 把这一片区域的群系改成目标群系
+      runCommand(var5, var2, var6, "fillbiome " + var10 + " " + (var8 - 8) + " " + var12 + " " + var11 + " " + (var8 + 8) + " " + var13 + " " + var3);
+
+      if (var4.equals("cherry")) {
+         runCommand(var5, var2, var6, "place feature minecraft:trees_cherry " + (var7 - 4) + " " + var8 + " " + (var9 - 4));
+         runCommand(var5, var2, var6, "place feature minecraft:trees_cherry " + (var7 + 4) + " " + var8 + " " + (var9 + 4));
+         runCommand(var5, var2, var6, "place feature minecraft:flower_cherry " + var7 + " " + var8 + " " + var9);
+      } else {
+         int[][] var14 = new int[][]{{-10, -10}, {-4, -11}, {3, -9}, {10, -10}, {-11, 2}, {-5, 4}, {4, 3}, {11, 1}, {-9, 10}, {-2, 11}, {5, 10}, {10, 11}};
+
+         for (int[] var15 : var14) {
+            runCommand(var5, var2, var6, "place feature minecraft:pale_oak_creaking_checked " + (var7 + var15[0]) + " " + var8 + " " + (var9 + var15[1]));
+         }
+
+         runCommand(var5, var2, var6, "place feature minecraft:pale_moss_patch " + (var7 - 6) + " " + var8 + " " + (var9 - 6));
+         runCommand(var5, var2, var6, "place feature minecraft:pale_moss_patch " + (var7 + 6) + " " + var8 + " " + (var9 + 6));
+         runCommand(var5, var2, var6, "place feature minecraft:pale_garden_vegetation " + var7 + " " + var8 + " " + var9);
+      }
+
+      BlockPos var16 = safeSurfaceSpot(var2, new BlockPos(var7, var8, var9));
+      return var16 == null ? new BlockPos(var7, var8, var9) : var16;
+   }
+
+   private static BlockPos findLandSpot(ServerLevel var2, ServerPlayer var0, int var1) {
+      for (int var3 = 0; var3 < 8; var3++) {
+         double var4 = (Math.PI * 2.0) * (double)var3 / 8.0;
+         int var6 = var0.getBlockX() + (int)Math.round(Math.cos(var4) * (double)var1);
+         int var7 = var0.getBlockZ() + (int)Math.round(Math.sin(var4) * (double)var1);
+         var2.getChunk(var6 >> 4, var7 >> 4);
+         int var8 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var6, var7);
+         if (var8 <= var2.getMinY() + 2 || var8 >= var2.getMaxY() - 2) {
+            continue;
+         }
+
+         if (!var2.getBlockState(new BlockPos(var6, var8 - 1, var7)).getFluidState().isEmpty()) {
+            continue;
+         }
+
+         // 只选草方块/泥土类地表，保证樱花树与苍白橡树能正常生长
+         if (!var2.getBlockState(new BlockPos(var6, var8 - 1, var7)).is(BlockTags.DIRT)) {
+            continue;
+         }
+
+         String var9 = var2.getBiome(new BlockPos(var6, var8, var7))
+            .unwrapKey()
+            .map(var10 -> var10.identifier().getPath())
+            .orElse("");
+         if (var9.contains("ocean")
+            || var9.contains("river")
+            || var9.contains("beach")
+            || var9.contains("desert")
+            || var9.contains("badlands")
+            || var9.contains("snow")
+            || var9.contains("frozen")
+            || var9.contains("icy")) {
+            continue;
+         }
+
+         return new BlockPos(var6, var8, var7);
+      }
+
+      return null;
+   }
+
+   private static int runCommand(MinecraftServer var0, ServerLevel var1, BlockPos var2, String var3) {
+      CommandSourceStack var4 = var0.createCommandSourceStack().withLevel(var1).withPosition(Vec3.atCenterOf(var2)).withSuppressedOutput();
+
+      try {
+         return var0.getCommands().getDispatcher().execute(var3, var4);
+      } catch (CommandSyntaxException var6) {
+         return 0;
+      }
+   }
+
+   // 深暗兜底：在 500 格外地下挖一间深板岩洞穴，改成 deep_dark 并铺幽匿块
+   private static BlockPos createArtificialDeepDark(ServerLevel var2, ServerPlayer var0, int var1) {
+      MinecraftServer var3 = var2.getServer();
+      if (var3 == null) {
+         return null;
+      }
+
+      BlockPos var4 = findLandSpot(var2, var0, var1);
+      if (var4 == null) {
+         return null;
+      }
+
+      int var5 = var4.getX();
+      int var6 = var4.getZ();
+      int var7 = Math.max(var2.getMinY() + 20, -44);
+      var2.getChunk(var5 >> 4, var6 >> 4);
+      BlockPos var8 = new BlockPos(var5, var7, var6);
+      // 挖出 17×7×17 的洞穴，并铺深板岩地板与天花板
+      runCommand(var3, var2, var8, "fill " + (var5 - 8) + " " + var7 + " " + (var6 - 8) + " " + (var5 + 8) + " " + (var7 + 6) + " " + (var6 + 8) + " air");
+      runCommand(
+         var3, var2, var8, "fill " + (var5 - 8) + " " + (var7 - 1) + " " + (var6 - 8) + " " + (var5 + 8) + " " + (var7 - 1) + " " + (var6 + 8) + " minecraft:deepslate"
+      );
+      runCommand(
+         var3, var2, var8, "fill " + (var5 - 8) + " " + (var7 + 7) + " " + (var6 - 8) + " " + (var5 + 8) + " " + (var7 + 7) + " " + (var6 + 8) + " minecraft:deepslate"
+      );
+      // 群系覆盖整个洞穴及外围一圈
+      runCommand(
+         var3, var2, var8, "fillbiome " + (var5 - 8) + " " + (var7 - 8) + " " + (var6 - 8) + " " + (var5 + 8) + " " + (var7 + 16) + " " + (var6 + 8) + " minecraft:deep_dark"
+      );
+      ThreadLocalRandom var9 = ThreadLocalRandom.current();
+
+      for (int var10 = 0; var10 < 80; var10++) {
+         int var11 = var5 + var9.nextInt(17) - 8;
+         int var12 = var6 + var9.nextInt(17) - 8;
+         BlockPos var13 = new BlockPos(var11, var7 - 1, var12);
+         if (!var2.getBlockState(var13).isAir()) {
+            var2.setBlockAndUpdate(var13, Blocks.SCULK.defaultBlockState());
+            if (var9.nextDouble() < 0.6) {
+               var2.setBlockAndUpdate(var13.above(), Blocks.SCULK_VEIN.defaultBlockState());
+            }
+         }
+      }
+
+      var2.setBlockAndUpdate(new BlockPos(var5, var7, var6), Blocks.SCULK_CATALYST.defaultBlockState());
+      var2.setBlockAndUpdate(new BlockPos(var5 - 4, var7, var6 + 3), Blocks.SCULK_SENSOR.defaultBlockState());
+      var2.setBlockAndUpdate(new BlockPos(var5 + 5, var7, var6 - 2), Blocks.SCULK_SENSOR.defaultBlockState());
+      return new BlockPos(var5, var7, var6);
    }
 
    private static BlockPos safeSurfaceSpot(ServerLevel var0, BlockPos var1) {

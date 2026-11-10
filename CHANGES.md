@@ -1,5 +1,17 @@
 # Changelog
 
+## 26.2-1.40.0 — 2026-11-10
+
+### Changed
+
+- Cherry Grove / Pale Garden / Deep Dark lookup range increased from 6400 to
+  12800 blocks with a coarser sampling step.
+- Added a biome fallback for all three hexes: if no target biome is found, a
+  suitable spot 500 blocks away is converted with `/fillbiome` and populated
+  with the matching features (cherry trees/flowers, pale oaks with creaking
+  hearts/moss, or an underground deepslate cave filled with sculk for Deep
+  Dark). The hexes now always take the player to the target biome.
+
 ## 26.2-1.39.0 — 2026-11-10
 
 ### Added
