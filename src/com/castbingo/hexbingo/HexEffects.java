@@ -7779,12 +7779,12 @@ public final class HexEffects {
          return;
       }
 
-      // 同一玩家重新放蛋时，取消旧孵化并清掉旧蛋
+      // 同一玩家重新放蛋时，取消旧孵化（同坐标时不要删掉刚放下的新蛋）
       for (Iterator<HexEffects.EggIncubation> var3 = INCUBATIONS.iterator(); var3.hasNext();) {
          HexEffects.EggIncubation var4 = var3.next();
          if (var4.owner.equals(var0.getUUID())) {
             discardIncubationDisplay(var4);
-            if (var4.level.getBlockState(var4.pos).is(Blocks.DRAGON_EGG)) {
+            if (!var4.pos.equals(var1) && var4.level.getBlockState(var4.pos).is(Blocks.DRAGON_EGG)) {
                var4.level.removeBlock(var4.pos, false);
             }
             var3.remove();
@@ -7876,8 +7876,8 @@ public final class HexEffects {
             long var6 = var4.readyAt - var1;
             if (var6 <= 0L) {
                discardIncubationDisplay(var4);
+               hatchDragon(var5, var4.level, var4.pos);
                var3.remove();
-               hatchDragon(var5, var4.pos);
             } else {
                // 区块重载后实体引用会失效，重新生成倒计时文字
                if (var4.display == null || var4.display.isRemoved()) {
@@ -7925,17 +7925,13 @@ public final class HexEffects {
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_egg").withStyle(ChatFormatting.GOLD));
    }
 
-   public static boolean hatchDragon(ServerPlayer var0, BlockPos var1) {
+   public static boolean hatchDragon(ServerPlayer var0, ServerLevel var2, BlockPos var1) {
       if (!hasHex(var0, "dragon_rider")) {
          return false;
       }
 
       if (DRAGON_PETS.containsKey(var0.getUUID())) {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_exists").withStyle(ChatFormatting.GRAY));
-         return false;
-      }
-
-      if (!(var0.level() instanceof ServerLevel var2)) {
          return false;
       }
 
@@ -7961,7 +7957,21 @@ public final class HexEffects {
       DRAGON_PETS.put(var0.getUUID(), var3);
       DRAGON_ANGLES.put(var0.getUUID(), 0.0);
       DRAGON_SOUND_TIMER.put(var0.getUUID(), 40);
+      var2.playSound(null, var1, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.NEUTRAL, 1.0F, 1.4F);
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_hatched").withStyle(ChatFormatting.GOLD));
+      MinecraftServer var5 = var2.getServer();
+      Team var6 = team(var0);
+
+      if (var5 != null && var6 != null) {
+         Component var7 = Component.translatable("hexbingo.msg.dragon_hatched_team", var0.getDisplayName()).withStyle(ChatFormatting.GOLD);
+
+         for (ServerPlayer var9 : onlineTeamPlayers(var5, var6)) {
+            if (var9 != var0) {
+               var9.sendSystemMessage(var7);
+            }
+         }
+      }
+
       return true;
    }
 
@@ -9388,6 +9398,8 @@ public final class HexEffects {
 
          var0.setHealth(Math.min(var0.getHealth(), var0.getMaxHealth()));
          if (var1) {
+            // 形态结束给 1 分钟缓降，避免从飞行状态直接摔死
+            var0.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 1200, 0, true, false, true));
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.bat_end").withStyle(ChatFormatting.GRAY));
          }
       }

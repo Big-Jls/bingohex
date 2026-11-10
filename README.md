@@ -13,6 +13,13 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.1 修复
+
+- **蝙蝠形态**：形态结束时额外获得 1 分钟缓降。
+- **驯龙高手**：修复同一坐标重新放蛋时误删新蛋导致无法孵化、跨维度孵化时龙蛋不消失的问题；孵化成功会播放龙吼并向自己和队友提示。
+- **苦行者**：修复「海克斯一览」中展示其赠送海克斯时显示 `hexbingo.hex.prefix.ascetic` 原始键名、看不到海克斯名字的问题。
+- **空白格 / 目标封锁**：复查了掀桌子、洗牌、万能牌等会改动卡面的海克斯；选择界面始终读取当前卡牌与最新任务列表。
+
 ### 1.42.0 更新摘要
 
 - **便携熔炉**：关闭界面后仍会继续烧制，不再只在打开熔炉时工作。
@@ -154,7 +161,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.1.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -279,7 +286,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 自动熔炼 | `auto_smelt` | 挖掘矿物时自动烧炼掉落物，并额外获得经验。 |
 | 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
-| 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，蝙蝠跟在玩家脚边；可飞行、无法攻击、血量与体型变小。冷却 7 分钟。 |
+| 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，蝙蝠跟在玩家脚边；可飞行、无法攻击、血量与体型变小，结束后获得 1 分钟缓降。冷却 7 分钟。 |
 | 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点；附近没有时在 500 格外地下生成一处深暗洞穴。 |
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
@@ -427,7 +434,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Auto Smelt | `auto_smelt` | Mining ores automatically smelts the drops and grants extra experience. |
 | Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
-| Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). The bat follows at your feet. Cooldown 7 minutes. |
+| Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight, cannot attack, bat-sized health and body). The bat follows at your feet; the form ends with 1 minute of Slow Falling. Cooldown 7 minutes. |
 | Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves; if none is nearby, create an artificial deep dark cave 500 blocks away underground. |
 | Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
 | Destiny Dice | `destiny_dice` | Roll a die: complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
@@ -489,7 +496,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.0 `
+.\build.ps1 -Version 26.2-1.42.1 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

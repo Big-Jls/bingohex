@@ -1,5 +1,22 @@
 # Changelog
 
+## 26.2-1.42.1 — 2026-11-11
+
+### Fixed
+
+- **Bat Form** (`bat_form`): when the form ends, grant 1 minute of Slow
+  Falling so players do not fall to their death.
+- **Dragon Tamer** (`dragon_rider`): re-placing the egg at the same position no
+  longer deletes the newly placed egg and leaves it unable to incubate.
+  Hatching now removes the egg in the incubation's own dimension, plays a
+  dragon growl, and notifies the owner and teammates.
+- **Ascetic** (`ascetic`): added the missing `hexbingo.hex.prefix.ascetic`
+  translation, so the granted hexes show "Ascetic: <name>" instead of the raw
+  language key.
+- **Blank Cell / Objective Deny**: re-checked card-altering hexes (Flip Table,
+  Card Shuffle, Wildcard, etc.); the picker always reads the current card and
+  the latest task list.
+
 ## 26.2-1.42.0 — 2026-11-11
 
 ### Changed
