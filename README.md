@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.42.6 修复
+
+- **ok回力镖**：修复群系任务类型判断用错命名空间（写成 `bingo.biome`，实际是 `bongo.biome`）导致明明有未完成群系任务却提示“没有找到未完成的群系任务”的问题；现在直接按 `TaskTypeBiome` 判断。
+
 ### 1.42.5 调整
 
 - **ok回力镖**（原「回力ok镖」）：已改名。搜索未完成群系任务时半径扩大到 12800；仍然找不到目标群系时，会在玩家前方约 500 格用 `/fillbiome` 生成一处目标群系，并把回力镖指向那里。
@@ -178,7 +182,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.5.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.42.6.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -513,7 +517,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.5 `
+.\build.ps1 -Version 26.2-1.42.6 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

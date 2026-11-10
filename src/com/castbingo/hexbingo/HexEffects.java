@@ -15,6 +15,7 @@ import io.github.noeppi_noeppi.mods.bongo.event.BingoTaskEvent;
 import io.github.noeppi_noeppi.mods.bongo.task.Task;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskType;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeAdvancement;
+import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeBiome;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypeItem;
 import io.github.noeppi_noeppi.mods.bongo.util.TagWithCount;
 import java.lang.reflect.Field;
@@ -4809,7 +4810,7 @@ public final class HexEffects {
          ArrayList var4 = new ArrayList();
 
          for (int var5 = 0; var5 < var15.tasks().size(); var5++) {
-            if (!var3.completed(var5) && !var3.locked(var5) && var15.task(var5).getType().id().equals("bingo.biome")) {
+            if (!var3.completed(var5) && !var3.locked(var5) && var15.task(var5).getType() == TaskTypeBiome.INSTANCE) {
                var4.add(var5);
             }
          }

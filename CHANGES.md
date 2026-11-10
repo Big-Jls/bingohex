@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.42.6 — 2026-11-11
+
+### Fixed
+
+- **OK Boomerang** (`boomerang_biome`): the biome task check used the wrong
+  type id (`bingo.biome` instead of `bongo.biome`), so it reported "no
+  unfinished biome task" even when one existed. It now compares against
+  `TaskTypeBiome.INSTANCE` directly.
+
 ## 26.2-1.42.5 — 2026-11-11
 
 ### Changed
