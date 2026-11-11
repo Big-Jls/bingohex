@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.43.5 — 2026-11-12
+
+### Fixed
+
+- **Bound skill items**: Objective Deny, Blind, Bat Form, Mind Control, X-Ray,
+  Mirror Copy and Blank Cell items are now bound like the OK Boomerang — they
+  cannot be dropped or placed into chests, furnaces, backpacks or other
+  containers, and are automatically pulled back if they end up in one.
+
 ## 26.2-1.43.4 — 2026-11-12
 
 ### Changed
