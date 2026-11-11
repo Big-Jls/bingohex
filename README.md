@@ -11,7 +11,11 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **131 个海克斯强化**：53 银色 / 42 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+
+### 1.43.0 新增
+
+- 新增金色 **初音未来**（`mangrove_map`）：获得一张指向最近红树林群系的地图；附近没有时在 500 格外改造一片红树林并标记。
 
 ### 1.42.10 修复
 
@@ -208,7 +212,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.42.10.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -233,7 +237,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（131）
+## 海克斯一览（132）
 
 ### 银色（53）
 
@@ -293,7 +297,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 地心游记 | `journey_core` | 传送到 Y=-50 的地下洞穴。 |
 | 苦行者 | `ascetic` | 清空本队所有已完成格，立即获得 2 个随机彩色海克斯。只在第三次海克斯选择中出现。 |
 
-### 金色（42）
+### 金色（43）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -339,6 +343,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
 | 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，且不会攻击任何玩家。 |
+| 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图；附近没有时在 500 格外改造一片红树林并标记。 |
 
 ### 彩色（36）
 
@@ -441,7 +446,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Journey to the Core | `journey_core` | Teleport to a cave at Y=-50. |
 | Ascetic | `ascetic` | Clear all of your team's completed cells and immediately gain 2 random prismatic hexes. Only appears in the third hex selection. |
 
-### Gold (42)
+### Gold (43)
 
 | Name | id | Effect |
 |---|---|---|
@@ -487,6 +492,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Destiny Dice | `destiny_dice` | Roll a die: complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
 | Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
 | Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
+| Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome; if none is nearby, create one 500 blocks away and mark it. |
 
 ### Prismatic (36)
 
@@ -543,7 +549,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.42.10 `
+.\build.ps1 -Version 26.2-1.43.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

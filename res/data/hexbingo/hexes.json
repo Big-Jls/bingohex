@@ -1319,6 +1319,15 @@
                                           "type":  "blank_cell"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "mangrove_map",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "mangrove_map"
+                                      }
+                                  ]
                   }
               ]
 }

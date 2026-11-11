@@ -735,6 +735,10 @@ public final class HexEffects {
          case "pale_garden_map":
             givePaleGardenMap(var0);
             break;
+         // 初音未来：给予最近红树林群系的地图
+         case "mangrove_map":
+            giveMangroveMap(var0);
+            break;
          // 尖端发明家：技能型海克斯冷却缩短 30%
          case "cutting_edge":
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.cutting_edge").withStyle(ChatFormatting.AQUA));
@@ -2908,6 +2912,41 @@ public final class HexEffects {
       return var3;
    }
 
+   // 初音未来：给予一张指向最近红树林群系的地图
+   private static void giveMangroveMap(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      ServerLevel var2 = var1.overworld();
+      Pair<BlockPos, Holder<Biome>> var3 = var2.findClosestBiome3d(var0x -> var0x.is(Biomes.MANGROVE_SWAMP), var0.blockPosition(), 12800, 32, 96);
+      if (var3 == null) {
+         BlockPos var6 = createArtificialBiome(var2, var0, 500, "minecraft:mangrove_swamp", "mangrove");
+         if (var6 == null) {
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.mangrove_map_none").withStyle(ChatFormatting.GRAY));
+            return;
+         }
+
+         var0.addItem(mangroveMap(var2, var6.getX(), var6.getZ()));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mangrove_map_gen").withStyle(ChatFormatting.GOLD));
+         return;
+      }
+
+      BlockPos var4 = var3.getFirst();
+      var0.addItem(mangroveMap(var2, var4.getX(), var4.getZ()));
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.mangrove_map").withStyle(ChatFormatting.GOLD));
+   }
+
+   private static ItemStack mangroveMap(ServerLevel var0, int var1, int var2) {
+      var0.getChunk(var1 >> 4, var2 >> 4);
+      ItemStack var3 = MapItem.create(var0, var1, var2, (byte)1, true, true);
+      var3.set(DataComponents.CUSTOM_NAME, Component.translatable("hexbingo.item.mangrove_map"));
+      int var4 = var0.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var1, var2);
+      MapItemSavedData.addTargetDecoration(var3, new BlockPos(var1, var4, var2), "+", MapDecorationTypes.RED_X);
+      return var3;
+   }
+
    // 群系兜底：在玩家 500 格外选一块陆地，改造成目标群系并补种对应植被
    private static BlockPos createArtificialBiome(ServerLevel var2, ServerPlayer var0, int var1, String var3, String var4) {
       MinecraftServer var5 = var2.getServer();
@@ -2936,6 +2975,12 @@ public final class HexEffects {
          runCommand(var5, var2, var6, "place feature minecraft:trees_cherry " + (var7 - 4) + " " + var8 + " " + (var9 - 4));
          runCommand(var5, var2, var6, "place feature minecraft:trees_cherry " + (var7 + 4) + " " + var8 + " " + (var9 + 4));
          runCommand(var5, var2, var6, "place feature minecraft:flower_cherry " + var7 + " " + var8 + " " + var9);
+      } else if (var4.equals("mangrove")) {
+         int[][] var14 = new int[][]{{-8, -8}, {-3, -9}, {4, -7}, {9, -8}, {-9, 3}, {-2, 5}, {5, 4}, {9, 2}, {-7, 9}, {0, 10}, {6, 9}};
+
+         for (int[] var15 : var14) {
+            runCommand(var5, var2, var6, "place feature minecraft:trees_mangrove " + (var7 + var15[0]) + " " + var8 + " " + (var9 + var15[1]));
+         }
       } else {
          int[][] var14 = new int[][]{{-10, -10}, {-4, -11}, {3, -9}, {10, -10}, {-11, 2}, {-5, 4}, {4, 3}, {11, 1}, {-9, 10}, {-2, 11}, {5, 10}, {10, 11}};
 

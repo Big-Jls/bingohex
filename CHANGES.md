@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.43.0 — 2026-11-12
+
+### Added
+
+- **Hatsune Miku** (`mangrove_map`, gold): gain a map pointing to the nearest
+  mangrove swamp biome. If none is found within 12800 blocks, a mangrove swamp
+  patch is created 500 blocks away and marked on the map.
+
 ## 26.2-1.42.10 — 2026-11-11
 
 ### Fixed
