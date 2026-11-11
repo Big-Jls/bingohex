@@ -13,6 +13,10 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.43.2 修复
+
+- **物品任务「附魔书」**：任意附魔、任意附加组件的附魔书现在都能完成该任务。此前只忽略附魔组件，来自战利品或模组的附魔书若带有其它组件会无法计数。
+
 ### 1.43.1 修复
 
 - **结构与群系定位传送**：`/locate` 返回的结构坐标 Y 恒为 0，之前直接按该 X/Z 取地表高度，导致地下结构（废弃地狱门、试炼大厅等）会把玩家传到结构正上方的地表。现在会反查结构实际包围盒中心，并在中心附近寻找安全落脚点；水下结构仍落到水面上方。受益海克斯：致敬爱情（沉船）、地狱开局（废弃地狱门）、谁才是掠夺者、条条大路通罗马（村庄）、九九八十一难（试炼大厅）。
@@ -217,7 +221,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.1.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.2.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -554,7 +558,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.1 `
+.\build.ps1 -Version 26.2-1.43.2 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

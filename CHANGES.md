@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.43.2 — 2026-11-12
+
+### Fixed
+
+- **Item task "Enchanted Book"**: any enchanted book now completes the task,
+  regardless of its enchantments or extra components. Previously only the
+  enchantment components were stripped before comparison, so books obtained
+  from loot tables or mods with additional components could never count.
+
 ## 26.2-1.43.1 — 2026-11-12
 
 ### Fixed

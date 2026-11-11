@@ -1100,7 +1100,12 @@ public final class HexEffects {
    }
 
    private static boolean matchesItemIgnoringEnchantments(ItemStack var0, ItemStack var1) {
-      if (ItemStack.isSameItemSameComponents(var0, var1)) {
+      if (var0.isEmpty() || var1.isEmpty()) {
+         return false;
+      } else if (var0.is(Items.ENCHANTED_BOOK) && var1.is(Items.ENCHANTED_BOOK)) {
+         // 附魔书任务：任意附魔、任意附加组件都算获得
+         return true;
+      } else if (ItemStack.isSameItemSameComponents(var0, var1)) {
          return true;
       } else if (var1.has(DataComponents.ENCHANTMENTS) || var1.has(DataComponents.STORED_ENCHANTMENTS)) {
          return false;
