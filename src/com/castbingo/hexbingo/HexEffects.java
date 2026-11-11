@@ -166,11 +166,15 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.BrushableBlockEntity;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -2700,16 +2704,23 @@ public final class HexEffects {
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_none").withStyle(ChatFormatting.GRAY));
             }
          } else {
-            var2.getChunk(var3.getX() >> 4, var3.getZ() >> 4);
-            int var4 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var3.getX(), var3.getZ());
-            int var5 = safeGroundY(var2, var3.getX(), var3.getZ(), var4 + 2);
-            if (var5 < 0) {
-               if (!generateStructure(var0, var2, "minecraft:village", "hexbingo.msg.village_tp")) {
-                  var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_fail").withStyle(ChatFormatting.RED));
-               }
-            } else {
-               var0.teleportTo(var2, var3.getX() + 0.5, var5, var3.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+            BlockPos var4 = structureCenter(var2, var3);
+            BlockPos var5 = var4 == null ? null : findSpotNear(var2, var4, 16, 8);
+            if (var5 != null) {
+               var0.teleportTo(var2, var5.getX() + 0.5, var5.getY(), var5.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_tp").withStyle(ChatFormatting.GOLD));
+            } else {
+               var2.getChunk(var3.getX() >> 4, var3.getZ() >> 4);
+               int var6 = var2.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var3.getX(), var3.getZ());
+               int var7 = safeGroundY(var2, var3.getX(), var3.getZ(), var6 + 2);
+               if (var7 < 0) {
+                  if (!generateStructure(var0, var2, "minecraft:village", "hexbingo.msg.village_tp")) {
+                     var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_fail").withStyle(ChatFormatting.RED));
+                  }
+               } else {
+                  var0.teleportTo(var2, var3.getX() + 0.5, var7, var3.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+                  var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_tp").withStyle(ChatFormatting.GOLD));
+               }
             }
          }
       }
@@ -2751,20 +2762,24 @@ public final class HexEffects {
          }
       }
 
-      int var6 = Math.max(var0.getMinY() + 2, var1.getY() - 40);
+      int var6 = var0.getMinY() + 2;
 
-      for (int var2 = var1.getY() + 24; var2 >= var6; var2 -= 2) {
+      for (int var2 = Math.min(var0.getMaxY() - 2, var1.getY() + 24); var2 >= var6; var2 -= 2) {
          for (int var3 = -8; var3 <= 8; var3 += 2) {
             for (int var4 = -8; var4 <= 8; var4 += 2) {
                BlockPos var5 = var1.offset(var3, var2 - var1.getY(), var4);
-               if (var0.getBlockState(var5).isAir() && var0.getBlockState(var5.above()).isAir() && !var0.getBlockState(var5.below()).isAir()) {
+               if (var0.getBlockState(var5).isAir()
+                  && var0.getBlockState(var5.above()).isAir()
+                  && !var0.getBlockState(var5.below()).isAir()
+                  && var0.getBiome(var5).is(Biomes.DEEP_DARK)) {
                   return var5;
                }
             }
          }
       }
 
-      return carveSafeSpot(var0, var1);
+      // 没有现成洞穴时，在深暗层高度直接挖一个安全落脚点
+      return carveSafeSpot(var0, new BlockPos(var1.getX(), Math.max(var0.getMinY() + 20, -51), var1.getZ()));
    }
 
    // 谁才是掠夺者：传送到最近的掠夺者前哨站，找不到就在 8 个方向 200 格外生成一座
@@ -2777,9 +2792,18 @@ public final class HexEffects {
       ServerLevel var2 = var1.overworld();
       BlockPos var3 = var2.findNearestMapStructure(PILLAGER_OUTPOST, var0.blockPosition(), 100, false);
       if (var3 != null) {
-         BlockPos var4 = safeSurfaceSpot(var2, var3);
-         if (var4 != null) {
-            teleportSurface(var0, var2, var4, "hexbingo.msg.pillager_outpost");
+         BlockPos var4 = structureCenter(var2, var3);
+         BlockPos var7 = var4 == null ? null : findSpotNear(var2, var4, 24, 8);
+         if (var7 != null) {
+            var0.teleportTo(var2, var7.getX() + 0.5, var7.getY(), var7.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+            var0.resetFallDistance();
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.pillager_outpost").withStyle(ChatFormatting.GOLD));
+            return;
+         }
+
+         BlockPos var5 = safeSurfaceSpot(var2, var3);
+         if (var5 != null) {
+            teleportSurface(var0, var2, var5, "hexbingo.msg.pillager_outpost");
             return;
          }
       }
@@ -3850,24 +3874,88 @@ public final class HexEffects {
             var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GRAY));
          }
       } else {
-         int var7 = var5.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var6.getX(), var6.getZ());
-         int var8 = safeGroundY(var5, var6.getX(), var6.getZ(), var7 + 2);
-         if (var8 < 0) {
-            // 水下结构（沉船/海底废弃门）找不到干燥落脚点：直接传送到水面上方
-            boolean var10 = !var5.getBlockState(new BlockPos(var6.getX(), var7 - 1, var6.getZ())).getFluidState().isEmpty();
+         // /locate 返回的 Y 恒为 0，必须取结构包围盒中心，否则地下结构会把玩家放到正上方地表
+         BlockPos var7 = structureCenter(var5, var6);
+         BlockPos var8 = var7 == null ? null : findSpotNear(var5, var7, 24, 8);
+         if (var8 != null) {
+            var0.teleportTo(var5, var8.getX() + 0.5, var8.getY(), var8.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+            var0.resetFallDistance();
+            var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
+         } else {
+            int var9 = var5.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var6.getX(), var6.getZ());
+            boolean var10 = !var5.getBlockState(new BlockPos(var6.getX(), var9 - 1, var6.getZ())).getFluidState().isEmpty();
             if (var10) {
-               int var9 = var7 + 1;
-               var0.teleportTo(var5, var6.getX() + 0.5, var9, var6.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+               // 水下结构（沉船/海底废弃门）找不到干燥落脚点：直接传送到水面上方
+               var0.teleportTo(var5, var6.getX() + 0.5, var9 + 1, var6.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
                var0.resetFallDistance();
                var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
-            } else if (!generateStructure(var0, var5, var4, var2)) {
-               var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GRAY));
+            } else {
+               BlockPos var11 = safeSurfaceSpot(var5, var6);
+               if (var11 != null) {
+                  var0.teleportTo(var5, var11.getX() + 0.5, var11.getY(), var11.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
+                  var0.resetFallDistance();
+                  var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
+               } else if (!generateStructure(var0, var5, var4, var2)) {
+                  var0.sendSystemMessage(Component.translatable(var3).withStyle(ChatFormatting.GRAY));
+               }
             }
-         } else {
-            var0.teleportTo(var5, var6.getX() + 0.5, var8, var6.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
-            var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
          }
       }
+   }
+
+   // 由 /locate 返回的区块坐标反查结构实际包围盒中心（locate 的 Y 恒为 0）
+   private static BlockPos structureCenter(ServerLevel var0, BlockPos var1) {
+      BlockPos var2 = null;
+      double var3 = Double.MAX_VALUE;
+
+      for (int var5 = -1; var5 <= 1; var5++) {
+         for (int var6 = -1; var6 <= 1; var6++) {
+            ChunkAccess var7 = var0.getChunk((var1.getX() >> 4) + var5, (var1.getZ() >> 4) + var6, ChunkStatus.STRUCTURE_STARTS);
+
+            for (StructureStart var9 : var7.getAllStarts().values()) {
+               if (var9.isValid()) {
+                  BoundingBox var10 = var9.getBoundingBox();
+                  BlockPos var11 = var10.getCenter();
+                  double var12 = var11.distSqr(var1);
+                  if (var12 < var3) {
+                     var3 = var12;
+                     var2 = var11;
+                  }
+               }
+            }
+         }
+      }
+
+      return var2;
+   }
+
+   // 在目标点附近寻找安全落脚点：两格空气、脚下为固体，优先靠近目标 Y
+   private static BlockPos findSpotNear(ServerLevel var0, BlockPos var1, int var2, int var3) {
+      for (int var4 = 0; var4 <= var2; var4++) {
+         for (int var5 = 0; var5 < 2; var5++) {
+            if (var4 != 0 || var5 != 1) {
+               int var6 = var5 == 0 ? var1.getY() - var4 : var1.getY() + var4;
+               if (var6 >= var0.getMinY() + 2 && var6 <= var0.getMaxY() - 2) {
+                  for (int var7 = -var3; var7 <= var3; var7 += 2) {
+                     for (int var8 = -var3; var8 <= var3; var8 += 2) {
+                        BlockPos var9 = new BlockPos(var1.getX() + var7, var6, var1.getZ() + var8);
+                        BlockState var10 = var0.getBlockState(var9.below());
+                        if (var0.getBlockState(var9).isAir()
+                           && var0.getBlockState(var9.above()).isAir()
+                           && !var10.isAir()
+                           && var10.getFluidState().isEmpty()
+                           && !var10.is(Blocks.BEDROCK)
+                           && !var10.is(BlockTags.LEAVES)) {
+                           return var9;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      return null;
    }
 
    private static boolean generateStructure(ServerPlayer var0, ServerLevel var1, String var2, String var3) {

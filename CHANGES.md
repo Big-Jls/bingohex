@@ -1,5 +1,19 @@
 # Changelog
 
+## 26.2-1.43.1 — 2026-11-12
+
+### Fixed
+
+- **Structure / biome teleport accuracy**: `/locate` returns structure positions with
+  Y fixed at 0, so the old code used the surface height above the structure. Teleports
+  now resolve the real structure bounding box from structure starts and search for a
+  safe spot around its center; underwater structures still land on the water surface.
+  Affects Love Tribute (shipwreck), Hell Start (ruined portal), Pillager Outpost,
+  All Roads Lead to Rome (village) and Eighty-One Trials (trial chambers).
+- **Gaze Into the Abyss** (`gaze_abyss`): the deep dark search now requires the
+  candidate spot to actually be inside the `deep_dark` biome and scans the full
+  vertical column, so players are no longer dropped on the surface above the biome.
+
 ## 26.2-1.43.0 — 2026-11-12
 
 ### Added
