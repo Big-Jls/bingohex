@@ -3881,7 +3881,24 @@ public final class HexEffects {
       } else {
          // /locate 返回的 Y 恒为 0，必须取结构包围盒中心，否则地下结构会把玩家放到正上方地表
          BlockPos var7 = structureCenter(var5, var6);
-         BlockPos var8 = var7 == null ? null : findSpotNear(var5, var7, 24, 8);
+         BlockPos var8 = null;
+         if ("minecraft:ruined_portal".equals(var4)) {
+            // 废弃地狱门：先按黑曜石/地狱岩/金块等特征方块锁定传送门本体
+            BlockPos var16 = findNearbyBlock(
+               var5,
+               var7 == null ? new BlockPos(var6.getX(), 32, var6.getZ()) : var7,
+               12,
+               var7 == null ? 96 : 32,
+               HexEffects::isRuinedPortalBlock
+            );
+            if (var16 != null) {
+               var8 = findSpotNear(var5, var16, 6, 4);
+            }
+         }
+
+         if (var8 == null) {
+            var8 = var7 == null ? null : findSpotNear(var5, var7, 24, 8);
+         }
          if (var8 != null) {
             var0.teleportTo(var5, var8.getX() + 0.5, var8.getY(), var8.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
             var0.resetFallDistance();
@@ -3961,6 +3978,58 @@ public final class HexEffects {
       }
 
       return null;
+   }
+
+   // 废弃地狱门：黑曜石、哭泣的黑曜石、地狱岩、金块、岩浆块、地狱砖与石砖
+   private static boolean isRuinedPortalBlock(BlockState var0) {
+      return var0.is(Blocks.OBSIDIAN)
+         || var0.is(Blocks.CRYING_OBSIDIAN)
+         || var0.is(Blocks.NETHERRACK)
+         || var0.is(Blocks.GOLD_BLOCK)
+         || var0.is(Blocks.MAGMA_BLOCK)
+         || var0.is(Blocks.NETHER_BRICKS)
+         || var0.is(Blocks.STONE_BRICKS)
+         || var0.is(Blocks.CHISELED_STONE_BRICKS);
+   }
+
+   // 试炼大厅：凝灰岩类方块、涂蜡铜块、铜格栅与铜灯
+   private static boolean isTrialChamberBlock(BlockState var0) {
+      String var1 = var0.getBlock().getDescriptionId();
+      return var1.contains("tuff")
+         || var1.contains("copper_grate")
+         || var1.contains("copper_bulb")
+         || var1.contains("waxed") && var1.contains("copper");
+   }
+
+   // 在定位点附近扫描特征方块，返回距离最近的一个
+   private static BlockPos findNearbyBlock(ServerLevel var0, BlockPos var1, int var2, int var3, Predicate<BlockState> var4) {
+      for (int var5 = -1; var5 <= 1; var5++) {
+         for (int var6 = -1; var6 <= 1; var6++) {
+            var0.getChunk((var1.getX() >> 4) + var5, (var1.getZ() >> 4) + var6);
+         }
+      }
+
+      int var5 = Math.max(var0.getMinY() + 1, var1.getY() - var3);
+      int var6 = Math.min(var0.getMaxY() - 2, var1.getY() + var3);
+      BlockPos var7 = null;
+      double var8 = Double.MAX_VALUE;
+
+      for (int var10 = -var2; var10 <= var2; var10 += 2) {
+         for (int var11 = -var2; var11 <= var2; var11 += 2) {
+            for (int var12 = var5; var12 <= var6; var12++) {
+               BlockPos var13 = new BlockPos(var1.getX() + var10, var12, var1.getZ() + var11);
+               if (var4.test(var0.getBlockState(var13))) {
+                  double var14 = var13.distSqr(var1);
+                  if (var14 < var8) {
+                     var8 = var14;
+                     var7 = var13;
+                  }
+               }
+            }
+         }
+      }
+
+      return var7;
    }
 
    private static boolean generateStructure(ServerPlayer var0, ServerLevel var1, String var2, String var3) {
@@ -4087,7 +4156,19 @@ public final class HexEffects {
 
       BlockPos var2 = var1.findNearestMapStructure(TRIAL_CHAMBERS, var0.blockPosition(), 100, false);
       if (var2 != null) {
-         BlockPos var3 = findUndergroundSpot(var1, var2);
+         // 先按涂蜡铜块/凝灰岩等特征方块锁定试炼大厅内部，再找安全落脚点
+         BlockPos var7 = structureCenter(var1, var2);
+         BlockPos var8 = findNearbyBlock(
+            var1,
+            var7 == null ? new BlockPos(var2.getX(), 0, var2.getZ()) : var7,
+            var7 == null ? 48 : 24,
+            var7 == null ? 128 : 32,
+            HexEffects::isTrialChamberBlock
+         );
+         BlockPos var3 = var8 == null ? null : findSpotNear(var1, var8, 8, 6);
+         if (var3 == null) {
+            var3 = findUndergroundSpot(var1, var2);
+         }
          if (var3 != null) {
             teleportUnderground(var0, var1, var3);
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.trial_chambers").withStyle(ChatFormatting.GOLD));

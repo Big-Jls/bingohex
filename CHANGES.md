@@ -1,5 +1,18 @@
 # Changelog
 
+## 26.2-1.43.3 — 2026-11-12
+
+### Changed
+
+- **Hell Start** (`ruined_portal`): before teleporting, the structure area is
+  scanned for obsidian, crying obsidian, netherrack, gold blocks, magma blocks,
+  nether bricks and stone bricks to pin down the actual portal, then a safe spot
+  next to it is used.
+- **Eighty-One Trials** (`trial_chambers`): added a scan for tuff-family blocks,
+  waxed copper blocks, copper grates and copper bulbs to locate the chamber
+  interior before picking a landing spot; the old tuff/copper floor scan remains
+  as a fallback.
+
 ## 26.2-1.43.2 — 2026-11-12
 
 ### Fixed
