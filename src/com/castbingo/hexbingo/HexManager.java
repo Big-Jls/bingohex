@@ -88,10 +88,40 @@ public final class HexManager {
                || var15.equals("teleport")
                || var15.equals("spreadplayers")
                || isBingoTp(var2);
-            if (var19 && HexEffects.isEndExiled(var4)) {
-               var3.sendFailure(Component.translatable("hexbingo.msg.end_exile_no_tp"));
-               var0.setCanceled(true);
-               return;
+            if (var19) {
+               if (HexEffects.isEndExiled(var4)) {
+                  var3.sendFailure(Component.translatable("hexbingo.msg.end_exile_no_tp"));
+                  var0.setCanceled(true);
+                  return;
+               }
+
+               MinecraftServer var20 = var3.getServer();
+               if (var20 != null) {
+                  // /bingo tp <target>：直接检查解析后的目标玩家
+                  if (isBingoTp(var2)) {
+                     try {
+                        ServerPlayer var21 = net.minecraft.commands.arguments.EntityArgument.getPlayer(
+                           var0.getParseResults().getContext().build(var0.getParseResults().getReader().getString()), "target"
+                        );
+                        if (HexEffects.isEndExiled(var21)) {
+                           var3.sendFailure(Component.translatable("hexbingo.msg.end_exile_no_tp"));
+                           var0.setCanceled(true);
+                           return;
+                        }
+                     } catch (Exception var23) {
+                     }
+                  }
+
+                  // /tp、/teleport：参数中出现的被放逐玩家同样拦截
+                  for (int var24 = 1; var24 < var2.length; var24++) {
+                     ServerPlayer var25 = var20.getPlayerList().getPlayerByName(var2[var24]);
+                     if (var25 != null && HexEffects.isEndExiled(var25)) {
+                        var3.sendFailure(Component.translatable("hexbingo.msg.end_exile_no_tp"));
+                        var0.setCanceled(true);
+                        return;
+                     }
+                  }
+               }
             }
 
             boolean var18 = var15.equals("bp")

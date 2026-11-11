@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.43.4 — 2026-11-12
+
+### Changed
+
+- **Is It Over?** (`is_it_over`): while exiled in the End, the exiled player can
+  no longer be teleported by anything, and other players can no longer teleport
+  to their position via `/tp`, `/teleport`, `/bingo tp`, etc. Self-movement such
+  as ender pearls and chorus fruit still works.
+
 ## 26.2-1.43.3 — 2026-11-12
 
 ### Changed

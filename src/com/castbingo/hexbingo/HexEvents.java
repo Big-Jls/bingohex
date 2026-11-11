@@ -493,9 +493,27 @@ public class HexEvents {
          return;
       }
 
-      if (var1.getEntity() instanceof ServerPlayer var2 && HexEffects.isEndExiled(var2) && !HexEffects.isExileBypassing()) {
+      if (HexEffects.isExileBypassing()) {
+         return;
+      }
+
+      if (var1.getEntity() instanceof ServerPlayer var2 && HexEffects.isEndExiled(var2)) {
          var1.setCanceled(true);
          var2.sendSystemMessage(net.minecraft.network.chat.Component.translatable("hexbingo.msg.end_exile_no_tp").withStyle(net.minecraft.ChatFormatting.DARK_PURPLE));
+         return;
+      }
+
+      // 放逐期间，其他玩家也不能传送到被放逐玩家的位置
+      if (var1.getTargetLevel() != null) {
+         ServerPlayer var3 = HexEffects.findEndExiledNear(var1.getTargetLevel(), var1.getTargetX(), var1.getTargetY(), var1.getTargetZ(), 4.0);
+         if (var3 != null) {
+            var1.setCanceled(true);
+            if (var1.getEntity() instanceof ServerPlayer var4) {
+               var4.sendSystemMessage(
+                  net.minecraft.network.chat.Component.translatable("hexbingo.msg.end_exile_no_tp").withStyle(net.minecraft.ChatFormatting.DARK_PURPLE)
+               );
+            }
+         }
       }
    }
 

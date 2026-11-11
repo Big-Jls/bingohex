@@ -9434,6 +9434,23 @@ public final class HexEffects {
       return END_EXILE.containsKey(var0.getUUID());
    }
 
+   // 返回目标坐标附近处于放逐状态的玩家（别人不能传送到其身边）
+   public static ServerPlayer findEndExiledNear(ServerLevel var0, double var1, double var3, double var5, double var7) {
+      MinecraftServer var9 = var0.getServer();
+      if (var9 == null) {
+         return null;
+      }
+
+      for (UUID var11 : END_EXILE.keySet()) {
+         ServerPlayer var12 = var9.getPlayerList().getPlayer(var11);
+         if (var12 != null && var12.level() == var0 && var12.distanceToSqr(var1, var3, var5) < var7) {
+            return var12;
+         }
+      }
+
+      return null;
+   }
+
    public static void tickEndExile(MinecraftServer var0) {
       long var1 = System.currentTimeMillis();
       Iterator<Map.Entry<UUID, HexEffects.ExileState>> var3 = END_EXILE.entrySet().iterator();
