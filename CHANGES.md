@@ -1,5 +1,18 @@
 # Changelog
 
+## 26.2-1.43.15 — 2026-11-13
+
+### Fixed
+
+- **Dragon Rider** (`dragon_rider`): when the incubating dragon egg falls
+  (gravity) or teleports away, it was treated as a plain vanilla egg, the
+  countdown vanished and it could never hatch. Incubation now keeps the
+  remaining time while the egg falls, relocates it below or around the old
+  spot, and only cancels after a 10 second grace period.
+- **Mind Control** (`mind_control`): the target no longer has to be within
+  30 blocks. The nearest enemy on the whole server is picked (same-dimension
+  players first, then any player in other dimensions).
+
 ## 26.2-1.43.14 — 2026-11-13
 
 ### Fixed

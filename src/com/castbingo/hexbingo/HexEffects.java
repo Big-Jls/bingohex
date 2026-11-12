@@ -116,6 +116,7 @@ import net.minecraft.world.entity.animal.parrot.Parrot.Variant;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.wolf.WolfVariant;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Monster;
@@ -8265,24 +8266,33 @@ public final class HexEffects {
             }
 
             if (!var4.level.getBlockState(var4.pos).is(Blocks.DRAGON_EGG)) {
-               BlockPos var9 = findMovedEgg(var4);
-               if (var9 != null) {
-                  // 龙蛋被活塞推动或原版瞬移：在新位置重新计时并显示倒计时
-                  discardIncubationDisplay(var4);
-                  var4.pos = var9;
-                  var4.readyAt = System.currentTimeMillis() + DRAGON_INCUBATION_MS;
-                  var4.lastSecond = -1;
-                  var4.display = createIncubationDisplay(var4.level, var4.pos, DRAGON_INCUBATION_MS);
-               } else {
-                  discardIncubationDisplay(var4);
-                  var3.remove();
+               if (hasFallingDragonEggNear(var4.level, var4.pos)) {
+                  // 龙蛋正在自然下落（重力方块尚未落地）：保持计时，等它落地后再重新定位
+                  continue;
                }
 
-               if (var5 != null) {
-                  var5.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_broken").withStyle(ChatFormatting.GRAY));
+               BlockPos var9 = var4.missingTicks % 20 == 0 ? findMovedEgg(var4) : null;
+               if (var9 != null) {
+                  // 龙蛋被活塞推动、原版瞬移或自然掉落：保留剩余计时，在新位置继续孵化
+                  long var10 = Math.max(0L, var4.readyAt - var1);
+                  discardIncubationDisplay(var4);
+                  var4.pos = var9;
+                  var4.readyAt = var1 + var10;
+                  var4.lastSecond = -1;
+                  var4.missingTicks = 0;
+                  var4.display = createIncubationDisplay(var4.level, var4.pos, var10);
+               } else if (++var4.missingTicks >= 200) {
+                  // 10 秒宽限期内仍未找到龙蛋（可能被破坏或落入未加载区块）：判定孵化取消
+                  discardIncubationDisplay(var4);
+                  var3.remove();
+                  if (var5 != null) {
+                     var5.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_incubation_broken").withStyle(ChatFormatting.GRAY));
+                  }
                }
                continue;
             }
+
+            var4.missingTicks = 0;
 
             if (var5 == null) {
                continue;
@@ -8311,22 +8321,42 @@ public final class HexEffects {
       }
    }
 
-   /** 在旧位置附近寻找被活塞或原版随机瞬移带走的龙蛋。 */
-   private static BlockPos findMovedEgg(HexEffects.EggIncubation var0) {
-      BlockPos var1 = null;
-      double var2 = Double.MAX_VALUE;
+   /** 旧位置附近是否有一颗正在自然下落的龙蛋（重力方块下落中，尚未落地成方块）。 */
+   private static boolean hasFallingDragonEggNear(ServerLevel var0, BlockPos var1) {
+      AABB var2 = new AABB(var1.getX() - 16.0, var1.getY() - 96.0, var1.getZ() - 16.0, var1.getX() + 17.0, var1.getY() + 16.0, var1.getZ() + 17.0);
 
-      for (BlockPos var5 : BlockPos.betweenClosed(var0.pos.offset(-16, -8, -16), var0.pos.offset(16, 8, 16))) {
-         if (var0.level.getBlockState(var5).is(Blocks.DRAGON_EGG) && !var5.equals(var0.pos) && !isIncubatingAt(var0.level, var5)) {
-            double var6 = var5.distSqr(var0.pos);
-            if (var6 < var2) {
-               var2 = var6;
-               var1 = var5.immutable();
+      for (FallingBlockEntity var4 : var0.getEntitiesOfClass(FallingBlockEntity.class, var2, var3 -> var3.getBlockState().is(Blocks.DRAGON_EGG))) {
+         if (!var4.isRemoved()) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /** 在旧位置附近寻找被活塞、原版瞬移或自然掉落带走的龙蛋；先扫正下方（掉落），再扫周边（瞬移）。 */
+   private static BlockPos findMovedEgg(HexEffects.EggIncubation var0) {
+      for (int var1 = var0.pos.getY() - 1; var1 >= var0.level.getMinY(); var1--) {
+         BlockPos var2 = new BlockPos(var0.pos.getX(), var1, var0.pos.getZ());
+         if (var0.level.getBlockState(var2).is(Blocks.DRAGON_EGG) && !isIncubatingAt(var0.level, var2)) {
+            return var2.immutable();
+         }
+      }
+
+      BlockPos var3 = null;
+      double var4 = Double.MAX_VALUE;
+
+      for (BlockPos var6 : BlockPos.betweenClosed(var0.pos.offset(-32, -32, -32), var0.pos.offset(32, 16, 32))) {
+         if (var0.level.getBlockState(var6).is(Blocks.DRAGON_EGG) && !var6.equals(var0.pos) && !isIncubatingAt(var0.level, var6)) {
+            double var7 = var6.distSqr(var0.pos);
+            if (var7 < var4) {
+               var4 = var7;
+               var3 = var6.immutable();
             }
          }
       }
 
-      return var1;
+      return var3;
    }
 
    private static boolean isIncubatingAt(ServerLevel var0, BlockPos var1) {
@@ -9997,7 +10027,7 @@ public final class HexEffects {
          return true;
       }
 
-      ServerPlayer var6 = nearestEnemy(var0, 30.0);
+      ServerPlayer var6 = nearestEnemy(var0, -1.0);
       if (var6 == null) {
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_no_target").withStyle(ChatFormatting.GRAY));
          return true;
@@ -10010,26 +10040,37 @@ public final class HexEffects {
       return true;
    }
 
+   /** 寻找敌方玩家：优先同维度最近的；maxDist <= 0 表示无视范围，同维度无人时跨维度也能选中。 */
    private static ServerPlayer nearestEnemy(ServerPlayer var0, double var1) {
-      if (!(var0.level() instanceof ServerLevel var3)) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
          return null;
       }
 
-      Team var4 = team(var0);
-      ServerPlayer var5 = null;
-      double var6 = var1 * var1;
+      Team var3 = team(var0);
+      boolean var4 = var1 <= 0.0;
+      double var5 = var1 * var1;
+      ServerPlayer var6 = null;
+      double var7 = Double.MAX_VALUE;
+      ServerPlayer var8 = null;
 
-      for (ServerPlayer var8 : var3.players()) {
-         if (var8 != var0 && !var8.isSpectator() && (var4 == null || !var4.hasPlayer(var8))) {
-            double var9 = var0.distanceToSqr(var8);
-            if (var9 <= var6) {
+      for (ServerPlayer var9 : var2.getPlayerList().getPlayers()) {
+         if (var9 == var0 || var9.isSpectator() || var3 != null && var3.hasPlayer(var9)) {
+            continue;
+         }
+
+         if (var9.level() == var0.level()) {
+            double var10 = var0.distanceToSqr(var9);
+            if ((var4 || var10 <= var5) && var10 < var7) {
+               var7 = var10;
                var6 = var9;
-               var5 = var8;
             }
+         } else if (var8 == null) {
+            var8 = var9;
          }
       }
 
-      return var5;
+      return var6 != null ? var6 : var8;
    }
 
    /** 每 tick 由被控制者的 PlayerTickEvent 调用。 */
@@ -10549,6 +10590,7 @@ public final class HexEffects {
       private long readyAt;
       private Display.TextDisplay display;
       private int lastSecond = -1;
+      private int missingTicks;
 
       private EggIncubation(UUID var0, ServerLevel var1, BlockPos var2, long var3, Display.TextDisplay var5) {
          this.owner = var0;
