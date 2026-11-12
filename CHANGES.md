@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.43.13 — 2026-11-13
+
+### Fixed
+
+- **Spy** (`spy`): the description no longer mentions the removed "彩虹大作战"
+  bound item; the stale entry was also dropped from the bound-item name set
+  and the dead rainbow-duel lang keys were removed.
+
 ## 26.2-1.43.12 — 2026-11-13
 
 ### Changed

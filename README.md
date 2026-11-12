@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.12.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.13.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -201,7 +201,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 和我一起困在这里 | `rainbow_duel` | 获得一个绑定锁链。右键与最近的敌人进入基岩决斗场并允许 PVP：先死亡者失败，死亡者复活后额外坐牢 20 秒；胜者立即出来；5 分钟无人交战则双方自动出来。冷却 3 分钟。 |
 | 精怪魔法 | `fae_magic` | 获得「精怪魔法」：右键把敌对队伍变成小动物 1 分钟，冷却 5 分钟。 |
 | 中国人会飞 | `chinese_can_fly` | 获得一个无限耐久的鞘翅，以及一个用掉后会自动补充的绑定烟花火箭。 |
-| 间谍 | `spy` | 使用 /bingo spy <队友> <敌人> 交换两人的位置和背包。钩爪、ok回力镖、彩虹大作战等绑定物品会留在原主人身上。整局只能使用一次。 |
+| 间谍 | `spy` | 使用 /bingo spy <队友> <敌人> 交换两人的位置和背包。钩爪、ok回力镖等绑定物品会留在原主人身上。整局只能使用一次。 |
 | 共同富裕 | `common_wealth` | 没收所有人的物品栏物品到公共池，然后随机重新分配。 |
 | 质变混沌 | `chaos_shift` | 随机获得两个随机种类的海克斯。 |
 | CV工程师 | `task_copy` | 随机复制一个对手已完成而你队未完成的任务；Lockout 模式下改为直接抢占该格。 |
@@ -382,7 +382,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.12 `
+.\build.ps1 -Version 26.2-1.43.13 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -405,6 +405,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.43.13 修复
+
+- **间谍**：描述不再提及已移除的「彩虹大作战」绑定物品；绑定物品名单与残留的旧彩虹决斗语言键一并清理。
 
 ### 1.43.12 修复
 

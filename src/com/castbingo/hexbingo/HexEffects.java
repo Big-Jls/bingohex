@@ -265,7 +265,7 @@ public final class HexEffects {
    );
    private static final Map<UUID, Holder<MobEffect>> SONG_BUFFS = new HashMap<>();
    private static final Set<UUID> SPY_USED = new HashSet<>();
-   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "彩虹大作战", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格");
+   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格");
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
