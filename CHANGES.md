@@ -1,5 +1,19 @@
 # Changelog
 
+## 26.2-1.43.16 — 2026-11-13
+
+### Fixed
+
+- **Chaos Mind** (`inventory_shuffle`): shuffling an enemy's inventory also moved
+  their bound skill items and glass-cannon lock markers into random armor/offhand
+  slots. Like Spy and Common Wealth, bound items and lock markers now stay in
+  their original slots.
+- **Pet Master** (`pet_master`): when the pet was temporarily removed (chunk
+  unload or a cross-dimension teleport), it was mistaken for dead and the item
+  supply stopped permanently. Only an actual kill (e.g. `/kill`) dismisses the
+  pet now; unloaded pets keep their reference and resume following once their
+  chunk loads again.
+
 ## 26.2-1.43.15 — 2026-11-13
 
 ### Fixed

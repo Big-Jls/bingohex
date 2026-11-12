@@ -157,7 +157,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 冲冲冲 | `dash_charge` | 获得「冲冲冲」：右键后自动向前冲刺 8 秒（无需按前进键），可用视线控制方向，破坏沿途 3×3 范围内除黑曜石、基岩外的方块并使其掉落，对撞到的生物造成 10 点伤害。冲刺结束后冷却 15 秒。 |
 | 灵魂出窍 | `soul_out` | 选中后立即进入旁观状态 30 秒，期间可以自由飞行观察，结束后回到进入旁观前的位置。 |
 | 九九八十一难 | `eighty_one_trials` | 传送到最近的试炼大厅。 |
-| 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。冷却 8 分钟。 |
+| 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。绑定技能物品不受影响。冷却 8 分钟。 |
 | Spider Man | `spider_man` | 像蜘蛛一样爬墙：身体贴到任意墙即可吸附，按住前进向上爬，松开贴墙不下落，潜行取消；按 V 可开关爬墙功能。 |
 | 吸铁石 | `magnet` | 16 格内的掉落物会自动飞向你。按 T 可开关吸铁功能。 |
 | 3面骰 | `dice_roll` | 每 5 分钟投一次六面骰（屏幕播放掷骰动画后才揭晓）：大于 3 获得速度 II 4 分钟，小于 3 获得缓慢 I 4 分钟，等于 3 禁锢 6 秒。 |
@@ -306,7 +306,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Rush Rush Rush | `dash_charge` | Gain "Rush Rush Rush": right-click to dash forward for 8 seconds, steering with your view. Blocks in the way are broken and drop (except obsidian and bedrock), and creatures hit take 10 damage. 15 second cooldown after the dash ends. |
 | Soul Out | `soul_out` | Immediately enter spectator mode for 30 seconds to scout freely, then return to the position where you entered spectator mode. |
 | Eighty-One Trials | `eighty_one_trials` | Teleport to the nearest trial chambers. |
-| Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). 8 minute cooldown. |
+| Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). Bound skill items are unaffected. 8 minute cooldown. |
 | Spider Man | `spider_man` | Climb walls like a spider: stick to any wall your body touches, hold forward to climb, release to hang, sneak to cancel. Press V to toggle. |
 | Magnet | `magnet` | All dropped items within 16 blocks fly toward you. Press T to toggle. |
 | 3-Sided Die | `dice_roll` | Every 5 minutes roll a d6 (a dice animation plays before the result is revealed): above 3 grants Speed II for 4 minutes, below 3 grants Slowness I for 4 minutes, and 3 roots you for 6 seconds. |
@@ -405,6 +405,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.43.16 修复
+
+- **混沌智**：打乱敌方背包时不再移动绑定技能物品与玻璃大炮锁定槽标记——它们留在原主人原位，和其他交换类海克斯（间谍、共同富裕）保持一致，避免技能物品被换走后又无法丢弃。
+- **仆从大师**：宠物因区块卸载或跨维度传送被临时移除时，不再误判为死亡并永久停发物品；只有真正被击杀（如 /kill）才按设计停止补给。
 
 ### 1.43.15 修复
 

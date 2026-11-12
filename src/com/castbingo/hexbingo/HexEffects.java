@@ -4925,10 +4925,20 @@ public final class HexEffects {
       if (var2 == null) {
          summonPet(var0);
       } else if (!var2.isAlive()) {
-         // 已被 /kill 等方式杀死：不再自动补发
-         PETS.remove(var0.getUUID());
-         PET_DISMISSED.add(var0.getUUID());
-         return;
+         Entity.RemovalReason var6 = var2.getRemovalReason();
+         if (var6 == Entity.RemovalReason.KILLED || var6 == Entity.RemovalReason.DISCARDED) {
+            // 被 /kill 等方式真正击杀：按设计不再补发
+            PETS.remove(var0.getUUID());
+            PET_DISMISSED.add(var0.getUUID());
+            return;
+         }
+
+         if (var6 == Entity.RemovalReason.CHANGED_DIMENSION) {
+            // 跨维度传送遗留的旧实例：重新召唤一只，保证持续跟随
+            summonPet(var0);
+         }
+         // 区块卸载（UNLOADED_TO_CHUNK / UNLOADED_WITH_PLAYER）：同一实例在区块重载后会自动复活，
+         // 保留引用并继续计时，避免误判为死亡后永久不再补给
       } else if (var2.level() != var0.level()) {
          // 26.2 跨维度传送会重建实体实例（NBT 往返），旧引用会被移除：必须拿返回值更新引用，
          // 否则下一 tick 会把宠物误判为死亡并永久不再补发
@@ -7637,6 +7647,11 @@ public final class HexEffects {
       for (int var3 = 0; var3 < var1.size(); var3++) {
          ItemStack var4 = var1.get(var3);
          if (!var4.isEmpty()) {
+            // 绑定技能物品与玻璃大炮锁定槽标记留在原位，不参与打乱
+            if (isBoundItem(var4) || isLockMarker(var4)) {
+               continue;
+            }
+
             var2.add(var4.copy());
             var1.set(var3, ItemStack.EMPTY);
          }
@@ -7647,6 +7662,10 @@ public final class HexEffects {
       for (EquipmentSlot var6 : var5) {
          ItemStack var7 = var0.getItemBySlot(var6);
          if (!var7.isEmpty()) {
+            if (isBoundItem(var7) || isLockMarker(var7)) {
+               continue;
+            }
+
             var2.add(var7.copy());
             var0.setItemSlot(var6, ItemStack.EMPTY);
          }
@@ -7656,10 +7675,18 @@ public final class HexEffects {
       int var8 = 0;
 
       for (int var9 = 0; var9 < var1.size(); var9++) {
+         if (!var1.get(var9).isEmpty()) {
+            continue;
+         }
+
          var1.set(var9, var8 < var2.size() ? var2.get(var8++) : ItemStack.EMPTY);
       }
 
       for (EquipmentSlot var11 : var5) {
+         if (!var0.getItemBySlot(var11).isEmpty()) {
+            continue;
+         }
+
          var0.setItemSlot(var11, var8 < var2.size() ? var2.get(var8++) : ItemStack.EMPTY);
       }
 
