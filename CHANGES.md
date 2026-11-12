@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.43.14 — 2026-11-13
+
+### Fixed
+
+- **Blank Cell** (`blank_cell`): the description no longer calls it an
+  "extra team-exclusive cell"; it is simply an item that opens the current
+  Bingo card and lights up any incomplete task.
+
 ## 26.2-1.43.13 — 2026-11-13
 
 ### Fixed
