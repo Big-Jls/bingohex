@@ -1237,6 +1237,19 @@ public final class HexEffects {
       XRAY_COOLDOWN.remove(var0.getUUID());
       MIND_CONTROL.remove(var0.getUUID());
       MIND_CONTROL.entrySet().removeIf(var1 -> var1.getValue().target.equals(var0.getUUID()));
+      // 补齐一次性标记与冷却的清理，避免重抽海克斯/对局重置后跨局残留
+      RTP_COOLDOWN.remove(var0.getUUID());
+      SPY_USED.remove(var0.getUUID());
+      UNTOUCHABLE_COOLDOWN.remove(var0.getUUID());
+      CHAOS_MIND_COOLDOWN.remove(var0.getUUID());
+      SPIDER_CLIMB_OFF.remove(var0.getUUID());
+      BANISH_COOLDOWN.remove(var0.getUUID());
+      THE_WORLD_COOLDOWN.remove(var0.getUUID());
+      BANISHED.remove(var0.getUUID());
+      KILL_STACKS.remove(var0.getUUID());
+      BEACONS.remove(var0.getUUID());
+      VOYAGE_LOCK_MASK.remove(var0.getUUID());
+      GOLD_RUSH.remove(var0.getUUID());
 
       for (Holder var4 : ALL_ATTRIBUTES) {
          AttributeInstance var5 = var0.getAttribute(var4);
@@ -1297,9 +1310,10 @@ public final class HexEffects {
                   var25.setRemainingFireTicks(0);
                   var25.sendSystemMessage(Component.translatable("hexbingo.msg.banish_return").withStyle(ChatFormatting.GREEN));
                }
-
-               var22.remove();
             }
+
+            // 到期即无条件清除：玩家放逐期间离线也不残留到下一局
+            var22.remove();
          }
       }
 
@@ -2281,6 +2295,8 @@ public final class HexEffects {
             for (int var10 = 0; var10 < 32 && var7 == null; var10++) {
                int var11 = var8 + var15.nextInt(801) - 400;
                int var12 = var9 + var15.nextInt(801) - 400;
+               // 未加载区块的 getHeight 会返回世界最低点：先加载区块再取高度
+               var5.getChunk(var11 >> 4, var12 >> 4);
                int var13 = var5.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var11, var12);
                BlockPos var14 = new BlockPos(var11, var13, var12);
                if (var5.isInWorldBounds(var14)
@@ -2502,6 +2518,8 @@ public final class HexEffects {
             int var7 = 1 + var12.nextInt(1000);
             int var8 = var0.blockPosition().getX() + (int)Math.round(Math.cos(var5) * var7);
             int var9 = var0.blockPosition().getZ() + (int)Math.round(Math.sin(var5) * var7);
+            // 未加载区块的 getHeight 会返回世界最低点：先加载区块再取高度
+            var1.getChunk(var8 >> 4, var9 >> 4);
             int var10 = var1.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var8, var9);
             BlockPos var11 = new BlockPos(var8, var10, var9);
             if (var1.isInWorldBounds(var11)
@@ -2710,7 +2728,7 @@ public final class HexEffects {
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.village_none").withStyle(ChatFormatting.GRAY));
             }
          } else {
-            BlockPos var4 = structureCenter(var2, var3);
+            BlockPos var4 = structureCenter(var2, var3, StructureTags.VILLAGE);
             BlockPos var5 = var4 == null ? null : findSpotNear(var2, var4, 16, 8);
             if (var5 != null) {
                var0.teleportTo(var2, var5.getX() + 0.5, var5.getY(), var5.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
@@ -2798,7 +2816,7 @@ public final class HexEffects {
       ServerLevel var2 = var1.overworld();
       BlockPos var3 = var2.findNearestMapStructure(PILLAGER_OUTPOST, var0.blockPosition(), 100, false);
       if (var3 != null) {
-         BlockPos var4 = structureCenter(var2, var3);
+         BlockPos var4 = structureCenter(var2, var3, PILLAGER_OUTPOST);
          BlockPos var7 = var4 == null ? null : findSpotNear(var2, var4, 24, 8);
          if (var7 != null) {
             var0.teleportTo(var2, var7.getX() + 0.5, var7.getY(), var7.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
@@ -3282,6 +3300,8 @@ public final class HexEffects {
    private static ItemStack structureMap(ServerLevel var0, int var1, int var2, String var3) {
       ItemStack var4 = MapItem.create(var0, var1, var2, (byte)1, true, true);
       var4.set(DataComponents.CUSTOM_NAME, Component.literal(var3));
+      // 未加载区块的 getHeight 会返回世界最低点：先加载区块再取高度
+      var0.getChunk(var1 >> 4, var2 >> 4);
       MapItemSavedData.addTargetDecoration(
          var4, new BlockPos(var1, var0.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var1, var2), var2), "+", MapDecorationTypes.RED_X
       );
@@ -3478,7 +3498,8 @@ public final class HexEffects {
                         continue;
                      }
 
-                     PUMPKIN_HEADS.put(var8, var9.getItemBySlot(EquipmentSlot.HEAD).copy());
+                     // 只备份一次真实头盔，避免重复施放时把诅咒南瓜当作备份覆盖掉原装备
+                     PUMPKIN_HEADS.putIfAbsent(var8, var9.getItemBySlot(EquipmentSlot.HEAD).copy());
                      var9.setItemSlot(EquipmentSlot.HEAD, cursedPumpkin(var2));
                      var4++;
                   }
@@ -3881,7 +3902,7 @@ public final class HexEffects {
          }
       } else {
          // /locate 返回的 Y 恒为 0，必须取结构包围盒中心，否则地下结构会把玩家放到正上方地表
-         BlockPos var7 = structureCenter(var5, var6);
+         BlockPos var7 = structureCenter(var5, var6, var1);
          BlockPos var8 = null;
          if ("minecraft:ruined_portal".equals(var4)) {
             // 废弃地狱门：先按黑曜石/地狱岩/金块等特征方块锁定传送门本体
@@ -3905,6 +3926,8 @@ public final class HexEffects {
             var0.resetFallDistance();
             var0.sendSystemMessage(Component.translatable(var2).withStyle(ChatFormatting.GOLD));
          } else {
+            // 未加载区块的 getHeight 会返回世界最低点：先加载区块再取高度
+            var5.getChunk(var6.getX() >> 4, var6.getZ() >> 4);
             int var9 = var5.getHeight(Types.MOTION_BLOCKING_NO_LEAVES, var6.getX(), var6.getZ());
             boolean var10 = !var5.getBlockState(new BlockPos(var6.getX(), var9 - 1, var6.getZ())).getFluidState().isEmpty();
             if (var10) {
@@ -3926,30 +3949,32 @@ public final class HexEffects {
       }
    }
 
-   // 由 /locate 返回的区块坐标反查结构实际包围盒中心（locate 的 Y 恒为 0）
-   private static BlockPos structureCenter(ServerLevel var0, BlockPos var1) {
-      BlockPos var2 = null;
-      double var3 = Double.MAX_VALUE;
+   // 由 /locate 返回的区块坐标反查结构实际包围盒中心（locate 的 Y 恒为 0）；按目标结构标签过滤，避免选中相邻的其它结构
+   private static BlockPos structureCenter(ServerLevel var0, BlockPos var1, TagKey<Structure> var2) {
+      BlockPos var3 = null;
+      double var4 = Double.MAX_VALUE;
+      Registry<Structure> var5 = var0.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+      net.minecraft.core.HolderSet<Structure> var6 = var5.get(var2).orElseThrow();
 
-      for (int var5 = -1; var5 <= 1; var5++) {
-         for (int var6 = -1; var6 <= 1; var6++) {
-            ChunkAccess var7 = var0.getChunk((var1.getX() >> 4) + var5, (var1.getZ() >> 4) + var6, ChunkStatus.STRUCTURE_STARTS);
+      for (int var7 = -1; var7 <= 1; var7++) {
+         for (int var8 = -1; var8 <= 1; var8++) {
+            ChunkAccess var9 = var0.getChunk((var1.getX() >> 4) + var7, (var1.getZ() >> 4) + var8, ChunkStatus.STRUCTURE_STARTS);
 
-            for (StructureStart var9 : var7.getAllStarts().values()) {
-               if (var9.isValid()) {
-                  BoundingBox var10 = var9.getBoundingBox();
-                  BlockPos var11 = var10.getCenter();
-                  double var12 = var11.distSqr(var1);
-                  if (var12 < var3) {
-                     var3 = var12;
-                     var2 = var11;
+            for (StructureStart var11 : var9.getAllStarts().values()) {
+               if (var11.isValid() && var6.contains(var5.wrapAsHolder(var11.getStructure()))) {
+                  BoundingBox var12 = var11.getBoundingBox();
+                  BlockPos var13 = var12.getCenter();
+                  double var14 = var13.distSqr(var1);
+                  if (var14 < var4) {
+                     var4 = var14;
+                     var3 = var13;
                   }
                }
             }
          }
       }
 
-      return var2;
+      return var3;
    }
 
    // 在目标点附近寻找安全落脚点：两格空气、脚下为固体，优先靠近目标 Y
@@ -4158,7 +4183,7 @@ public final class HexEffects {
       BlockPos var2 = var1.findNearestMapStructure(TRIAL_CHAMBERS, var0.blockPosition(), 100, false);
       if (var2 != null) {
          // 先按涂蜡铜块/凝灰岩等特征方块锁定试炼大厅内部，再找安全落脚点
-         BlockPos var7 = structureCenter(var1, var2);
+         BlockPos var7 = structureCenter(var1, var2, TRIAL_CHAMBERS);
          BlockPos var8 = findNearbyBlock(
             var1,
             var7 == null ? new BlockPos(var2.getX(), 0, var2.getZ()) : var7,
@@ -4789,7 +4814,11 @@ public final class HexEffects {
 
    private static void enchantGear(ServerPlayer var0) {
       Registry<Enchantment> var1 = var0.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-      List<Holder<Enchantment>> var2 = var1.entrySet().stream().map(var1x -> var1.wrapAsHolder((Enchantment)var1x.getValue())).toList();
+      // 排除诅咒类附魔（26.2 用 EnchantmentTags.CURSE 标签识别），避免给装备套上绑定/消失诅咒
+      List<Holder<Enchantment>> var2 = var1.entrySet().stream()
+         .map(var1x -> var1.wrapAsHolder((Enchantment)var1x.getValue()))
+         .filter(var1x -> !var1x.is(net.minecraft.tags.EnchantmentTags.CURSE))
+         .toList();
       if (!var2.isEmpty()) {
          ThreadLocalRandom var3 = ThreadLocalRandom.current();
 
@@ -4799,7 +4828,10 @@ public final class HexEffects {
                int var6 = 1 + var3.nextInt(5);
 
                for (int var7 = 0; var7 < var6; var7++) {
-                  var5.enchant((Holder)var2.get(var3.nextInt(var2.size())), 1 + var3.nextInt(3));
+                  Holder<Enchantment> var8 = var2.get(var3.nextInt(var2.size()));
+                  if (var8.value().canEnchant(var5)) {
+                     var5.enchant(var8, 1 + var3.nextInt(3));
+                  }
                }
             }
          }
@@ -4861,8 +4893,15 @@ public final class HexEffects {
          PETS.remove(var0.getUUID());
          PET_DISMISSED.add(var0.getUUID());
          return;
-      } else if (var2.level() != var0.level() || var2.distanceToSqr(var0) > 1024.0) {
-         // 玩家传送或跨维度后把宠物一并带过去，避免在旧位置遗留后再生成第二只
+      } else if (var2.level() != var0.level()) {
+         // 26.2 跨维度传送会重建实体实例（NBT 往返），旧引用会被移除：必须拿返回值更新引用，
+         // 否则下一 tick 会把宠物误判为死亡并永久不再补发
+         Entity var6 = var2.teleport(new TeleportTransition((ServerLevel)var0.level(), new Vec3(var0.getX(), var0.getY(), var0.getZ()), Vec3.ZERO, var0.getYRot(), var0.getXRot(), Set.of(), TeleportTransition.DO_NOTHING));
+         if (var6 instanceof TamableAnimal var7) {
+            PETS.put(var0.getUUID(), var7);
+         }
+      } else if (var2.distanceToSqr(var0) > 1024.0) {
+         // 同维度远距离传送：直接拉回（同维度不重建实例）
          var2.teleportTo((ServerLevel)var0.level(), var0.getX(), var0.getY(), var0.getZ(), Set.of(), var0.getYRot(), var0.getXRot(), false);
       } else {
          // 兜底维持无敌状态，避免被绕过无敌的伤害击杀
@@ -5938,7 +5977,8 @@ public final class HexEffects {
                suppressTrapRegen(var2);
                suppressTrapRegen(var3);
                var1.ticks++;
-               if (!var1.pvpOccurred && var1.ticks >= 6000) {
+               // 超时与 PVP 无关：PVP 发生后双方若停手，也必须能靠超时结束决斗，否则永久困在基岩房
+               if (var1.ticks >= 6000) {
                   finishTrap(var0, var1, true);
                }
             } else {
@@ -6425,7 +6465,12 @@ public final class HexEffects {
          if (var5 != null && var5.isAlive()) {
             // 已有伪装：跨维度时直接带过去，避免在旧维度遗留无 AI 生物
             if (var5.level() != var1) {
-               var5.teleportTo(var1, var0.getX(), var0.getY(), var0.getZ(), Set.of(), var0.getYRot(), var0.getXRot(), false);
+               // 26.2 跨维度传送会重建实体实例：拿返回值更新引用，并重设 noPhysics（不在 NBT 里）
+               Entity var6 = var5.teleport(new TeleportTransition(var1, new Vec3(var0.getX(), var0.getY(), var0.getZ()), Vec3.ZERO, var5.getYRot(), var5.getXRot(), Set.of(), TeleportTransition.DO_NOTHING));
+               if (var6 instanceof Mob var7) {
+                  var7.noPhysics = true;
+                  FAE_DISGUISES.put(var0.getUUID(), var7);
+               }
             }
 
             return;
@@ -6473,8 +6518,15 @@ public final class HexEffects {
             } else if (var6 != null && var1 < var6) {
                if (var7 != null && var7.isAlive()) {
                   if (var7.level() != var5.level()) {
-                     // 跨维度时把伪装一起带过去，避免旧维度留下无 AI 生物
-                     var7.teleportTo((ServerLevel)var5.level(), var5.getX(), var5.getY(), var5.getZ(), Set.of(), var5.getYRot(), var5.getXRot(), false);
+                     // 跨维度时把伪装一起带过去，避免旧维度留下无 AI 生物；26.2 会重建实例，必须更新引用
+                     Entity var8 = var7.teleport(new TeleportTransition((ServerLevel)var5.level(), new Vec3(var5.getX(), var5.getY(), var5.getZ()), Vec3.ZERO, var7.getYRot(), var7.getXRot(), Set.of(), TeleportTransition.DO_NOTHING));
+                     if (var8 instanceof Mob var9) {
+                        var9.noPhysics = true;
+                        FAE_DISGUISES.put(var4, var9);
+                        var7 = var9;
+                     } else {
+                        continue;
+                     }
                   }
 
                   var7.setPos(var5.getX(), var5.getY(), var5.getZ());
@@ -8306,10 +8358,9 @@ public final class HexEffects {
          Phantom var3 = var2.getValue();
          ServerPlayer var4 = var0.getPlayerList().getPlayer(var2.getKey());
          if (var4 == null) {
-            // 主人不在线：原地待命
+            // 主人不在线：直接丢弃幼龙，避免它随区块卸载被保存、区块重载后复活成无敌孤儿
             if (var3 != null && !var3.isRemoved()) {
-               var3.setTarget(null);
-               setPhantomMoveTarget(var3, var3.position());
+               var3.discard();
             }
 
             continue;
@@ -8391,7 +8442,7 @@ public final class HexEffects {
       }
    }
 
-   /** 服务器重启后旧幼龙不再受本模组控制：关掉 AI，避免它恢复成敌对幻翼攻击玩家。 */
+   /** 服务器重启/区块重载后残留的旧幼龙不在宠物表里：关闭 AI 并直接移除，避免它恢复成敌对幻翼或变成无敌孤儿。 */
    public static void tickDragonPet(Entity var0) {
       if (var0 instanceof Phantom var1 && !var1.level().isClientSide()) {
          if (!DRAGON_PETS.containsValue(var1) && var1.getCustomName() != null && "幼龙".equals(var1.getCustomName().getString())) {
@@ -8399,6 +8450,7 @@ public final class HexEffects {
             var1.setNoAi(true);
             var1.getGoalSelector().removeAllGoals(goal -> true);
             stripPhantomTargetGoals(var1);
+            var1.discard();
          }
       }
    }
@@ -9744,7 +9796,15 @@ public final class HexEffects {
                if (var7 != null && var7.isAlive()) {
                   double var8 = batFootY(var5);
                   if (var7.level() != var5.level()) {
-                     var7.teleportTo((ServerLevel)var5.level(), var5.getX(), var8, var5.getZ(), Set.of(), var5.getYRot(), 0.0F, false);
+                     // 26.2 跨维度传送会重建实例：更新引用并重设 noPhysics（不在 NBT 里）
+                     Entity var9 = var7.teleport(new TeleportTransition((ServerLevel)var5.level(), new Vec3(var5.getX(), var8, var5.getZ()), Vec3.ZERO, var5.getYRot(), 0.0F, Set.of(), TeleportTransition.DO_NOTHING));
+                     if (var9 instanceof Bat var10) {
+                        var10.noPhysics = true;
+                        BAT_DISGUISES.put(var4, var10);
+                        var7 = var10;
+                     } else {
+                        continue;
+                     }
                   }
 
                   var7.setPos(var5.getX(), var8, var5.getZ());
@@ -10300,6 +10360,11 @@ public final class HexEffects {
       DRAGON_PETS.clear();
       DRAGON_ANGLES.clear();
       DRAGON_SOUND_TIMER.clear();
+      // 全局一次性标记与临时状态随对局重置清空
+      GOLD_RUSH.clear();
+      BEE_TARGETS.clear();
+      HEX_BEES.clear();
+      BANISHED.clear();
 
       for (HexEffects.EggIncubation var6 : new ArrayList<>(INCUBATIONS)) {
          cancelIncubation(var6.owner, true);

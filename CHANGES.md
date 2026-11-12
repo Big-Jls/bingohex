@@ -1,5 +1,45 @@
 # Changelog
 
+## 26.2-1.43.7 — 2026-11-12
+
+### Fixed
+
+- **Cross-dimension entity references**: after a dimension change the mod kept
+  stale entity references (26.2 rebuilds the entity instance on cross-dimension
+  teleports and removes the old one). Fairy disguise, the minion pet and the
+  bat-form bat now update their map references from the teleport result and
+  re-apply `noPhysics`. Previously the old reference was treated as dead,
+  which permanently dismissed the pet or spawned duplicate orphan disguises.
+- **Rainbow Duel** (`rainbow_duel`): the 6000-tick timeout is no longer tied to
+  `pvpOccurred`. After the first PVP hit both players could stall the duel
+  forever inside the bedrock room; the duel now always times out.
+- **Random teleport / wormhole**: candidate chunks are loaded before taking
+  surface heights, so the search no longer reads world-minimum heights from
+  unloaded chunks and fails almost every attempt.
+- **Dragon Tamer** (`dragon_rider`): the baby dragon is discarded when its
+  owner goes offline instead of being left to be saved with its chunk, and
+  stale dragons loaded from disk (server restart / chunk reload) are removed
+  on their first tick instead of lingering as invincible orphans.
+- **State cleanup**: `BANISHED` now expires unconditionally (also while the
+  player is offline) and is cleared on game reset; `clearAll` and
+  `clearNewStates` now also clear RTP cooldowns, spy/mirror one-shot marks,
+  untouchable / chaos mind / spider climb / banish / the-world cooldowns,
+  kill stacks, beacons, voyage locks, gold-rush and bee-target maps.
+- **Enchanting** (`enchant_gear`): curse enchantments are excluded via the
+  `minecraft:curse` tag and enchants are only applied when
+  `Enchantment#canEnchant` allows them (no more binding/vanishing curses or
+  invalid enchantments on gear).
+- **Snow Pumpkin** (`snow_pumpkin`): re-cursing an already-pumpkined player no
+  longer overwrites the backed-up real helmet with the cursed pumpkin
+  (`putIfAbsent`), so the original equipment cannot be lost.
+- **Structure teleports**: structure bounding boxes are now filtered by the
+  target structure tag, so a closer unrelated structure (e.g. a village next
+  to a ruined portal) can no longer be picked as the teleport anchor; surface
+  heights for structure spots and structure maps load the chunk first.
+- **Task-pick packet**: the server now drops task-pick requests that were not
+  preceded by an actual picker offer (client-controlled index is only applied
+  after the mode was opened server-side).
+
 ## 26.2-1.43.6 — 2026-11-12
 
 ### Fixed

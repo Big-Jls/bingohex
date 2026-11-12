@@ -861,6 +861,11 @@ public final class HexManager {
 
    public static void denyTaskPick(ServerPlayer var0, int var1) {
       String var2 = TASK_PICK_MODE.remove(var0.getUUID());
+      if (var2 == null) {
+         // 未打开过选择界面（或重复包）：直接丢弃，客户端 index 不可信
+         return;
+      }
+
       if ("blank".equals(var2)) {
          HexEffects.applyBlankCell(var0, var1);
       } else {
