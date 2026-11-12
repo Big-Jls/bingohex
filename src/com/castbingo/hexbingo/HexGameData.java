@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -284,43 +288,60 @@ public class HexGameData extends SavedData {
    }
 
    public CompoundTag save(CompoundTag var1) {
+      var1.putInt("format", 2);
       var1.putBoolean("mayhem", this.mayhem);
       var1.putLong("gameStart", this.gameStart);
       var1.putBoolean("allPrismatic", this.allPrismatic);
       CompoundTag var2 = new CompoundTag();
       this.hexes.forEach((var1x, var2x) -> {
          if (!var2x.isEmpty()) {
-            var2.putString(var1x.toString(), String.join(",", var2x));
+            ListTag var3x = new ListTag();
+            var2x.forEach(var3y -> var3x.add(StringTag.valueOf(var3y)));
+            var2.put(var1x.toString(), var3x);
          }
       });
       var1.put("hexes", var2);
       CompoundTag var7 = new CompoundTag();
-      this.granted.forEach((uuid, sources) -> {
-         if (!sources.isEmpty()) {
-            ArrayList<String> entries = new ArrayList<>();
-            sources.forEach((hexId, prefix) -> entries.add(hexId + "|" + prefix));
-            var7.putString(uuid.toString(), String.join(",", entries));
+      this.granted.forEach((var1x, var2x) -> {
+         if (!var2x.isEmpty()) {
+            ListTag var3x = new ListTag();
+            var2x.forEach((var3y, var4y) -> {
+               CompoundTag var5y = new CompoundTag();
+               var5y.putString("id", var3y);
+               var5y.putString("prefix", var4y);
+               var3x.add(var5y);
+            });
+            var7.put(var1x.toString(), var3x);
          }
       });
       var1.put("granted", var7);
       CompoundTag var3 = new CompoundTag();
       this.pending.forEach((var1x, var2x) -> {
          if (!var2x.isEmpty()) {
-            var3.putString(var1x.toString(), String.join(",", var2x.stream().map(String::valueOf).toList()));
+            ListTag var3x = new ListTag();
+            var2x.forEach(var3y -> var3x.add(IntTag.valueOf(var3y)));
+            var3.put(var1x.toString(), var3x);
          }
       });
       var1.put("pending", var3);
       CompoundTag var4 = new CompoundTag();
       this.offers.forEach((var1x, var2x) -> {
          if (!var2x.ids().isEmpty()) {
-            var4.putString(var1x.toString(), var2x.rewardIndex() + "|" + String.join(",", var2x.ids()));
+            CompoundTag var3x = new CompoundTag();
+            var3x.putInt("reward", var2x.rewardIndex());
+            ListTag var4x = new ListTag();
+            var2x.ids().forEach(var4y -> var4x.add(StringTag.valueOf(var4y)));
+            var3x.put("ids", var4x);
+            var4.put(var1x.toString(), var3x);
          }
       });
       var1.put("offers", var4);
       CompoundTag var5 = new CompoundTag();
       this.teams.forEach(var5::putIntArray);
       var1.put("teams", var5);
-      var1.putString("extraChoice", String.join(",", this.extraChoice.stream().map(UUID::toString).toList()));
+      ListTag var15 = new ListTag();
+      this.extraChoice.forEach(var1x -> var15.add(StringTag.valueOf(var1x.toString())));
+      var1.put("extraChoice", var15);
       CompoundTag refreshTag = new CompoundTag();
       this.refreshCharges.forEach((var1x, var2x) -> refreshTag.putInt(var1x.toString(), var2x));
       var1.put("refreshes", refreshTag);
@@ -330,7 +351,9 @@ public class HexGameData extends SavedData {
       CompoundTag var6 = new CompoundTag();
       this.qualityUp.forEach((var1x, var2x) -> var6.putInt(var1x.toString(), var2x));
       var1.put("qualityUp", var6);
-      var1.putString("hexLocked", String.join(",", this.hexLocked.stream().map(UUID::toString).toList()));
+      ListTag var16 = new ListTag();
+      this.hexLocked.forEach(var1x -> var16.add(StringTag.valueOf(var1x.toString())));
+      var1.put("hexLocked", var16);
       var1.putBoolean("hexesLocked", this.hexesLocked);
       return var1;
    }
@@ -350,14 +373,27 @@ public class HexGameData extends SavedData {
       this.mayhem = var1.getBooleanOr("mayhem", false);
       this.gameStart = var1.getLongOr("gameStart", 0L);
       this.allPrismatic = var1.getBooleanOr("allPrismatic", false);
+      int format = var1.getIntOr("format", 1);
       CompoundTag var2 = var1.getCompoundOrEmpty("hexes");
 
       for (String var4 : var2.keySet()) {
          UUID var5 = parseUuid(var4);
          if (var5 != null) {
-            String var6 = var2.getStringOr(var4, "");
+            ArrayList<String> var6 = new ArrayList<>();
+            Tag var10 = var2.get(var4);
+            if (format >= 2 && var10 instanceof ListTag var11) {
+               for (int var12 = 0; var12 < var11.size(); var12++) {
+                  var6.add(var11.getStringOr(var12, ""));
+               }
+            } else {
+               String var13 = var2.getStringOr(var4, "");
+               if (!var13.isEmpty()) {
+                  var6.addAll(List.of(var13.split(",")));
+               }
+            }
+
             if (!var6.isEmpty()) {
-               this.hexes.put(var5, new ArrayList<>(List.of(var6.split(","))));
+               this.hexes.put(var5, var6);
             }
          }
       }
@@ -367,20 +403,27 @@ public class HexGameData extends SavedData {
       for (String uuidKey : grantedTag.keySet()) {
          UUID uuid = parseUuid(uuidKey);
          if (uuid != null) {
-            String payload = grantedTag.getStringOr(uuidKey, "");
-            if (!payload.isEmpty()) {
-               HashMap<String, String> sources = new HashMap<>();
-
-               for (String entry : payload.split(",")) {
-                  int split = entry.indexOf(124);
-                  if (split > 0) {
-                     sources.put(entry.substring(0, split), entry.substring(split + 1));
+            HashMap<String, String> sources = new HashMap<>();
+            Tag var20 = grantedTag.get(uuidKey);
+            if (format >= 2 && var20 instanceof ListTag var21) {
+               for (int var22 = 0; var22 < var21.size(); var22++) {
+                  CompoundTag var23 = var21.getCompoundOrEmpty(var22);
+                  sources.put(var23.getStringOr("id", ""), var23.getStringOr("prefix", ""));
+               }
+            } else {
+               String payload = grantedTag.getStringOr(uuidKey, "");
+               if (!payload.isEmpty()) {
+                  for (String entry : payload.split(",")) {
+                     int split = entry.indexOf(124);
+                     if (split > 0) {
+                        sources.put(entry.substring(0, split), entry.substring(split + 1));
+                     }
                   }
                }
+            }
 
-               if (!sources.isEmpty()) {
-                  this.granted.put(uuid, sources);
-               }
+            if (!sources.isEmpty()) {
+               this.granted.put(uuid, sources);
             }
          }
       }
@@ -405,17 +448,25 @@ public class HexGameData extends SavedData {
       for (String var19 : var16.keySet()) {
          UUID var22 = parseUuid(var19);
          if (var22 != null) {
-            String var7 = var16.getStringOr(var19, "");
-            if (!var7.isEmpty()) {
-               ArrayList var8 = new ArrayList();
-
-               for (String var12 : var7.split(",")) {
-                  try {
-                     var8.add(Integer.parseInt(var12));
-                  } catch (NumberFormatException var15) {
+            ArrayList var8 = new ArrayList();
+            Tag var24 = var16.get(var19);
+            if (format >= 2 && var24 instanceof ListTag var25) {
+               for (int var26 = 0; var26 < var25.size(); var26++) {
+                  var8.add(var25.getInt(var26));
+               }
+            } else {
+               String var7 = var16.getStringOr(var19, "");
+               if (!var7.isEmpty()) {
+                  for (String var12 : var7.split(",")) {
+                     try {
+                        var8.add(Integer.parseInt(var12));
+                     } catch (NumberFormatException var15) {
+                     }
                   }
                }
+            }
 
+            if (!var8.isEmpty()) {
                this.pending.put(var22, var8);
             }
          }
@@ -426,16 +477,32 @@ public class HexGameData extends SavedData {
       for (String var23 : var18.keySet()) {
          UUID var26 = parseUuid(var23);
          if (var26 != null) {
-            String var30 = var18.getStringOr(var23, "");
-            int var35 = var30.indexOf(124);
-            if (var35 >= 0) {
-               try {
-                  int var39 = Integer.parseInt(var30.substring(0, var35));
-                  String var43 = var30.substring(var35 + 1);
-                  if (!var43.isEmpty()) {
-                     this.offers.put(var26, new HexGameData.Offer(var39, new ArrayList<>(List.of(var43.split(",")))));
+            Tag var27 = var18.get(var23);
+            if (format >= 2 && var27 instanceof CompoundTag var28) {
+               int var29 = var28.getIntOr("reward", 0);
+               ArrayList<String> var30 = new ArrayList<>();
+               Tag var31 = var28.get("ids");
+               if (var31 instanceof ListTag var32) {
+                  for (int var33 = 0; var33 < var32.size(); var33++) {
+                     var30.add(var32.getStringOr(var33, ""));
                   }
-               } catch (NumberFormatException var14) {
+               }
+
+               if (!var30.isEmpty()) {
+                  this.offers.put(var26, new HexGameData.Offer(var29, var30));
+               }
+            } else {
+               String var30 = var18.getStringOr(var23, "");
+               int var35 = var30.indexOf(124);
+               if (var35 >= 0) {
+                  try {
+                     int var39 = Integer.parseInt(var30.substring(0, var35));
+                     String var43 = var30.substring(var35 + 1);
+                     if (!var43.isEmpty()) {
+                        this.offers.put(var26, new HexGameData.Offer(var39, new ArrayList<>(List.of(var43.split(",")))));
+                     }
+                  } catch (NumberFormatException var14) {
+                  }
                }
             }
          }
@@ -452,12 +519,22 @@ public class HexGameData extends SavedData {
          this.teams.put(var27, var31);
       }
 
-      String var25 = var1.getStringOr("extraChoice", "");
+      Tag var25 = var1.get("extraChoice");
+      if (format >= 2 && var25 instanceof ListTag var26) {
+         for (int var27 = 0; var27 < var26.size(); var27++) {
+            UUID var28 = parseUuid(var26.getStringOr(var27, ""));
+            if (var28 != null) {
+               this.extraChoice.add(var28);
+            }
+         }
+      } else {
+         String var29 = var1.getStringOr("extraChoice", "");
 
-      for (String var40 : var25.split(",")) {
-         UUID var44 = parseUuid(var40);
-         if (var44 != null) {
-            this.extraChoice.add(var44);
+         for (String var40 : var29.split(",")) {
+            UUID var44 = parseUuid(var40);
+            if (var44 != null) {
+               this.extraChoice.add(var44);
+            }
          }
       }
 
@@ -494,12 +571,22 @@ public class HexGameData extends SavedData {
          }
       }
 
-      String var34 = var1.getStringOr("hexLocked", "");
+      Tag var34 = var1.get("hexLocked");
+      if (format >= 2 && var34 instanceof ListTag var35) {
+         for (int var36 = 0; var36 < var35.size(); var36++) {
+            UUID var37 = parseUuid(var35.getStringOr(var36, ""));
+            if (var37 != null) {
+               this.hexLocked.add(var37);
+            }
+         }
+      } else {
+         String var38 = var1.getStringOr("hexLocked", "");
 
-      for (String var47 : var34.split(",")) {
-         UUID var13 = parseUuid(var47);
-         if (var13 != null) {
-            this.hexLocked.add(var13);
+         for (String var47 : var38.split(",")) {
+            UUID var13 = parseUuid(var47);
+            if (var13 != null) {
+               this.hexLocked.add(var13);
+            }
          }
       }
 

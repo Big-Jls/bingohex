@@ -6225,12 +6225,20 @@ public final class HexEffects {
       var1.setRemainingFireTicks(0);
       var2.setRemainingFireTicks(0);
 
-      for (ItemStack var26 : var34) {
-         var1.drop(var26, false);
+      // 溢出的物品掉落到双方当前脚下（交换后），而不是交换前的位置；跨维度时重新取实例，避免旧引用掉落位置错误
+      ServerPlayer var41 = var3.getPlayerList().getPlayer(var1.getUUID());
+      ServerPlayer var42 = var3.getPlayerList().getPlayer(var2.getUUID());
+
+      if (var41 != null) {
+         for (ItemStack var26 : var34) {
+            var41.drop(var26, false);
+         }
       }
 
-      for (ItemStack var39 : var35) {
-         var2.drop(var39, false);
+      if (var42 != null) {
+         for (ItemStack var39 : var35) {
+            var42.drop(var39, false);
+         }
       }
 
       SPY_USED.add(var0.getUUID());
@@ -6436,17 +6444,17 @@ public final class HexEffects {
       var0.setInvisible(true);
       AttributeInstance var4 = var0.getAttribute(Attributes.MAX_HEALTH);
       if (var4 != null) {
-         var4.addOrUpdateTransientModifier(new AttributeModifier(modifierId("fae_magic", 0), -0.5, Operation.ADD_MULTIPLIED_BASE));
+         var4.addOrUpdateTransientModifier(new AttributeModifier(faeModifierId(var0, 0), -0.5, Operation.ADD_MULTIPLIED_BASE));
       }
 
       AttributeInstance var5 = var0.getAttribute(Attributes.MOVEMENT_SPEED);
       if (var5 != null) {
-         var5.addOrUpdateTransientModifier(new AttributeModifier(modifierId("fae_magic", 1), 0.15, Operation.ADD_MULTIPLIED_BASE));
+         var5.addOrUpdateTransientModifier(new AttributeModifier(faeModifierId(var0, 1), 0.15, Operation.ADD_MULTIPLIED_BASE));
       }
 
       AttributeInstance var6 = var0.getAttribute(Attributes.SCALE);
       if (var6 != null) {
-         var6.addOrUpdateTransientModifier(new AttributeModifier(modifierId("fae_magic", 2), -0.3, Operation.ADD_MULTIPLIED_BASE));
+         var6.addOrUpdateTransientModifier(new AttributeModifier(faeModifierId(var0, 2), -0.3, Operation.ADD_MULTIPLIED_BASE));
       }
 
       if (var0.getHealth() > var0.getMaxHealth()) {
@@ -6601,10 +6609,15 @@ public final class HexEffects {
       }
    }
 
+   /** 每个目标独立的精怪魔法修饰符 ID，避免不同施法者的诅咒在属性上互相覆盖。 */
+   private static Identifier faeModifierId(ServerPlayer var0, int var1) {
+      return modifierId("fae_magic_" + Long.toHexString(var0.getUUID().getLeastSignificantBits()), var1);
+   }
+
    private static void removeFaeModifier(ServerPlayer var0, Holder<Attribute> var1, int var2) {
       AttributeInstance var3 = var0.getAttribute(var1);
       if (var3 != null) {
-         var3.removeModifier(modifierId("fae_magic", var2));
+         var3.removeModifier(faeModifierId(var0, var2));
       }
    }
 
@@ -7902,19 +7915,26 @@ public final class HexEffects {
    }
 
    private static void setTeamSlot(Team var0, int var1, boolean var2) {
-      try {
-         Field var3 = Team.class.getDeclaredField("completed");
-         var3.setAccessible(true);
-         int var4 = var3.getInt(var0);
-         int var5 = 1 << var1 % 25;
-         var3.setInt(var0, var2 ? var4 | var5 : var4 & ~var5);
-         Field var6 = Team.class.getDeclaredField("completion");
-         var6.setAccessible(true);
-         var6.set(var0, null);
-         var0.setDirty();
-      } catch (Exception var7) {
-         HexBingo.LOGGER.warn("Failed to update team completion", var7);
+      if (var2) {
+         var0.complete(var1);
+      } else {
+         // Team 没有公开的单格取消接口：重建完成集合（与 uncompleteSlot 相同的做法）
+         ArrayList<Integer> var3 = new ArrayList<>();
+
+         for (int var4 = 0; var4 < 25; var4++) {
+            if (var0.completed(var4) && var4 != var1) {
+               var3.add(var4);
+            }
+         }
+
+         var0.resetCompleted();
+
+         for (int var5 : var3) {
+            var0.complete(var5);
+         }
       }
+
+      var0.setDirty();
    }
 
    // 地心游记：传送到 Y=-50 附近的洞穴

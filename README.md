@@ -13,6 +13,15 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.43.8 修复
+
+- **间谍**：交换后放不下的溢出物品掉落到双方当前脚下，而不是交换前的位置（跨维度交换也正确）。
+- **小蜜蜂**：只有本模组召唤的蜜蜂能穿透被取消的伤害事件，野生蜜蜂不再强制造成伤害。
+- **下线清理**：自选/镜像/任务选择模式在玩家下线时清除，重连后不再保留资格。
+- **存档**：海克斯数据改用结构化 NBT 列表（format=2）存储，旧存档仍可读取。
+- **偷天换日**：移除反射位掩码，改用 Team 公开 API（修复超过 25 格时位掩码回绕与静默失败）。
+- **精怪魔法**：属性修饰符 ID 按目标独立，不同施法者的诅咒不再互相覆盖。
+
 ### 1.43.7 修复
 
 - **跨维度实体引用**：26.2 跨维度传送会重建实体实例（旧实例被移除）。精怪魔法伪装、仆从宠物、蝙蝠形态现在都会用传送返回值更新地图引用并重设 `noPhysics`，不再出现「宠物被误判死亡永久消失 / 每次跨维度多一只无敌孤儿伪装」。
@@ -251,7 +260,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.7.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.8.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -588,7 +597,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.7 `
+.\build.ps1 -Version 26.2-1.43.8 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

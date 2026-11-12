@@ -47,6 +47,15 @@ public final class HexManager {
    private static final Set<UUID> MIRROR_OPEN = new HashSet<>();
    private static final Map<UUID, String> TASK_PICK_MODE = new HashMap<>();
 
+   /** 玩家下线时清理选择/镜像/任务选择模式，防止重连后仍持有资格。 */
+   public static void onLogout(ServerPlayer var0) {
+      UUID var1 = var0.getUUID();
+      FREE_PICK.remove(var1);
+      MIRROR_OPEN.remove(var1);
+      TASK_PICK_MODE.remove(var1);
+      BREAK_LOCK_SEEN.remove(var1);
+   }
+
    private static void updateBreakLock(MinecraftServer var0) {
       for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
          long var3 = HexEffects.breakLockRemainingMs(var2);

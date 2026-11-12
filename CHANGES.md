@@ -1,5 +1,30 @@
 # Changelog
 
+## 26.2-1.43.8 — 2026-11-12
+
+### Fixed
+
+- **Spy** (`spy`): overflow items that do not fit after the inventory swap now
+  drop at both players' feet at their post-swap positions instead of the
+  pre-swap spots; instances are re-fetched so the drops also land correctly
+  when the swap crosses dimensions.
+- **Bees** (`bees`): only bees summoned by the hex itself can bypass an
+  already-cancelled damage event; wild bees no longer force damage through.
+- **Logout cleanup**: the free pick, mirror-open and task-pick modes are
+  cleared when a player logs out, so they cannot keep picker privileges after
+  reconnecting.
+- **Game data**: hex lists, granted sources, pending rewards, offers, extra
+  choice and hex-locked sets are now saved as structured NBT lists
+  (`format = 2`) instead of delimiter-joined strings; old saves are still
+  readable via the legacy fallback.
+- **Cell Swap** (`cell_swap`): the team slot update no longer uses reflection
+  and a 25-bit mask (which wrapped for larger boards); it now goes through the
+  public `Team` API with a completed-set rebuild for uncompleting, matching
+  the existing uncomplete path.
+- **Fae Magic** (`fae_magic`): attribute modifier IDs are now unique per
+  target, so curses from different casters can no longer overwrite each
+  other's modifiers.
+
 ## 26.2-1.43.7 — 2026-11-12
 
 ### Fixed

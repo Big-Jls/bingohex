@@ -99,7 +99,10 @@ public class HexEvents {
 
    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
    public void beeDamage(LivingIncomingDamageEvent var1) {
-      if (var1.isCanceled() && var1.getEntity() instanceof ServerPlayer && var1.getSource().getDirectEntity() instanceof Bee) {
+      if (var1.isCanceled()
+         && var1.getEntity() instanceof ServerPlayer
+         && var1.getSource().getDirectEntity() instanceof Bee var3
+         && HexEffects.isHexBee(var3)) {
          var1.setCanceled(false);
       }
    }
@@ -529,6 +532,7 @@ public class HexEvents {
          HexEffects.onBatLogout(var2);
          HexEffects.onTrapLogout(var2);
          HexEffects.onSoulLogout(var2);
+         HexManager.onLogout(var2);
       }
    }
 
