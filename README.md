@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：52 银色 / 45 金色 / 35 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.11.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.12.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -71,7 +71,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 <!-- HEX-TABLE-START -->
 ## 海克斯一览（132）
 
-### 银色（53）
+### 银色（52）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -99,7 +99,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 淘金热 | `sand_gold` | 挖掘沙子时有 3% 概率获得金粒。 |
 | 滴滴打眼 | `eye_taxi` | 你投出的末影之眼不再碎裂。 |
 | 步步生花 | `flowers_walk` | 你走过草方块时会长出花。 |
-| 锻造大师 | `forge_master` | 将背包里的工具、武器替换成随机等级的同类型装备。 |
+| 装备升级 | `forge_master` | 将背包里的工具、武器替换成随机等级的同类型装备。 |
 | 随便 | `random_bingo` | 随便提供一个bingo（包含已完成）。 |
 | 致敬爱情 | `love_tribute` | 传送到最近的沉船。 |
 | 地狱开局 | `ruined_portal` | 传送到最近的废弃地狱门结构。 |
@@ -108,7 +108,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 随身工作台 | `portable_bench` | 获得「随身工作台」：右键直接打开 3×3 合成界面，无需放置工作台。 |
 | 催熟喷雾 | `bone_meal_spray` | 每 10 秒向周围 9 格范围内的作物与植物洒下骨粉，随机催熟最多 12 处。 |
 | 村庄英雄 | `village_hero` | 永久获得村庄英雄 I。 |
-| 免疫护盾 | `immunity_shield` | 每 60 秒免疫对手的下一个技能类海克斯。 |
 | 种子礼包 | `seed_gift` | 随机获得小麦、胡萝卜、马铃薯、甜菜根、西瓜、南瓜种子，每种 1-8 个。 |
 | 考古刷 | `archaeology_brush` | 获得一把不会损耗耐久的刷子。 |
 | 跳跳虎 | `jump_tiger` | 永久获得跳跃提升 II。 |
@@ -117,7 +116,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 鱼神 | `dolphin_dash` | 在水中获得永久的海豚的恩惠 II。 |
 | 便携熔炉 | `portable_furnace` | 获得「便携熔炉」：右键随时打开熔炉界面；关闭界面后仍会继续烧制，熔炼速度受「烧制加速」影响。 |
 | 烧制加速 | `smelt_speed` | 附近的熔炉、高炉、烟熏炉烧制速度翻倍。 |
-| 陨石 | `meteor` | 计算所有队伍玩家的平均位置，召唤 5-10 颗大小不一的紫水晶陨石坠落；其他队伍玩家被减速 III，脚下地块会像真实地震一样逐格崩塌，并获得标记落点的地图。 |
+| 陨石 | `meteor` | 在你周围召唤 5-10 颗大小不一的紫水晶陨石坠落（最远不超过 500 格）；其他队伍玩家被减速 III，脚下地块会像真实地震一样逐格崩塌，并获得标记落点的地图。 |
 | 品质提升 | `offer_upgrade` | 下一次海克斯选择必定出现至少 1 个彩色；只会在第一次海克斯选择中出现。 |
 | 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
 | 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
@@ -129,10 +128,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 地心游记 | `journey_core` | 传送到 Y=-50 的地下洞穴。 |
 | 苦行者 | `ascetic` | 清空本队所有已完成格，立即获得 2 个随机彩色海克斯。只在第三次海克斯选择中出现。 |
 
-### 金色（43）
+### 金色（45）
 
 | 名称 | id | 效果 |
 |---|---|---|
+| 免疫护盾 | `immunity_shield` | 每 3 分钟免疫对手的下一个技能类海克斯。 |
+| 锻造大师 | `inventor` | 获得时附魔当前背包里的工具、武器和盔甲；以后制作的同类物品也会获得随机附魔。 |
 | 随机传送 | `random_teleport` | 获得 /bingo rtp 指令：在当前位置附近随机传送，冷却 5 秒。 |
 | 尖端发明家 | `cutting_edge` | 所有技能型海克斯的冷却时间缩短 30%。 |
 | 我很想要 | `want_more_items` | 获得 10 个随机物品（与仆从大师宠物同款加权随机池）。 |
@@ -177,7 +178,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，跨维度、远距离传送与区块卸载后都会回到你身边继续环绕；经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，不会攻击任何玩家，且完全无敌（任何伤害都会被取消，包括创造模式攻击）。 |
 | 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图；附近没有时在 500 格外改造一片红树林并标记。 |
 
-### 彩色（36）
+### 彩色（35）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -193,7 +194,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 玻璃大炮 | `glass_cannon_bag` | 背包后 18 格被屏障占据（放入的物品会被移出或掉落），但方块与生物掉落变为 8 倍，并受时运与幸运加成（每级 +25%）。 |
 | 回归基本功 | `back_to_basics` | 无法使用工作台，但获得的物品掉落翻倍（受抢夺加成），并永久获得速度 I。 |
 | 大法师 | `archmage` | 制作物品后，每个材料有 10% 概率返还。 |
-| 尖端发明家 | `inventor` | 获得时附魔当前背包里的工具、武器和盔甲；以后制作的同类物品也会获得随机附魔。 |
 | 仆从大师 | `pet_master` | 获得一只无敌宠物，每 8 秒从全物品池中随机给你一个物品（贵重物品概率较低）。 |
 | 尊我为王 | `crown_me_king` | 敌方位置出现信标光柱，抵达后获得一个彩色海克斯、一套随机附魔钻石盔甲、效率 IV 钻石镐与锋利 IV/火焰附加 I 钻石剑。 |
 | 掀桌子！ | `flip_table` | 重新随机所有未被任意队伍完成的任务。 |
@@ -220,7 +220,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 ## Hex list (English)
 
-### Silver (53)
+### Silver (52)
 
 | Name | id | Effect |
 |---|---|---|
@@ -248,7 +248,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Gold Rush | `sand_gold` | Mining sand has a 3% chance to drop a gold nugget. |
 | Eye Taxi | `eye_taxi` | Your thrown eyes of ender no longer shatter. |
 | Flowers on the Way | `flowers_walk` | Flowers grow on grass blocks you walk over. |
-| Forge Master | `forge_master` | Replace the tools and weapons in your inventory with random tiers of the same type. |
+| Gear Upgrade | `forge_master` | Replace the tools and weapons in your inventory with random tiers of the same type. |
 | Whatever | `random_bingo` | Gives you a random bingo (completed ones included). |
 | Tribute to Love | `love_tribute` | Teleport to the nearest shipwreck. |
 | Nether Start | `ruined_portal` | Teleport to the nearest ruined portal. |
@@ -257,7 +257,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Portable Workbench | `portable_bench` | Gain "Portable Workbench": right-click to open a 3x3 crafting grid without placing a crafting table. |
 | Growth Spray | `bone_meal_spray` | Every 10 seconds, sprinkles bone meal on crops and plants within a 9 block radius, randomly growing up to 12 of them. |
 | Village Hero | `village_hero` | Gain Hero of the Village I permanently. |
-| Immunity Shield | `immunity_shield` | Every 60 seconds, become immune to the next skill-type hex from an opponent. |
 | Seed Pack | `seed_gift` | Gain 1-8 each of random wheat, carrot, potato, beetroot, melon, and pumpkin seeds. |
 | Archaeology Brush | `archaeology_brush` | Gain a brush that never loses durability. |
 | Jumping Tiger | `jump_tiger` | Gain Jump Boost II permanently. |
@@ -266,7 +265,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Fish God | `dolphin_dash` | Gain permanent Dolphin's Grace II while in water. |
 | Portable Furnace | `portable_furnace` | Gain 'Portable Furnace': right-click to open a furnace screen anywhere. Smelting continues after closing the screen. Its smelting speed is affected by Smelting Speed. |
 | Smelting Speed | `smelt_speed` | Nearby furnaces, blast furnaces and smokers smelt twice as fast. |
-| Meteor | `meteor` | Average all teams' positions and call down 5-10 amethyst meteors of varying size. Enemy players get Slowness III while the ground under them crumbles block by block like a real earthquake; you gain a map marking every impact point. |
+| Meteor | `meteor` | Call down 5-10 amethyst meteors of varying size around you (never more than 500 blocks away). Enemy players get Slowness III while the ground under them crumbles block by block like a real earthquake; you gain a map marking every impact point. |
 | Quality Upgrade | `offer_upgrade` | Your next hex selection is guaranteed to contain at least 1 prismatic hex. Only offered during the first hex selection. |
 | Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
 | Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
@@ -278,10 +277,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Journey to the Core | `journey_core` | Teleport to a cave at Y=-50. |
 | Ascetic | `ascetic` | Clear all of your team's completed cells and immediately gain 2 random prismatic hexes. Only appears in the third hex selection. |
 
-### Gold (43)
+### Gold (45)
 
 | Name | id | Effect |
 |---|---|---|
+| Immunity Shield | `immunity_shield` | Every 3 minutes, become immune to the next skill-type hex from an opponent. |
+| Forge Master | `inventor` | Tools, weapons and armor you craft in the future gain random enchantments. |
 | Random Teleport | `random_teleport` | Unlocks /bingo rtp: randomly teleport nearby with a 5s cooldown. |
 | Cutting Edge Inventor | `cutting_edge` | All skill-type hex cooldowns are reduced by 30%. |
 | I Want More | `want_more_items` | Gain 10 random items (same weighted pool as the Pet Master pet). |
@@ -326,7 +327,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
 | Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome; if none is nearby, create one 500 blocks away and mark it. |
 
-### Prismatic (36)
+### Prismatic (35)
 
 | Name | id | Effect |
 |---|---|---|
@@ -342,7 +343,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Glass Cannon Bag | `glass_cannon_bag` | The last 18 inventory slots are filled with barrier markers (items are moved out or dropped). Item drops are doubled. |
 | Back to Basics | `back_to_basics` | You cannot use a crafting table, but item drops are doubled (boosted by Looting) and you gain permanent Speed I. |
 | Archmage | `archmage` | After crafting, each material has a 10% chance to be refunded. |
-| Inventor | `inventor` | Tools, weapons and armor you craft in the future gain random enchantments. |
 | Pet Master | `pet_master` | Gain an invincible pet that gives you a random item from the full item pool every 8s (valuable items are rarer). |
 | Crown Me King | `crown_me_king` | A beacon marks an enemy position. Reach it to gain a prismatic hex, a randomly enchanted diamond armor set, an Efficiency IV diamond pickaxe and a Sharpness IV / Fire Aspect I diamond sword. |
 | Flip the Table! | `flip_table` | Reroll every task that no team has completed. |
@@ -382,7 +382,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.11 `
+.\build.ps1 -Version 26.2-1.43.12 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -405,6 +405,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.43.12 修复
+
+- **命名/分档**：彩色「尖端发明家」与金色「尖端发明家」重名——彩色版改名**锻造大师**并降为金色；原银色「锻造大师」改名**装备升级**。分档变为 52 银 / 45 金 / 35 彩（总数仍 132）。
+- **免疫护盾**：升为金色，抵挡后冷却从 60 秒改为 **3 分钟**。
+- **陨石**：落点改以**施放者为中心**（最远不超过 500 格），不再按全服玩家平均位置。
+- **ok回力镖**：飞行速度降低（1.5 → 1.0）。
+- **透视**：矿石高亮改为在矿石位置放置**不会开口的发光隐身潜影贝**（只显示发光轮廓），不再用漂浮的方块掉落物。
 
 ### 1.43.11 修复
 

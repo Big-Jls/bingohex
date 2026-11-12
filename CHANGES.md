@@ -1,5 +1,22 @@
 # Changelog
 
+## 26.2-1.43.12 — 2026-11-13
+
+### Changed
+
+- **Naming / tiers**: the prismatic `inventor` hex is renamed from a duplicate
+  "尖端发明家" to **锻造大师** and demoted to gold; the old silver
+  `forge_master` is renamed to **装备升级** to avoid the name clash. Hex counts
+  are now 52 silver / 45 gold / 35 prismatic (still 132 total).
+- **Immunity Shield** (`immunity_shield`): promoted from silver to gold and its
+  block cooldown raised from 60 seconds to 3 minutes.
+- **Meteor** (`meteor`): impact points are now centered on the caster (never
+  more than 500 blocks away) instead of the average position of all players.
+- **OK Boomerang** (`boomerang_biome`): flight speed reduced (1.5 -> 1.0
+  blocks/tick).
+- **X-Ray** (`xray`): ore highlights are now closed, invisible, glowing
+  shulkers at the ore positions instead of floating item drops.
+
 ## 26.2-1.43.11 — 2026-11-13
 
 ### Added

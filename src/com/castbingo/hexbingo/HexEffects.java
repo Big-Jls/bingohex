@@ -120,6 +120,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Phantom;
+import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
@@ -231,7 +232,7 @@ public final class HexEffects {
    private static final Map<DyeColor, Long> BP_JAM = new HashMap<>();
    private static final Map<UUID, Long> BP_JAM_PLAYER = new HashMap<>();
    private static final Map<UUID, Long> SHIELD_READY = new HashMap<>();
-   private static final long SHIELD_COOLDOWN_MS = 60000L;
+   private static final long SHIELD_COOLDOWN_MS = 180000L;
    private static final Map<UUID, HexEffects.BanishState> BANISHED = new HashMap<>();
    private static final Map<UUID, Long> BANISH_COOLDOWN = new HashMap<>();
    private static long DAY_NIGHT_UNTIL = 0L;
@@ -419,7 +420,7 @@ public final class HexEffects {
    // 透视
    private static final Map<UUID, Long> XRAY_UNTIL = new HashMap<>();
    private static final Map<UUID, Long> XRAY_COOLDOWN = new HashMap<>();
-   private static final Map<UUID, List<ItemEntity>> XRAY_MARKERS = new HashMap<>();
+   private static final Map<UUID, List<Shulker>> XRAY_MARKERS = new HashMap<>();
    private static final String XRAY_TAG = "hexbingo_xray_marker";
    // 任务护盾：队伍 -> 受保护的卡牌
    private static final Map<String, Set<Task>> TASK_SHIELDS = new HashMap<>();
@@ -5071,7 +5072,7 @@ public final class HexEffects {
             continue;
          }
 
-         var3.entity.setDeltaMovement(var3.direction.scale(1.5));
+         var3.entity.setDeltaMovement(var3.direction.scale(1.0));
          if (var4.level() instanceof ServerLevel var9) {
             var9.sendParticles(ParticleTypes.END_ROD, var3.entity.getX(), var3.entity.getY(), var3.entity.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
          }
@@ -9279,35 +9280,14 @@ public final class HexEffects {
       Items.HEART_OF_THE_SEA
    );
 
-   // 陨石：取所有在线玩家的平均坐标，生成 5-10 颗大小不一的紫水晶陨石
+   // 陨石：以施放玩家为中心生成 5-10 颗大小不一的紫水晶陨石
    private static void castMeteor(ServerPlayer var0, HexEffect var1) {
       MinecraftServer var2 = var0.level().getServer();
       if (var2 != null && var0.level() instanceof ServerLevel var3) {
          List<ServerPlayer> var4 = var2.getPlayerList().getPlayers();
-         double var5 = 0.0;
-         double var6 = 0.0;
-         double var7 = 0.0;
-         int var8 = 0;
-
-         for (ServerPlayer var9 : var4) {
-            if (!var9.isSpectator()) {
-               var5 += var9.getX();
-               var6 += var9.getY();
-               var7 += var9.getZ();
-               var8++;
-            }
-         }
-
-         if (var8 == 0) {
-            var5 = var0.getX();
-            var6 = var0.getY();
-            var7 = var0.getZ();
-            var8 = 1;
-         }
-
-         var5 /= var8;
-         var6 /= var8;
-         var7 /= var8;
+         // 以施放玩家的位置为中心（最远不超过 500 格），而不是全服平均位置
+         double var5 = var0.getX();
+         double var7 = var0.getZ();
          int var10 = Math.max(1, var1.min > 0 ? var1.min : 5);
          int var11 = Math.max(var10, var1.max > 0 ? var1.max : 10);
          ThreadLocalRandom var12 = ThreadLocalRandom.current();
@@ -10290,7 +10270,7 @@ public final class HexEffects {
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_end").withStyle(ChatFormatting.GRAY));
          } else if (var0.level() instanceof ServerLevel var4) {
             clearXrayMarkers(var0);
-            ArrayList<ItemEntity> var5 = new ArrayList<>();
+            ArrayList<Shulker> var5 = new ArrayList<>();
             BlockPos var6 = var0.blockPosition();
 
             for (int var7 = -16; var7 <= 16 && var5.size() < 96; var7++) {
@@ -10299,19 +10279,17 @@ public final class HexEffects {
                      BlockPos var10 = var6.offset(var7, var9, var8);
                      BlockState var11 = var4.getBlockState(var10);
                      if (isOreBlock(var11)) {
-                        Item var12 = var11.getBlock().asItem();
-                        if (var12 != Items.AIR) {
-                           ItemEntity var13 = new ItemEntity(
-                              var4, var10.getX() + 0.5, var10.getY() + 0.5, var10.getZ() + 0.5, new ItemStack(var12)
-                           );
-                           var13.setNoGravity(true);
-                           var13.setNeverPickUp();
-                           var13.setPickUpDelay(32767);
-                           var13.setInvulnerable(true);
-                           var13.setGlowingTag(true);
+                        // 不会开口的发光隐身潜影贝：矿石位置只显示发光轮廓，不再用漂浮掉落物
+                        Shulker var13 = (Shulker)EntityTypes.SHULKER.create(var4, EntitySpawnReason.MOB_SUMMONED);
+                        if (var13 != null) {
+                           var13.setPos(var10.getX() + 0.5, var10.getY() + 0.5, var10.getZ() + 0.5);
+                           var13.setNoAi(true);
                            var13.setSilent(true);
+                           var13.setInvulnerable(true);
+                           var13.setInvisible(true);
+                           var13.setGlowingTag(true);
+                           var13.noPhysics = true;
                            var13.setCustomNameVisible(false);
-                           var13.setDeltaMovement(Vec3.ZERO);
                            var13.addTag(XRAY_TAG);
                            var4.addFreshEntity(var13);
                            var5.add(var13);
@@ -10332,9 +10310,9 @@ public final class HexEffects {
    }
 
    private static void clearXrayMarkers(ServerPlayer var0) {
-      List<ItemEntity> var1 = XRAY_MARKERS.remove(var0.getUUID());
+      List<Shulker> var1 = XRAY_MARKERS.remove(var0.getUUID());
       if (var1 != null) {
-         for (ItemEntity var3 : var1) {
+         for (Shulker var3 : var1) {
             var3.discard();
          }
       }
