@@ -175,6 +175,7 @@ import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -8223,6 +8224,37 @@ public final class HexEffects {
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.dragon_egg").withStyle(ChatFormatting.GOLD));
    }
 
+   /** 生成一只幼龙幻翼；返回 null 表示创建失败。 */
+   private static Phantom spawnBabyDragon(ServerLevel var0, Vec3 var1) {
+      Phantom var2 = (Phantom)EntityTypes.PHANTOM.create(var0, EntitySpawnReason.MOB_SUMMONED);
+      if (var2 == null) {
+         return null;
+      }
+
+      var2.setPos(var1.x, var1.y, var1.z);
+      var2.setPhantomSize(0);
+      // 开启幻翼 AI 以获得原版的飞行、转向和俯仰控制；同时清空全部 AI 目标，禁止它攻击玩家
+      var2.setNoAi(false);
+      var2.getGoalSelector().removeAllGoals(goal -> true);
+      stripPhantomTargetGoals(var2);
+      var2.setSilent(true);
+      var2.setInvulnerable(true);
+      var2.setPersistenceRequired();
+      var2.setNoGravity(true);
+      var2.noPhysics = true;
+      var2.setCustomName(Component.literal("幼龙"));
+      var2.setCustomNameVisible(true);
+      // 幻翼支持缩放；末影龙会被原版强制保持 1.0 大小
+      AttributeInstance var3 = var2.getAttribute(Attributes.SCALE);
+      if (var3 != null) {
+         var3.setBaseValue(0.5);
+      }
+
+      setPhantomMoveTarget(var2, var1);
+      var0.addFreshEntity(var2);
+      return var2;
+   }
+
    public static boolean hatchDragon(ServerPlayer var0, ServerLevel var2, BlockPos var1) {
       if (!hasHex(var0, "dragon_rider")) {
          return false;
@@ -8233,32 +8265,12 @@ public final class HexEffects {
          return false;
       }
 
-      Phantom var3 = (Phantom)EntityTypes.PHANTOM.create(var2, EntitySpawnReason.MOB_SUMMONED);
+      Phantom var3 = spawnBabyDragon(var2, new Vec3(var1.getX() + 0.5, var1.getY() + 1.0, var1.getZ() + 0.5));
       if (var3 == null) {
          return false;
       }
 
-      var3.setPos(var1.getX() + 0.5, var1.getY() + 1.0, var1.getZ() + 0.5);
-      var3.setPhantomSize(0);
-      // 开启幻翼 AI 以获得原版的飞行、转向和俯仰控制；同时清空全部 AI 目标，禁止它攻击玩家
-      var3.setNoAi(false);
-      var3.getGoalSelector().removeAllGoals(goal -> true);
-      stripPhantomTargetGoals(var3);
-      var3.setSilent(true);
-      var3.setInvulnerable(true);
-      var3.setPersistenceRequired();
-      var3.setNoGravity(true);
-      var3.noPhysics = true;
-      var3.setCustomName(Component.literal("幼龙"));
-      var3.setCustomNameVisible(true);
-      // 幻翼支持缩放；末影龙会被原版强制保持 1.0 大小
-      AttributeInstance var4 = var3.getAttribute(Attributes.SCALE);
-      if (var4 != null) {
-         var4.setBaseValue(0.5);
-      }
-
       setPhantomMoveTarget(var3, new Vec3(var1.getX() + 0.5, var1.getY() + 1.5, var1.getZ() + 0.5));
-      var2.addFreshEntity(var3);
       var2.removeBlock(var1, false);
       DRAGON_PETS.put(var0.getUUID(), var3);
       DRAGON_ANGLES.put(var0.getUUID(), 0.0);
@@ -8281,89 +8293,84 @@ public final class HexEffects {
       return true;
    }
 
+   /** 每 tick 从服务端驱动幼龙跟随主人；跨维度、远距离传送与区块卸载都能恢复跟随。 */
    public static void tickDragons(MinecraftServer var0) {
-      if (!DRAGON_PETS.isEmpty()) {
-         Iterator<Map.Entry<UUID, Phantom>> var1 = DRAGON_PETS.entrySet().iterator();
-
-         while (var1.hasNext()) {
-            Map.Entry<UUID, Phantom> var2 = var1.next();
-            Phantom var3 = var2.getValue();
-            if (var3 == null || !var3.isAlive() || var3.isRemoved()) {
-               var1.remove();
-               DRAGON_ANGLES.remove(var2.getKey());
-               DRAGON_SOUND_TIMER.remove(var2.getKey());
-            }
-         }
+      if (DRAGON_PETS.isEmpty()) {
+         return;
       }
-   }
 
-   /** 在幼龙自己的 tick 结束后移动它，确保位置能正常同步给客户端。 */
-   public static void tickDragonPet(Entity var0) {
-      if (var0 instanceof Phantom var1 && !var1.level().isClientSide()) {
-         MinecraftServer var2 = var1.level().getServer();
-         if (var2 == null) {
-            return;
+      Iterator<Map.Entry<UUID, Phantom>> var1 = DRAGON_PETS.entrySet().iterator();
+
+      while (var1.hasNext()) {
+         Map.Entry<UUID, Phantom> var2 = var1.next();
+         Phantom var3 = var2.getValue();
+         ServerPlayer var4 = var0.getPlayerList().getPlayer(var2.getKey());
+         if (var4 == null) {
+            // 主人不在线：原地待命
+            if (var3 != null && !var3.isRemoved()) {
+               var3.setTarget(null);
+               setPhantomMoveTarget(var3, var3.position());
+            }
+
+            continue;
          }
 
-         UUID var3 = null;
+         ServerLevel var5 = (ServerLevel)var4.level();
+         if (var3 == null || !var3.isAlive() || var3.isRemoved()) {
+            // 幼龙因区块卸载等原因被移除：在主人身边重新生成，保证持续跟随
+            Phantom var6 = spawnBabyDragon(var5, new Vec3(var4.getX(), var4.getY() + 1.5, var4.getZ()));
+            if (var6 == null) {
+               continue;
+            }
 
-         for (Map.Entry<UUID, Phantom> var5 : DRAGON_PETS.entrySet()) {
-            if (var5.getValue() == var1) {
-               var3 = var5.getKey();
-               break;
+            var2.setValue(var6);
+            var3 = var6;
+         } else if (var3.level() != var5) {
+            // 26.2 的跨维度传送会创建新实体实例（NBT 往返），旧实例会被移除，必须换掉地图里的引用
+            Entity var6 = var3.teleport(new TeleportTransition(var5, new Vec3(var4.getX(), var4.getY() + 1.5, var4.getZ()), Vec3.ZERO, var3.getYRot(), var3.getXRot(), Set.of(), TeleportTransition.DO_NOTHING));
+            if (var6 instanceof Phantom var7) {
+               var7.noPhysics = true;
+               var2.setValue(var7);
+               var3 = var7;
+            } else {
+               continue;
             }
          }
 
-         if (var3 == null) {
-            // 服务器重启后旧幼龙不再受本模组控制：关掉 AI，避免它恢复成敌对幻翼攻击玩家
-            if (var1.getCustomName() != null && "幼龙".equals(var1.getCustomName().getString())) {
-               var1.setTarget(null);
-               var1.setNoAi(true);
-               var1.getGoalSelector().removeAllGoals(goal -> true);
-               stripPhantomTargetGoals(var1);
-            }
+         var3.setRemainingFireTicks(0);
+         var3.setTarget(null);
 
-            return;
+         double var7 = DRAGON_ANGLES.getOrDefault(var2.getKey(), 0.0) + 0.07;
+         DRAGON_ANGLES.put(var2.getKey(), var7);
+         double var9 = var4.getX() + Math.cos(var7) * 4.0;
+         double var11 = var4.getZ() + Math.sin(var7) * 4.0;
+         double var13 = var4.getY() + 1.6 + Math.sin(var7 * 2.0) * 0.35;
+         if (var3.distanceToSqr(var4) > 1024.0) {
+            var3.teleportTo(var5, var9, var13, var11, Set.of(), var3.getYRot(), var3.getXRot(), false);
          }
 
-         ServerPlayer var4 = var2.getPlayerList().getPlayer(var3);
-         if (var4 != null) {
-            ServerLevel var6 = (ServerLevel)var4.level();
-            var1.setRemainingFireTicks(0);
-            var1.setTarget(null);
-            if (var1.level() != var6) {
-               var1.teleportTo(var6, var4.getX(), var4.getY() + 1.5, var4.getZ(), Set.of(), var1.getYRot(), var1.getXRot(), false);
-            }
+         // 只更新目标点，位置和朝向交给幻翼自己的 AI 平滑推进
+         setPhantomMoveTarget(var3, new Vec3(var9, var13, var11));
 
-            double var7 = DRAGON_ANGLES.getOrDefault(var3, 0.0) + 0.07;
-            DRAGON_ANGLES.put(var3, var7);
-            double var9 = var4.getX() + Math.cos(var7) * 4.0;
-            double var11 = var4.getZ() + Math.sin(var7) * 4.0;
-            double var13 = var4.getY() + 1.6 + Math.sin(var7 * 2.0) * 0.35;
-            if (var1.distanceToSqr(var4) > 1024.0) {
-               var1.teleportTo(var6, var9, var13, var11, Set.of(), var1.getYRot(), var1.getXRot(), false);
-            }
+         int var16 = DRAGON_SOUND_TIMER.getOrDefault(var2.getKey(), 40);
+         if (--var16 <= 0) {
+            var5.playSound(null, var3.getX(), var3.getY(), var3.getZ(), BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
+            var16 = 80 + ThreadLocalRandom.current().nextInt(80);
+         }
 
-            // 只更新目标点，位置和朝向交给幻翼自己的 AI 平滑推进
-            setPhantomMoveTarget(var1, new Vec3(var9, var13, var11));
+         DRAGON_SOUND_TIMER.put(var2.getKey(), var16);
 
-            int var16 = DRAGON_SOUND_TIMER.getOrDefault(var3, 40);
-            if (--var16 <= 0) {
-               var6.playSound(null, var1.getX(), var1.getY(), var1.getZ(), BABY_DRAGON_SOUND, SoundSource.NEUTRAL, 0.35F, 0.9F + ThreadLocalRandom.current().nextFloat() * 0.2F);
-               var16 = 80 + ThreadLocalRandom.current().nextInt(80);
-            }
-
-            DRAGON_SOUND_TIMER.put(var3, var16);
-
+         // 破坏方块与击退非玩家生物只在幼龙所在区块已加载时执行，避免强制加载区块
+         if (var5.hasChunkAt(var3.getBlockX(), var3.getBlockZ())) {
             if ((var4.tickCount & 1) == 0) {
                int var17 = 0;
 
                for (BlockPos var19 : BlockPos.betweenClosed(
-                  Mth.floor(var1.getX()) - 1, Mth.floor(var1.getY()) - 1, Mth.floor(var1.getZ()) - 1, Mth.floor(var1.getX()) + 1, Mth.floor(var1.getY()) + 1, Mth.floor(var1.getZ()) + 1
+                  Mth.floor(var3.getX()) - 1, Mth.floor(var3.getY()) - 1, Mth.floor(var3.getZ()) - 1, Mth.floor(var3.getX()) + 1, Mth.floor(var3.getY()) + 1, Mth.floor(var3.getZ()) + 1
                )) {
-                  BlockState var20 = var6.getBlockState(var19);
-                  if (!var20.isAir() && var20.getDestroySpeed(var6, var19) >= 0.0F) {
-                     var6.destroyBlock(var19.immutable(), true, var4);
+                  BlockState var20 = var5.getBlockState(var19);
+                  if (!var20.isAir() && var20.getDestroySpeed(var5, var19) >= 0.0F) {
+                     var5.destroyBlock(var19.immutable(), true, var4);
                      if (++var17 >= 6) {
                         break;
                      }
@@ -8371,19 +8378,40 @@ public final class HexEffects {
                }
             }
 
-            AABB var23 = new AABB(var1.getX() - 2.0, var1.getY() - 1.5, var1.getZ() - 2.0, var1.getX() + 2.0, var1.getY() + 1.5, var1.getZ() + 2.0);
+            AABB var23 = new AABB(var3.getX() - 2.0, var3.getY() - 1.5, var3.getZ() - 2.0, var3.getX() + 2.0, var3.getY() + 1.5, var3.getZ() + 2.0);
 
-            for (LivingEntity var24 : var6.getEntitiesOfClass(
+            for (LivingEntity var24 : var5.getEntitiesOfClass(
                LivingEntity.class, var23, var21 -> var21.isAlive() && !(var21 instanceof Player) && !(var21 instanceof Phantom)
             )) {
-               DamageSource var25 = var6.damageSources().mobAttack(var1);
-               var24.hurtServer(var6, var25, 4.0F);
-               var24.knockback(0.8, var1.getX() - var24.getX(), var1.getZ() - var24.getZ(), var25, 4.0F);
+               DamageSource var25 = var5.damageSources().mobAttack(var3);
+               var24.hurtServer(var5, var25, 4.0F);
+               var24.knockback(0.8, var3.getX() - var24.getX(), var3.getZ() - var24.getZ(), var25, 4.0F);
             }
-         } else {
-            setPhantomMoveTarget(var1, var1.position());
-            var1.setTarget(null);
          }
+      }
+   }
+
+   /** 服务器重启后旧幼龙不再受本模组控制：关掉 AI，避免它恢复成敌对幻翼攻击玩家。 */
+   public static void tickDragonPet(Entity var0) {
+      if (var0 instanceof Phantom var1 && !var1.level().isClientSide()) {
+         if (!DRAGON_PETS.containsValue(var1) && var1.getCustomName() != null && "幼龙".equals(var1.getCustomName().getString())) {
+            var1.setTarget(null);
+            var1.setNoAi(true);
+            var1.getGoalSelector().removeAllGoals(goal -> true);
+            stripPhantomTargetGoals(var1);
+         }
+      }
+   }
+
+   /** 幼龙是否属于本模组的宠物（跨维度传送瞬间的新实例也计入）。 */
+   public static boolean isDragonPet(Phantom var0) {
+      return DRAGON_PETS.containsValue(var0) || var0.getCustomName() != null && "幼龙".equals(var0.getCustomName().getString());
+   }
+
+   /** 幼龙完全无敌：取消一切来源的伤害（含创造模式攻击、虚空等穿透性伤害）。 */
+   public static void dragonPetDamage(LivingIncomingDamageEvent var0) {
+      if (var0.getEntity() instanceof Phantom var1 && isDragonPet(var1)) {
+         var0.setCanceled(true);
       }
    }
 

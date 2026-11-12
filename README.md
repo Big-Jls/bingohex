@@ -13,6 +13,11 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.43.6 修复
+
+- **驯龙高手**：幼龙跟随改为服务端每 tick 驱动。跨维度、远距离传送或所在区块卸载后都会恢复跟随并继续环绕飞行（26.2 跨维度传送会重建实体实例，旧引用失效的问题已修复；幼龙因区块卸载丢失时会在主人身边重新生成）。
+- 幼龙现在完全无敌：取消一切来源的伤害，包括创造模式玩家的攻击、虚空等穿透性伤害。
+
 ### 1.43.5 修复
 
 - **技能物品防存放**：目标封锁、致盲、蝙蝠形态、精神控制、矿物透视、镜像复制、空白格现在和 ok回力镖 一样，无法丢弃，也无法放入箱子、熔炉、背包等其它容器；放入后会被自动收回。
@@ -233,8 +238,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.6.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.5.jar` 放入客户端与服务端的 `mods`。
+2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
+3. 把 `HexBingo-26.2-1.43.6.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -364,7 +369,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
-| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，且不会攻击任何玩家。 |
+| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，跨维度、远距离传送与区块卸载后都会回到你身边继续环绕；经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，不会攻击任何玩家，且完全无敌（任何伤害都会被取消，包括创造模式攻击）。 |
 | 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图；附近没有时在 500 格外改造一片红树林并标记。 |
 
 ### 彩色（36）
@@ -571,11 +576,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.5 `
+.\build.ps1 -Version 26.2-1.43.6 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.6.jar"
+  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.8.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。

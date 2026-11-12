@@ -82,6 +82,11 @@ public class HexEvents {
       HexEffects.incomingDamage(var1);
    }
 
+   @SubscribeEvent(priority = EventPriority.HIGHEST)
+   public void dragonPetDamage(LivingIncomingDamageEvent var1) {
+      HexEffects.dragonPetDamage(var1);
+   }
+
    @SubscribeEvent
    public void damagePre(Pre var1) {
       HexEffects.damageDealt(var1);

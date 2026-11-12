@@ -1,5 +1,19 @@
 # Changelog
 
+## 26.2-1.43.6 — 2026-11-12
+
+### Fixed
+
+- **Dragon Tamer** (`dragon_rider`): the baby dragon's follow logic now runs
+  from the server tick instead of the pet's own entity tick. It recovers from
+  cross-dimension travel (26.2 rebuilds the entity instance on dimension
+  change, which invalidated the old pet reference), long-range teleports and
+  chunk unloads — if the tracked pet is removed, a fresh one is spawned next
+  to the owner, and the orbit resumes.
+- The baby dragon is now fully invincible: all incoming damage is cancelled,
+  including creative-mode player attacks and void damage, which bypass the
+  vanilla `Invulnerable` flag.
+
 ## 26.2-1.43.5 — 2026-11-12
 
 ### Fixed
