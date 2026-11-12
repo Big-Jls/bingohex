@@ -13,6 +13,16 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.43.9 修复
+
+- **`/bingo tp` 拦截**：按 ReBongo 实际的 `EntitySelector` 参数类型解析目标，选择器方式传送到被放逐玩家也能可靠拦截。
+- **星际航行**：玩家在地狱时不刷出该海克斯（y=256 落点在地狱无意义）。
+- **恶魔契约**：扣生命上限至少保留 2 点，与蝙蝠形态等效果叠加不会再扣成负值直接死亡。
+- **玻璃大炮**：锁定槽标记不再被间谍交换、共同富裕洗走。
+- **静水监狱**：被锁定的玩家不再收到自选/全选海克斯列表。
+- **驯龙高手**：幼龙击杀生物的掉落物直接给主人。
+- **超强大脑**：描述补充"期间新放进主物品栏的物品会被清除"。
+
 ### 1.43.8 修复
 
 - **间谍**：交换后放不下的溢出物品掉落到双方当前脚下，而不是交换前的位置（跨维度交换也正确）。
@@ -260,7 +270,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.8.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.9.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -356,7 +366,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
 | 小蜜蜂 | `bees` | 在其他所有队伍附近召唤 10 只愤怒的蜜蜂。蜜蜂可以无视无敌蜇伤玩家。 |
 | 饕餮盛宴 | `gluttonous_feast` | 永久获得饥饿 II；每次吃下食物，随机获得一个等级 II 的增益，持续 15 秒。 |
-| 超强大脑 | `big_brain` | 你的所有物品变成随机物品持续 5 秒，之后恢复原背包。 |
+| 超强大脑 | `big_brain` | 你的所有物品变成随机物品持续 5 秒，之后恢复原背包。注意：期间新放进主物品栏的物品会被清除。 |
 | 掀桌子？ | `flip_table_one` | 重新随机一个尚未被任何队伍完成的任务。 |
 | 灵魂炸弹 | `soul_bomb` | 获得 3 个灵魂沙、2 个凋零骷髅头和 1 个打火石。 |
 | 条条大路通罗马 | `village_road` | 将你传送到最近的村庄。 |
@@ -597,7 +607,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.8 `
+.\build.ps1 -Version 26.2-1.43.9 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `

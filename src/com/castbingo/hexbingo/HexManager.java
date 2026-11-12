@@ -106,13 +106,16 @@ public final class HexManager {
 
                MinecraftServer var20 = var3.getServer();
                if (var20 != null) {
-                  // /bingo tp <target>：直接检查解析后的目标玩家
+                  // /bingo tp <target>：ReBongo 的参数是 EntitySelector（不是 EntityArgument），
+                  // 直接按解析结果取目标玩家，避免用 EntityArgument.getPlayer 取错类型而静默漏拦
                   if (isBingoTp(var2)) {
                      try {
-                        ServerPlayer var21 = net.minecraft.commands.arguments.EntityArgument.getPlayer(
-                           var0.getParseResults().getContext().build(var0.getParseResults().getReader().getString()), "target"
-                        );
-                        if (HexEffects.isEndExiled(var21)) {
+                        net.minecraft.commands.arguments.selector.EntitySelector var21 = var0.getParseResults()
+                           .getContext()
+                           .build(var0.getParseResults().getReader().getString())
+                           .getArgument("target", net.minecraft.commands.arguments.selector.EntitySelector.class);
+                        ServerPlayer var22 = var21.findSinglePlayer(var3);
+                        if (HexEffects.isEndExiled(var22)) {
                            var3.sendFailure(Component.translatable("hexbingo.msg.end_exile_no_tp"));
                            var0.setCanceled(true);
                            return;
@@ -400,6 +403,18 @@ public final class HexManager {
       }
    }
 
+   /** 星际航行固定传送到 y=256，在地狱没有意义：玩家在地狱时不刷出该海克斯。 */
+   private static List<Hex> rollOfferFor(ServerPlayer var0, HexGameData var1, int var2, Collection<String> var3) {
+      List<Hex> var4 = rollOffer(var1, var0.getUUID(), var2, var3);
+      if (var0.level().dimension() == net.minecraft.world.level.Level.NETHER) {
+         for (int var5 = 0; var5 < 8 && var4.stream().anyMatch(var6 -> var6.id().equals("star_voyage")); var5++) {
+            var4 = rollOffer(var1, var0.getUUID(), var2, var3);
+         }
+      }
+
+      return var4;
+   }
+
    private static void presentNext(ServerPlayer var0, HexGameData var1) {
       UUID var2 = var0.getUUID();
       if (!var1.isHexLocked(var2) && var1.offer(var2) == null) {
@@ -408,7 +423,7 @@ public final class HexManager {
          while (!var3.isEmpty()) {
             int var4 = (Integer)var3.remove(0);
             int var5 = var1.qualityUp(var2);
-            List<Hex> var6 = rollOffer(var1, var2, var4, var1.hexes(var2));
+            List<Hex> var6 = rollOfferFor(var0, var1, var4, var1.hexes(var2));
             if (var6.size() >= 3) {
                if (var5 > 0) {
                   var1.clearQualityUp(var2);
@@ -473,7 +488,7 @@ public final class HexManager {
 
             ArrayList<String> var5 = new ArrayList<>(var2.hexes(var3));
             var5.addAll(var4.ids());
-            List<Hex> var6 = rollOffer(var2, var3, var4.rewardIndex(), var5);
+            List<Hex> var6 = rollOfferFor(var0, var2, var4.rewardIndex(), var5);
             if (var6.size() < 3) {
                var0.sendSystemMessage(Component.translatable("hexbingo.msg.refresh_fail").withStyle(ChatFormatting.GRAY));
                return;
@@ -564,6 +579,11 @@ public final class HexManager {
          return 0;
       }
 
+      if (var2.isHexLocked(var0.getUUID())) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.hex_locked").withStyle(ChatFormatting.DARK_GRAY));
+         return 0;
+      }
+
       ArrayList var3 = new ArrayList();
 
       for (Hex var5 : HexRegistry.all()) {
@@ -592,6 +612,10 @@ public final class HexManager {
       int var3 = 0;
 
       for (ServerPlayer var5 : var0.getPlayerList().getPlayers()) {
+         if (var1.isHexLocked(var5.getUUID())) {
+            continue;
+         }
+
          ArrayList<String> var6 = new ArrayList<>();
 
          for (Hex var8 : var2) {

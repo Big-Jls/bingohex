@@ -258,7 +258,7 @@
     "hexbingo.hex.task_copy.name":  "CV工程师",
     "hexbingo.hex.task_copy.desc":  "随机复制一个对手已完成而你队未完成的任务；Lockout 模式下改为直接抢占该格。",
     "hexbingo.hex.big_brain.name":  "超强大脑",
-    "hexbingo.hex.big_brain.desc":  "你的所有物品变成随机物品持续 5 秒，之后恢复原背包。",
+    "hexbingo.hex.big_brain.desc":  "你的所有物品变成随机物品持续 5 秒，之后恢复原背包。注意：期间新放进主物品栏的物品会被清除。",
     "hexbingo.hex.inventor.name":  "尖端发明家",
     "hexbingo.hex.inventor.desc":  "获得时附魔当前背包里的工具、武器和盔甲；以后制作的同类物品也会获得随机附魔。",
     "hexbingo.hex.pet_master.name":  "仆从大师",

@@ -3733,7 +3733,8 @@ public final class HexEffects {
          for (ServerPlayer var5 : var2) {
             for (int var6 = 0; var6 < 36; var6++) {
                ItemStack var7 = var5.getInventory().getItem(var6);
-               if (!var7.isEmpty() && !isBoundItem(var7)) {
+               // 玻璃大炮的锁定槽标记留在原位，不被共同富裕洗走
+               if (!var7.isEmpty() && !isBoundItem(var7) && !isLockMarker(var7)) {
                   var9.add(var7.copy());
                   var5.getInventory().setItem(var6, ItemStack.EMPTY);
                }
@@ -6173,11 +6174,12 @@ public final class HexEffects {
       for (int var12 = 0; var12 < var8.size() && var12 < var9.size(); var12++) {
          ItemStack var13 = (ItemStack)var8.get(var12);
          ItemStack var14 = (ItemStack)var9.get(var12);
-         if (isBoundItem(var13)) {
+         // 绑定物品与玻璃大炮锁定槽标记留在原主人原位，不参与交换
+         if (isBoundItem(var13) || isLockMarker(var13)) {
             var10.set(var12, var13);
          }
 
-         if (isBoundItem(var14)) {
+         if (isBoundItem(var14) || isLockMarker(var14)) {
             var11.set(var12, var14);
          }
       }
@@ -6189,7 +6191,7 @@ public final class HexEffects {
       for (int var15 = 0; var15 < var33; var15++) {
          ItemStack var16 = (ItemStack)var8.get(var15);
          ItemStack var17 = (ItemStack)var9.get(var15);
-         if (!var16.isEmpty() && !isBoundItem(var16)) {
+         if (!var16.isEmpty() && !isBoundItem(var16) && !isLockMarker(var16)) {
             if (((ItemStack)var11.get(var15)).isEmpty()) {
                var11.set(var15, var16);
             } else {
@@ -6197,7 +6199,7 @@ public final class HexEffects {
             }
          }
 
-         if (!var17.isEmpty() && !isBoundItem(var17)) {
+         if (!var17.isEmpty() && !isBoundItem(var17) && !isLockMarker(var17)) {
             if (((ItemStack)var10.get(var15)).isEmpty()) {
                var10.set(var15, var17);
             } else {
@@ -7086,6 +7088,28 @@ public final class HexEffects {
    }
 
    public static void livingDrops(LivingDropsEvent var0) {
+      // 驯龙高手：幼龙击杀的生物，掉落物直接调回给主人
+      if (var0.getSource().getEntity() instanceof Phantom var9 && isDragonPet(var9) && var0.getEntity().level() instanceof ServerLevel var10) {
+         ServerPlayer var11 = null;
+
+         for (Map.Entry<UUID, Phantom> var12 : DRAGON_PETS.entrySet()) {
+            if (var12.getValue() == var9) {
+               var11 = var10.getServer() == null ? null : var10.getServer().getPlayerList().getPlayer(var12.getKey());
+               break;
+            }
+         }
+
+         if (var11 != null) {
+            for (ItemEntity var13 : new ArrayList<>(var0.getDrops())) {
+               if (!var11.getInventory().add(var13.getItem())) {
+                  var11.drop(var13.getItem(), false);
+               }
+            }
+
+            var0.getDrops().clear();
+         }
+      }
+
       ServerPlayer var20 = killCredit(var0);
 
       if (var20 != null && var0.getEntity().level() instanceof ServerLevel var21 && LOUIS_PENDING.contains(var20.getUUID()) && hasHex(var20, "louis_xvi")) {
@@ -8810,7 +8834,24 @@ public final class HexEffects {
    }
 
    private static void applyDemonPactAttribute(ServerPlayer var0, String var1, int var2) {
-      applyNegativeAttribute(var0, var1, var2, Attributes.MAX_HEALTH, -10.0, Operation.ADD_VALUE);
+      AttributeInstance var3 = var0.getAttribute(Attributes.MAX_HEALTH);
+      if (var3 != null) {
+         Identifier var4 = modifierId(var1, var2);
+         double var5 = 0.0;
+
+         for (AttributeModifier var6 : var3.getModifiers()) {
+            if (var6.id().equals(var4)) {
+               var5 = var6.amount();
+               break;
+            }
+         }
+
+         // 现有总值去掉本修饰符 = 不含恶魔契约的上限；扣减后至少保留 2 点，
+         // 避免与蝙蝠形态等减上限效果叠加成负值导致直接死亡
+         double var7 = var3.getValue() - var5;
+         double var8 = Math.max(0.0, Math.min(10.0, var7 - 2.0));
+         var3.addOrUpdateTransientModifier(new AttributeModifier(var4, -var8, Operation.ADD_VALUE));
+      }
    }
 
    private static void giveDemonPactArmor(ServerPlayer var0) {

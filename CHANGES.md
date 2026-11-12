@@ -1,5 +1,31 @@
 # Changelog
 
+## 26.2-1.43.9 — 2026-11-12
+
+### Fixed
+
+- **`/bingo tp` interception**: the target player of ReBongo's `/bingo tp` is an
+  `EntitySelector`, not an `EntityArgument`; the exiled-target check now reads
+  the argument with the correct type, so teleporting to an exiled player via
+  selector is blocked reliably.
+- **Star Voyage** (`star_voyage`): while the player is in the Nether the offer
+  no longer rolls Star Voyage (its fixed y=256 landing point is meaningless
+  below the Nether ceiling).
+- **Demon Pact** (`demon_pact`): the max-health reduction now always leaves at
+  least 2 health points, so stacking it with Bat Form or other max-health
+  reductions can no longer drive max health negative and instantly kill the
+  player.
+- **Glass Cannon** (`glass_cannon_bag`): locked-slot markers are no longer
+  moved by Spy (`spy`) inventory swaps or Common Wealth (`common_wealth`)
+  redistribution; the barriers stay in their owner's locked slots.
+- **Still Water** (`still_water`): locked players no longer receive the
+  `/bingo hex` self-pick list or the free-pick list at all (previously the list
+  was sent and only the final pick was rejected).
+- **Dragon Tamer** (`dragon_rider`): drops from mobs killed by the baby dragon
+  are given directly to its owner instead of falling where the mob died.
+- **Big Brain** (`big_brain`): the description now mentions that items newly
+  placed in the main inventory during the transform are cleared.
+
 ## 26.2-1.43.8 — 2026-11-12
 
 ### Fixed

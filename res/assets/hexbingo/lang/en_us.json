@@ -258,7 +258,7 @@
     "hexbingo.hex.task_copy.name":  "CV Engineer",
     "hexbingo.hex.task_copy.desc":  "Randomly copies a task an opponent has completed but your team has not; in Lockout mode, directly claims that slot instead.",
     "hexbingo.hex.big_brain.name":  "Big Brain",
-    "hexbingo.hex.big_brain.desc":  "All your inventory items become random items for 5s, then are restored.",
+    "hexbingo.hex.big_brain.desc":  "All your inventory items become random items for 5s, then are restored. Note: items newly placed in your main inventory during this time are cleared.",
     "hexbingo.hex.inventor.name":  "Inventor",
     "hexbingo.hex.inventor.desc":  "Tools, weapons and armor you craft in the future gain random enchantments.",
     "hexbingo.hex.pet_master.name":  "Pet Master",
