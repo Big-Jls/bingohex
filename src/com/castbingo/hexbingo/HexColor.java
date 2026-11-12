@@ -25,6 +25,8 @@ public enum HexColor {
          }
       }
 
+      // 未知颜色不再静默当银色：记录告警，便于发现 hexes.json 里的拼写错误
+      HexBingo.LOGGER.warn("Unknown hex color: '{}', falling back to SILVER", var0);
       return SILVER;
    }
 }

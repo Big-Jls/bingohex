@@ -1,5 +1,23 @@
 # Changelog
 
+## 26.2-1.43.10 — 2026-11-12
+
+### Fixed
+
+- **Offer queue** (`presentNext`): when a reward tier cannot roll 3 hexes
+  (player owns almost everything), the tier is now put back into the queue
+  instead of being silently consumed, so the reward is no longer lost.
+- **HexColor**: unknown color ids now log a warning instead of silently
+  falling back to silver, making `hexes.json` typos visible in the log.
+- **Star Voyage** (`star_voyage`): the platform is now placed 256 blocks above
+  the player's current height (clamped to the world build limit) instead of
+  the absolute y=256, so it no longer buries the platform inside tall
+  mountains. Completion/failure now compares against the pre-teleport height.
+- **Spider Man** (`spider_man`): wall detection now uses the player's own
+  collision (`horizontalCollision`) like vanilla spiders, so any wall the body
+  touches can be climbed (fences, panes, stairs and non-full blocks included)
+  instead of only full-collision blocks 1-2 above the feet.
+
 ## 26.2-1.43.9 — 2026-11-12
 
 ### Fixed

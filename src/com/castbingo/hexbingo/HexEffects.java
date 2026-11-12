@@ -334,6 +334,7 @@ public final class HexEffects {
    private static int[] PET_ITEM_WEIGHTS;
    private static int PET_ITEM_TOTAL_WEIGHT;
    private static final Map<UUID, Integer> VOYAGE_LOCK_MASK = new HashMap<>();
+   private static final Map<UUID, Double> VOYAGE_START_Y = new HashMap<>();
    private static final Set<UUID> NETHER_SENT = new HashSet<>();
    private static final Set<UUID> NETHER_ESCAPED = new HashSet<>();
    private static final TagKey<Structure> ANCIENT_CITY = TagKey.create(
@@ -1249,6 +1250,7 @@ public final class HexEffects {
       KILL_STACKS.remove(var0.getUUID());
       BEACONS.remove(var0.getUUID());
       VOYAGE_LOCK_MASK.remove(var0.getUUID());
+      VOYAGE_START_Y.remove(var0.getUUID());
       GOLD_RUSH.remove(var0.getUUID());
 
       for (Holder var4 : ALL_ATTRIBUTES) {
@@ -4413,19 +4415,22 @@ public final class HexEffects {
       if (var0.level() instanceof ServerLevel var1) {
          double var9 = var0.getX();
          double var4 = var0.getZ();
-         var0.teleportTo(var1, var9, 256.0, var4, Set.of(), var0.getYRot(), var0.getXRot(), false);
-         BlockPos var6 = BlockPos.containing(var9, 255.0, var4);
+         // 以玩家当前高度为基准向上 256 格；不超出世界最高建筑高度
+         double var8 = Math.min(var0.getY() + 256.0, var1.getMaxY() - 4.0);
+         var0.teleportTo(var1, var9, var8, var4, Set.of(), var0.getYRot(), var0.getXRot(), false);
+         BlockPos var6 = BlockPos.containing(var9, var8 - 1.0, var4);
 
          for (int var7 = -1; var7 <= 1; var7++) {
-            for (int var8 = -1; var8 <= 1; var8++) {
-               var1.setBlockAndUpdate(var6.offset(var7, 0, var8), Blocks.STONE.defaultBlockState());
-               var1.setBlockAndUpdate(var6.offset(var7, 1, var8), Blocks.AIR.defaultBlockState());
-               var1.setBlockAndUpdate(var6.offset(var7, 2, var8), Blocks.AIR.defaultBlockState());
+            for (int var8x = -1; var8x <= 1; var8x++) {
+               var1.setBlockAndUpdate(var6.offset(var7, 0, var8x), Blocks.STONE.defaultBlockState());
+               var1.setBlockAndUpdate(var6.offset(var7, 1, var8x), Blocks.AIR.defaultBlockState());
+               var1.setBlockAndUpdate(var6.offset(var7, 2, var8x), Blocks.AIR.defaultBlockState());
             }
          }
 
          var0.addItem(new ItemStack(Items.WATER_BUCKET));
          VOYAGE_ACTIVE.add(var0.getUUID());
+         VOYAGE_START_Y.put(var0.getUUID(), var0.getY());
          Team var10 = team(var0);
          VOYAGE_LOCK_MASK.put(var0.getUUID(), var10 == null ? 0 : lockedMask(var10));
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.voyage_start").withStyle(ChatFormatting.AQUA));
@@ -4433,16 +4438,21 @@ public final class HexEffects {
    }
 
    private static void tickVoyage(ServerPlayer var0) {
-      if (VOYAGE_ACTIVE.contains(var0.getUUID()) && var0.getY() < 250.0 && (var0.onGround() || var0.isInWater())) {
-         VOYAGE_ACTIVE.remove(var0.getUUID());
-         if (!var0.isInWater() && var0.isAlive()) {
-            var0.hurtServer(var0.level(), var0.damageSources().genericKill(), Float.MAX_VALUE);
-            var0.sendSystemMessage(Component.translatable("hexbingo.msg.voyage_fail").withStyle(ChatFormatting.RED));
-         } else {
-            int var2 = completeRandomTasks(var0, 1);
-            VOYAGE_LOCK_MASK.remove(var0.getUUID());
-            releaseSlotLock(var0, var2);
-            var0.sendSystemMessage(Component.translatable("hexbingo.msg.voyage_done").withStyle(ChatFormatting.AQUA));
+      if (VOYAGE_ACTIVE.contains(var0.getUUID())) {
+         // 落回出发高度附近才算完成/失败（以传送前的高度为基准）
+         double var11 = VOYAGE_START_Y.getOrDefault(var0.getUUID(), 250.0);
+         if (var0.getY() < var11 - 6.0 && (var0.onGround() || var0.isInWater())) {
+            VOYAGE_ACTIVE.remove(var0.getUUID());
+            VOYAGE_START_Y.remove(var0.getUUID());
+            if (!var0.isInWater() && var0.isAlive()) {
+               var0.hurtServer(var0.level(), var0.damageSources().genericKill(), Float.MAX_VALUE);
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.voyage_fail").withStyle(ChatFormatting.RED));
+            } else {
+               int var2 = completeRandomTasks(var0, 1);
+               VOYAGE_LOCK_MASK.remove(var0.getUUID());
+               releaseSlotLock(var0, var2);
+               var0.sendSystemMessage(Component.translatable("hexbingo.msg.voyage_done").withStyle(ChatFormatting.AQUA));
+            }
          }
       }
    }
@@ -4453,6 +4463,7 @@ public final class HexEffects {
 
    public static void onVoyageDeath(ServerPlayer var0) {
       VOYAGE_ACTIVE.remove(var0.getUUID());
+      VOYAGE_START_Y.remove(var0.getUUID());
    }
 
    private static int lockedMask(Team var0) {
@@ -8956,7 +8967,8 @@ public final class HexEffects {
       );
    }
 
-   // Spider Man：贴墙按住前进向上爬，不按前进则贴墙不下落
+   // Spider Man：与原版蜘蛛一致的爬墙判定——身体贴到任何墙（horizontalCollision）即吸附，
+   // 按住前进向上爬，松开前进贴在墙上不下落，潜行可取消
    public static void tickSpiderMan(ServerPlayer var0) {
       if (!hasHex(var0, "spider_man")
          || SPIDER_CLIMB_OFF.contains(var0.getUUID())
@@ -8970,9 +8982,7 @@ public final class HexEffects {
          return;
       }
 
-      // 只吸附完整碰撞方块，避免火把/门/活板门/花草等无完整碰撞方块造成误触
-      boolean var1 = hasWallInFront(var0);
-      if (!var1) {
+      if (!var0.horizontalCollision) {
          return;
       }
 
@@ -8987,21 +8997,6 @@ public final class HexEffects {
       }
 
       var0.resetFallDistance();
-   }
-
-   private static boolean hasWallInFront(ServerPlayer var0) {
-      Direction var1 = var0.getDirection();
-      BlockPos var2 = var0.blockPosition();
-
-      for (int var3 = 1; var3 <= 2; var3++) {
-         BlockPos var4 = var2.relative(var1).above(var3);
-         BlockState var5 = var0.level().getBlockState(var4);
-         if (var5.isCollisionShapeFullBlock(var0.level(), var4)) {
-            return true;
-         }
-      }
-
-      return false;
    }
 
    public static void toggleSpiderClimb(ServerPlayer var0) {

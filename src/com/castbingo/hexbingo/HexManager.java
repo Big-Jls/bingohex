@@ -439,6 +439,10 @@ public final class HexManager {
                PacketDistributor.sendToPlayer(var0, new HexOfferPayload(var4, var7, var1.refreshCharges(var2) > 0), new CustomPacketPayload[0]);
                return;
             }
+
+            // 掷不满 3 个（海克斯几乎集齐）：把该档奖励放回队列，不要白白吞掉
+            var3.add(0, var4);
+            break;
          }
 
          var1.setDirty();

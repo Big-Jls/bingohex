@@ -13,6 +13,13 @@
 
 为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **132 个海克斯强化**：53 银色 / 43 金色 / 36 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
+### 1.43.10 修复
+
+- **三选一队列**：掷不满 3 个海克斯时该档奖励放回队列，不再被吞掉。
+- **颜色解析**：未知颜色记录告警日志，不再静默当银色。
+- **星际航行**：平台改放到玩家当前高度上方 256 格（不超过世界高度上限），高山不再把平台埋进山里；判定以出发高度为基准。
+- **Spider Man**：爬墙判定改用身体碰撞（与原版蜘蛛一致），贴到任意墙都能爬（栅栏、玻璃板、楼梯等也行），不再只认完整方块。
+
 ### 1.43.9 修复
 
 - **`/bingo tp` 拦截**：按 ReBongo 实际的 `EntitySelector` 参数类型解析目标，选择器方式传送到被放逐玩家也能可靠拦截。
@@ -270,7 +277,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.9.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.10.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 Bingo，按提示选择海克斯。
 
 ## 按键与命令
@@ -315,7 +322,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 珍珠储备 | `pearl_stock` | 获得 8 个末影珍珠和 2 个烈焰粉。 |
 | 练手日 | `practice_day` | 永久获得急迫 I。 |
 | 地狱无门闯进来 | `nether_start` | 立即被传送到地狱，并禁用 /tp、/bp 与 /bingo tp；返回主世界后自动解除。 |
-| 星际航行 | `star_voyage` | 传送到 Y=256 并获得一个平台和水桶；必须用水桶安全落地，否则会摔死。成功落地后随机解锁 1 个 Bingo 格子。 |
+| 星际航行 | `star_voyage` | 传送到你当前高度上方 256 格并获得一个平台和水桶；必须用水桶安全落地，否则会摔死。成功落地后随机解锁 1 个 Bingo 格子。 |
 | 换位思考 | `swap_tasks` | 随机交换当前 Bingo 卡片上两个任务的位置。 |
 | 迅捷斥候 | `mushroom_scout` | 以你为中心 3 格内随机长出各种蘑菇（含地狱菌类）。 |
 | 虫洞 | `wormhole` | 立即随机传送到距当前位置 1–1000 格的地方。 |
@@ -383,7 +390,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 灵魂出窍 | `soul_out` | 选中后立即进入旁观状态 30 秒，期间可以自由飞行观察，结束后回到进入旁观前的位置。 |
 | 九九八十一难 | `eighty_one_trials` | 传送到最近的试炼大厅。 |
 | 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。冷却 8 分钟。 |
-| Spider Man | `spider_man` | 像蜘蛛一样爬墙，仅吸附有完整碰撞的方块；按 V 可开关爬墙功能。 |
+| Spider Man | `spider_man` | 像蜘蛛一样爬墙：身体贴到任意墙即可吸附，按住前进向上爬，松开贴墙不下落，潜行取消；按 V 可开关爬墙功能。 |
 | 吸铁石 | `magnet` | 16 格内的掉落物会自动飞向你。 |
 | 3面骰 | `dice_roll` | 每 5 分钟投一次六面骰：大于 3 获得速度 II 4 分钟，小于 3 获得缓慢 I 4 分钟，等于 3 禁锢 6 秒。 |
 | 路易十六 | `louis_xvi` | 击杀的第一个生物必定掉落 1 个该生物的头颅。 |
@@ -464,7 +471,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Pearl Stock | `pearl_stock` | Gain 8 ender pearls and 2 blaze powder. |
 | Practice Day | `practice_day` | Permanent Haste I. |
 | Breaking Into Hell | `nether_start` | Immediately sent to the Nether; /tp, /bp and /bingo tp are disabled until you return to the Overworld. |
-| Star Voyage | `star_voyage` | Teleported to Y=256 with a platform and a water bucket. You MUST land in water or you will die. Landing safely unlocks 1 random Bingo slot. |
+| Star Voyage | `star_voyage` | Teleported 256 blocks above your current height with a platform and a water bucket. You MUST land in water or you will die. Landing safely unlocks 1 random Bingo slot. |
 | Perspective Swap | `swap_tasks` | Randomly swap the positions of two tasks on the current Bingo card. |
 | Swift Scout | `mushroom_scout` | Random mushrooms (including nether fungi) grow in a 3 block radius around you. |
 | Wormhole | `wormhole` | Instantly teleport to a random spot 1-1000 blocks away. |
@@ -532,7 +539,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Soul Out | `soul_out` | Immediately enter spectator mode for 30 seconds to scout freely, then return to the position where you entered spectator mode. |
 | Eighty-One Trials | `eighty_one_trials` | Teleport to the nearest trial chambers. |
 | Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). 8 minute cooldown. |
-| Spider Man | `spider_man` | Climb walls like a spider (only full-collision blocks). Press V to toggle. |
+| Spider Man | `spider_man` | Climb walls like a spider: stick to any wall your body touches, hold forward to climb, release to hang, sneak to cancel. Press V to toggle. |
 | Magnet | `magnet` | All dropped items within 16 blocks fly toward you. |
 | 3-Sided Die | `dice_roll` | Every 5 minutes roll a d6: above 3 grants Speed II for 4 minutes, below 3 grants Slowness I for 4 minutes, and 3 roots you for 6 seconds. |
 | Louis XVI | `louis_xvi` | The first mob you kill is guaranteed to drop 1 of its heads. |
@@ -607,7 +614,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.9 `
+.\build.ps1 -Version 26.2-1.43.10 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
