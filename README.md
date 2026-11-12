@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.8.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.10.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.11.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -52,6 +52,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 |---|---|
 | **K** | 打开「海克斯一览」：查看所有队伍/玩家已经选了哪些海克斯（只读名单），叠角龙会显示当前层数 |
 | **V** | 切换蜘蛛类效果（获得对应海克斯后可用） |
+| **T** | 开关吸铁石吸物功能（获得对应海克斯后可用） |
 | **G** | 点石成金：把副手物品转化为等量金锭（获得对应海克斯后可用） |
 
 | 命令 | 权限 | 说明 |
@@ -77,7 +78,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 经验专精 | `experience_mastery` | 获得 500 点经验和 8–32 个随机青金石。 |
 | 我看到你了 | `i_see_you` | 每 2 秒使周围 20 格内的敌对生物发光。 |
 | 质变黄金阶 | `golden_shift` | 获得一个随机金色海克斯。 |
-| 我想要 | `want_items` | 获得 5 个随机物品。 |
+| 我想要 | `want_items` | 获得 5 个随机物品（与仆从大师宠物同款加权随机池）。 |
 | 枯木生花 | `random_wood` | 获得 5 种随机木头和 5 种随机花。 |
 | 练腿日 | `leg_day` | 永久获得速度 I。 |
 | 大力 | `strong` | 永久获得力量 II。 |
@@ -134,7 +135,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 |---|---|---|
 | 随机传送 | `random_teleport` | 获得 /bingo rtp 指令：在当前位置附近随机传送，冷却 5 秒。 |
 | 尖端发明家 | `cutting_edge` | 所有技能型海克斯的冷却时间缩短 30%。 |
-| 我很想要 | `want_more_items` | 获得 10 个随机物品。 |
+| 我很想要 | `want_more_items` | 获得 10 个随机物品（与仆从大师宠物同款加权随机池）。 |
 | 更更万用瞄准镜 | `scope_2` | 方块交互距离 +5，实体交互距离 +5。可与其他瞄准镜叠加。 |
 | 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
 | 小蜜蜂 | `bees` | 在其他所有队伍附近召唤 10 只愤怒的蜜蜂。蜜蜂可以无视无敌蜇伤玩家。 |
@@ -157,8 +158,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 九九八十一难 | `eighty_one_trials` | 传送到最近的试炼大厅。 |
 | 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。冷却 8 分钟。 |
 | Spider Man | `spider_man` | 像蜘蛛一样爬墙：身体贴到任意墙即可吸附，按住前进向上爬，松开贴墙不下落，潜行取消；按 V 可开关爬墙功能。 |
-| 吸铁石 | `magnet` | 16 格内的掉落物会自动飞向你。 |
-| 3面骰 | `dice_roll` | 每 5 分钟投一次六面骰：大于 3 获得速度 II 4 分钟，小于 3 获得缓慢 I 4 分钟，等于 3 禁锢 6 秒。 |
+| 吸铁石 | `magnet` | 16 格内的掉落物会自动飞向你。按 T 可开关吸铁功能。 |
+| 3面骰 | `dice_roll` | 每 5 分钟投一次六面骰（屏幕播放掷骰动画后才揭晓）：大于 3 获得速度 II 4 分钟，小于 3 获得缓慢 I 4 分钟，等于 3 禁锢 6 秒。 |
 | 路易十六 | `louis_xvi` | 击杀的第一个生物必定掉落 1 个该生物的头颅。 |
 | 快递到了 | `airdrop` | 在你头顶空投一个装有随机战利品箱奖励的箱子。 |
 | 海神 | `sea_god` | 获得一把附魔三叉戟（忠诚 III、引雷 I、经验修补 I），掷出后自动回收。 |
@@ -171,7 +172,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，蝙蝠跟在玩家脚边；可飞行（飞行速度降低 35%）、无法攻击、血量与体型变小，结束后获得 1 分钟缓降。冷却 7 分钟。 |
 | 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点；附近没有时在 500 格外地下生成一处深暗洞穴。 |
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
-| 命运骰子 | `destiny_dice` | 掷骰随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
+| 命运骰子 | `destiny_dice` | 掷骰（播放动画后揭晓）随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
 | 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，跨维度、远距离传送与区块卸载后都会回到你身边继续环绕；经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，不会攻击任何玩家，且完全无敌（任何伤害都会被取消，包括创造模式攻击）。 |
 | 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图；附近没有时在 500 格外改造一片红树林并标记。 |
@@ -181,7 +182,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 名称 | id | 效果 |
 |---|---|---|
 | 铁锁连环 | `chain_master` | 每完成一个团队任务，有 1% + 0.1% × 已完成任务数 的概率额外完成 1 个相邻任务，最高 50%。 |
-| 我真的很想要 | `want_lots_items` | 获得 15 个随机物品。 |
+| 我真的很想要 | `want_lots_items` | 获得 15 个随机物品（与仆从大师宠物同款加权随机池）。 |
 | 更更更万用瞄准镜 | `scope_3` | 方块交互距离 +9，实体交互距离 +9。可与其他瞄准镜叠加。 |
 | 夺金 | `gold_rush` | 攻击生物时随机获得 1-3 个金粒，同一生物冷却 5 秒。 |
 | 飞升仪式 | `ascension` | 击杀敌对生物时获得随机增益。 |
@@ -226,7 +227,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Experience Mastery | `experience_mastery` | Gain 500 experience and 8-32 random lapis lazuli. |
 | I See You | `i_see_you` | Every 2s, hostile mobs within 20 blocks glow. |
 | Golden Ascension | `golden_shift` | Gain a random gold hex. |
-| I Want It | `want_items` | Gain 5 random items. |
+| I Want It | `want_items` | Gain 5 random items (same weighted pool as the Pet Master pet). |
 | Dead Wood Blooms | `random_wood` | Gain 5 random wood types and 5 random flower types. |
 | Leg Day | `leg_day` | Permanent Speed I. |
 | Strength | `strong` | Permanent Strength II. |
@@ -283,7 +284,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 |---|---|---|
 | Random Teleport | `random_teleport` | Unlocks /bingo rtp: randomly teleport nearby with a 5s cooldown. |
 | Cutting Edge Inventor | `cutting_edge` | All skill-type hex cooldowns are reduced by 30%. |
-| I Want More | `want_more_items` | Gain 10 random items. |
+| I Want More | `want_more_items` | Gain 10 random items (same weighted pool as the Pet Master pet). |
 | Greater Utility Scope | `scope_2` | Gain +2 block interaction range and +2 entity interaction range. |
 | Prismatic Ascension | `prismatic_shift` | Gain a random prismatic hex. |
 | Little Bees | `bees` | Summon 10 angry bees around every enemy team. Bees can sting through invulnerability. |
@@ -306,8 +307,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Eighty-One Trials | `eighty_one_trials` | Teleport to the nearest trial chambers. |
 | Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). 8 minute cooldown. |
 | Spider Man | `spider_man` | Climb walls like a spider: stick to any wall your body touches, hold forward to climb, release to hang, sneak to cancel. Press V to toggle. |
-| Magnet | `magnet` | All dropped items within 16 blocks fly toward you. |
-| 3-Sided Die | `dice_roll` | Every 5 minutes roll a d6: above 3 grants Speed II for 4 minutes, below 3 grants Slowness I for 4 minutes, and 3 roots you for 6 seconds. |
+| Magnet | `magnet` | All dropped items within 16 blocks fly toward you. Press T to toggle. |
+| 3-Sided Die | `dice_roll` | Every 5 minutes roll a d6 (a dice animation plays before the result is revealed): above 3 grants Speed II for 4 minutes, below 3 grants Slowness I for 4 minutes, and 3 roots you for 6 seconds. |
 | Louis XVI | `louis_xvi` | The first mob you kill is guaranteed to drop 1 of its heads. |
 | Delivery Arrived | `airdrop` | Airdrop a chest above you filled with loot from a random vanilla chest loot table. |
 | Sea God | `sea_god` | Gain an enchanted trident (Loyalty III, Channeling I, Mending I) that returns when thrown. |
@@ -320,7 +321,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight at 35% reduced speed, cannot attack, bat-sized health and body). The bat follows at your feet; the form ends with 1 minute of Slow Falling. Cooldown 7 minutes. |
 | Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves; if none is nearby, create an artificial deep dark cave 500 blocks away underground. |
 | Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
-| Destiny Dice | `destiny_dice` | Roll a die: complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
+| Destiny Dice | `destiny_dice` | Roll a die (revealed after an animation): complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
 | Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
 | Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
 | Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome; if none is nearby, create one 500 blocks away and mark it. |
@@ -330,7 +331,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Name | id | Effect |
 |---|---|---|
 | Iron Chain | `chain_master` | Each completed team task gives a 1% + 0.1% per-completed-task chance (max 50%) to complete 1 adjacent task. |
-| I Really Want It | `want_lots_items` | Gain 15 random items. |
+| I Really Want It | `want_lots_items` | Gain 15 random items (same weighted pool as the Pet Master pet). |
 | Greatest Utility Scope | `scope_3` | Gain +3 block interaction range and +3 entity interaction range. |
 | Gold Rush | `gold_rush` | Attacking a mob grants 1-3 gold nuggets, 5s cooldown per mob. |
 | Ascension Ritual | `ascension` | Killing a hostile mob grants a random buff. |
@@ -373,6 +374,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 - `dechi_song.ogg` 为第三方录音，**不在本仓库许可范围内**，计划替换为自制音频；替换完成前请勿再分发该文件。
 - `sounds/dragon_1.ogg` ~ `dragon_4.ogg` 来自 freesoundsite.com 的 Dragon Purring 免费音效合集，站点声明免费、无需署名、可商用；已转成单声道 64kbps，单文件约 15–18 KB。
 - 海克斯名称与文案参考《英雄联盟》强化符文，仅作玩法致敬；《英雄联盟》为 Riot Games, Inc. 的商标，本项目与 Riot Games 无关。
+- `textures/gui/dice_d4_*.png`（掷骰动画用三角骰子贴图）为本项目自绘，无第三方素材。
 - 贴图与其余语言文件为本项目原创。
 
 ## 构建
@@ -380,7 +382,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.10 `
+.\build.ps1 -Version 26.2-1.43.11 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -403,6 +405,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.43.11 修复
+
+- **吸铁石**：新增 T 键开关吸物功能（开关时有提示，对局重置自动清理）。
+- **掷骰动画**：3面骰与命运骰子先播放屏幕中央的三角骰子旋转动画，动画结束后才揭晓并结算结果（贴图为自绘，无第三方素材）。
+- **我想要 / 我很想要 / 我真的很想要**：随机物品改为与仆从大师宠物同款加权随机池（贵重物品概率更低）。
 
 ### 1.43.10 修复
 

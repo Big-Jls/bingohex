@@ -1,5 +1,22 @@
 # Changelog
 
+## 26.2-1.43.11 — 2026-11-13
+
+### Added
+
+- **Magnet** (`magnet`): press **T** to toggle the item-attraction on and off
+  (overlay message on toggle; state is per player and cleared on game reset).
+- **Dice animation**: the 3-Sided Die (`dice_roll`) and Destiny Dice
+  (`destiny_dice`) now play a rolling triangle-die animation on screen before
+  the result is revealed; the outcome is only applied by the server after the
+  animation finishes. The d4 sprites are original art (no third-party assets).
+
+### Changed
+
+- **Want items** (`want_items` / `want_more_items` / `want_lots_items`): the
+  random items now come from the same weighted pool as the Pet Master pet
+  (valuable items are rarer) instead of a uniform full-item pool.
+
 ## 26.2-1.43.10 — 2026-11-12
 
 ### Fixed

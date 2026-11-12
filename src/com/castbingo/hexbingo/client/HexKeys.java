@@ -6,6 +6,7 @@
 package com.castbingo.hexbingo.client;
 
 import com.castbingo.hexbingo.HexBingo;
+import com.castbingo.hexbingo.network.HexMagnetTogglePayload;
 import com.castbingo.hexbingo.network.HexMidasPayload;
 import com.castbingo.hexbingo.network.HexRosterRequestPayload;
 import com.castbingo.hexbingo.network.HexSpiderTogglePayload;
@@ -21,11 +22,13 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 public final class HexKeys {
    public static final KeyMapping ROSTER = new KeyMapping("hexbingo.key.roster", 75, Category.MISC);
    public static final KeyMapping SPIDER_TOGGLE = new KeyMapping("hexbingo.key.spider_toggle", 86, Category.MISC);
+   public static final KeyMapping MAGNET_TOGGLE = new KeyMapping("hexbingo.key.magnet_toggle", 84, Category.MISC);
    public static final KeyMapping MIDAS = new KeyMapping("hexbingo.key.midas", 71, Category.MISC);
 
    public static void register(RegisterKeyMappingsEvent var0) {
       var0.register(ROSTER);
       var0.register(SPIDER_TOGGLE);
+      var0.register(MAGNET_TOGGLE);
       var0.register(MIDAS);
    }
 
@@ -41,6 +44,12 @@ public final class HexKeys {
       while (SPIDER_TOGGLE.consumeClick()) {
          if (Minecraft.getInstance().getConnection() != null) {
             ClientPacketDistributor.sendToServer(new HexSpiderTogglePayload(), new CustomPacketPayload[0]);
+         }
+      }
+
+      while (MAGNET_TOGGLE.consumeClick()) {
+         if (Minecraft.getInstance().getConnection() != null) {
+            ClientPacketDistributor.sendToServer(new HexMagnetTogglePayload(), new CustomPacketPayload[0]);
          }
       }
 

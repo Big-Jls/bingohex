@@ -58,6 +58,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.Identifier;
@@ -183,6 +184,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import com.castbingo.hexbingo.network.HexDiceRollPayload;
 import net.minecraft.world.phys.HitResult.Type;
 import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
@@ -191,6 +193,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
@@ -265,6 +268,20 @@ public final class HexEffects {
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
+   private static final Map<UUID, HexEffects.DicePending> DICE_PENDING = new HashMap<>();
+
+   /** 掷骰动画期间的待结算结果：动画结束后才生效。 */
+   private static final class DicePending {
+      final int outcome;
+      final boolean destiny;
+      int ticksLeft;
+
+      DicePending(int var1, boolean var2, int var3) {
+         this.outcome = var1;
+         this.destiny = var2;
+         this.ticksLeft = var3;
+      }
+   }
    private static final long DICE_INTERVAL_MS = 300000L;
    private static final Set<UUID> LOUIS_PENDING = new HashSet<>();
    private static final Set<UUID> MIRROR_USED = new HashSet<>();
@@ -278,6 +295,7 @@ public final class HexEffects {
    private static final Map<UUID, Long> CHAOS_MIND_COOLDOWN = new HashMap<>();
    private static final long CHAOS_MIND_COOLDOWN_MS = 480000L;
    private static final Set<UUID> SPIDER_CLIMB_OFF = new HashSet<>();
+   private static final Set<UUID> MAGNET_OFF = new HashSet<>();
    private static final Set<Item> VALUABLE_PET_ITEMS = Set.of(
       Items.DIAMOND,
       Items.DIAMOND_BLOCK,
@@ -1244,6 +1262,8 @@ public final class HexEffects {
       UNTOUCHABLE_COOLDOWN.remove(var0.getUUID());
       CHAOS_MIND_COOLDOWN.remove(var0.getUUID());
       SPIDER_CLIMB_OFF.remove(var0.getUUID());
+      MAGNET_OFF.remove(var0.getUUID());
+      DICE_PENDING.remove(var0.getUUID());
       BANISH_COOLDOWN.remove(var0.getUUID());
       THE_WORLD_COOLDOWN.remove(var0.getUUID());
       BANISHED.remove(var0.getUUID());
@@ -2325,10 +2345,12 @@ public final class HexEffects {
    }
 
    private static void giveRandomItems(ServerPlayer var0, int var1) {
-      ThreadLocalRandom var2 = ThreadLocalRandom.current();
-
+      // 与仆从大师宠物同一个加权随机池（贵重物品概率更低）
       for (int var3 = 0; var3 < var1; var3++) {
-         var0.addItem(new ItemStack((ItemLike)RANDOM_ITEMS.get(var2.nextInt(RANDOM_ITEMS.size()))));
+         Item var4 = randomPetItem();
+         if (var4 != null) {
+            var0.addItem(new ItemStack(var4));
+         }
       }
    }
 
@@ -8030,8 +8052,23 @@ public final class HexEffects {
       }
    }
 
-   // 命运骰子
+   // 命运骰子：先掷（播放动画），动画结束后才结算结果
    private static void destinyDice(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      if (Bingo.get(var1.overworld()).getTeam(var0) == null) {
+         return;
+      }
+
+      int var4 = ThreadLocalRandom.current().nextInt(4) + 1;
+      DICE_PENDING.put(var0.getUUID(), new HexEffects.DicePending(var4, true, 60));
+      PacketDistributor.sendToPlayer(var0, new HexDiceRollPayload(60), new CustomPacketPayload[0]);
+   }
+
+   private static void destinyDiceApply(ServerPlayer var0, int var4) {
       MinecraftServer var1 = var0.level().getServer();
       if (var1 == null) {
          return;
@@ -8043,7 +8080,6 @@ public final class HexEffects {
          return;
       }
 
-      int var4 = ThreadLocalRandom.current().nextInt(4) + 1;
       Team var5 = randomEnemyTeam(var2, var3);
       switch (var4) {
          case 1: {
@@ -9016,9 +9052,9 @@ public final class HexEffects {
       var0.sendOverlayMessage(Component.translatable(var1 ? "hexbingo.msg.spider_climb_on" : "hexbingo.msg.spider_climb_off"));
    }
 
-   // 吸铁石：每 tick 把 16 格内掉落物拉向玩家
+   // 吸铁石：每 tick 把 16 格内掉落物拉向玩家（T 键开关）
    public static void tickMagnet(ServerPlayer var0) {
-      if (hasHex(var0, "magnet") && var0.level() instanceof ServerLevel var1) {
+      if (hasHex(var0, "magnet") && !MAGNET_OFF.contains(var0.getUUID()) && var0.level() instanceof ServerLevel var1) {
          for (ItemEntity var3 : var1.getEntitiesOfClass(ItemEntity.class, var0.getBoundingBox().inflate(16.0))) {
             if (!var3.isRemoved()) {
                Vec3 var4 = var0.position().add(0.0, 0.8, 0.0).subtract(var3.position());
@@ -9035,9 +9071,44 @@ public final class HexEffects {
       }
    }
 
-   // 3面骰：每 5 分钟投 d6，按点数给速度/缓慢/禁锢
+   public static void toggleMagnet(ServerPlayer var0) {
+      if (!hasHex(var0, "magnet")) {
+         return;
+      }
+
+      boolean var1;
+      if (MAGNET_OFF.contains(var0.getUUID())) {
+         MAGNET_OFF.remove(var0.getUUID());
+         var1 = true;
+      } else {
+         MAGNET_OFF.add(var0.getUUID());
+         var1 = false;
+      }
+
+      var0.sendOverlayMessage(Component.translatable(var1 ? "hexbingo.msg.magnet_on" : "hexbingo.msg.magnet_off"));
+   }
+
+   // 3面骰：每 5 分钟投 d6，按点数给速度/缓慢/禁锢；先播放掷骰动画，动画结束后才结算
    public static void tickDice(ServerPlayer var0) {
       UUID var1 = var0.getUUID();
+
+      // 动画播放中：倒计时结束后再结算
+      HexEffects.DicePending var9 = DICE_PENDING.get(var1);
+      if (var9 != null) {
+         if (--var9.ticksLeft > 0) {
+            return;
+         }
+
+         DICE_PENDING.remove(var1);
+         if (var9.destiny) {
+            destinyDiceApply(var0, var9.outcome);
+         } else {
+            applyDiceOutcome(var0, var9.outcome);
+         }
+
+         return;
+      }
+
       if (!hasHex(var0, "dice_roll")) {
          DICE_NEXT.remove(var1);
          return;
@@ -9057,6 +9128,11 @@ public final class HexEffects {
       // 用当前时间重排下一次骰子，避免暂停/离线过久后连续补投
       DICE_NEXT.put(var1, var2 + DICE_INTERVAL_MS);
       int var5 = ThreadLocalRandom.current().nextInt(1, 7);
+      DICE_PENDING.put(var1, new HexEffects.DicePending(var5, false, 60));
+      PacketDistributor.sendToPlayer(var0, new HexDiceRollPayload(60), new CustomPacketPayload[0]);
+   }
+
+   private static void applyDiceOutcome(ServerPlayer var0, int var5) {
       if (var5 > 3) {
          var0.addEffect(new MobEffectInstance(MobEffects.SPEED, 4800, 1, false, true, true));
          var0.sendSystemMessage(

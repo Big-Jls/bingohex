@@ -6,8 +6,11 @@
 package com.castbingo.hexbingo;
 
 import com.castbingo.hexbingo.client.HexClient;
+import com.castbingo.hexbingo.client.HexDiceAnim;
 import com.castbingo.hexbingo.client.HexKeys;
+import com.castbingo.hexbingo.network.HexDiceRollPayload;
 import com.castbingo.hexbingo.network.HexListPayload;
+import com.castbingo.hexbingo.network.HexMagnetTogglePayload;
 import com.castbingo.hexbingo.network.HexMidasPayload;
 import com.castbingo.hexbingo.network.HexMirrorPayload;
 import com.castbingo.hexbingo.network.HexMirrorPickPayload;
@@ -53,6 +56,7 @@ public final class HexBingo {
       if (FMLEnvironment.getDist() == Dist.CLIENT) {
          var2.addListener(HexKeys::register);
          NeoForge.EVENT_BUS.addListener(HexKeys::clientTick);
+         NeoForge.EVENT_BUS.addListener(HexDiceAnim::render);
       }
    }
 
@@ -85,6 +89,12 @@ public final class HexBingo {
                HexEffects.toggleSpiderClimb(var2);
             }
          }))
+         .playToServer(HexMagnetTogglePayload.TYPE, HexMagnetTogglePayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
+            if (var1x.player() instanceof ServerPlayer var2) {
+               HexEffects.toggleMagnet(var2);
+            }
+         }))
+         .playToClient(HexDiceRollPayload.TYPE, HexDiceRollPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexDiceAnim.start(var0.durationTicks())))
          .playToServer(HexRefreshPayload.TYPE, HexRefreshPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
                HexManager.refresh(var2);
