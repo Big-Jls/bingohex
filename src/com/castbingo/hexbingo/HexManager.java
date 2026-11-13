@@ -994,6 +994,7 @@ public final class HexManager {
             HexEffects.ensureFae(var1);
             HexEffects.ensureQuestItems(var1);
             HexEffects.syncSealsTo(var3, var1);
+            HexEffects.syncAllMineLocksTo(var3, var1);
             resume(var1);
          } else {
             HexEffects.clearAll(var1);
@@ -1014,6 +1015,7 @@ public final class HexManager {
             HexEffects.ensureFae(var1);
             HexEffects.ensureQuestItems(var1);
             HexEffects.syncSealsTo(var3, var1);
+            HexEffects.syncAllMineLocksTo(var3, var1);
             resume(var1);
          } else {
             HexEffects.clearAll(var1);

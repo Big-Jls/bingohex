@@ -19,6 +19,8 @@ import net.minecraft.client.Minecraft;
 public final class HexClient {
    /** 客户端缓存：被「封印」海克斯封印的任务下标。 */
    private static final Set<Integer> SEALED = new HashSet<>();
+   /** 客户端缓存：被「全是我的」海克斯锁定的任务下标。 */
+   private static final Set<Integer> ALL_MINE_LOCKED = new HashSet<>();
 
    public static boolean isSealed(int var0) {
       return SEALED.contains(var0);
@@ -28,6 +30,17 @@ public final class HexClient {
       SEALED.clear();
       for (int var1 : var0) {
          SEALED.add(var1);
+      }
+   }
+
+   public static boolean isAllMineLocked(int var0) {
+      return ALL_MINE_LOCKED.contains(var0);
+   }
+
+   public static void applyAllMineLocks(int[] var0) {
+      ALL_MINE_LOCKED.clear();
+      for (int var1 : var0) {
+         ALL_MINE_LOCKED.add(var1);
       }
    }
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.49.5 — 2026-11-14
+
+### Changed
+
+- **All Mine** (`all_mine`): locked tasks now show a small lock icon in the
+  bottom-right corner of their cell on the Bingo card (visible to everyone),
+  synced via a new client payload on cast, join and respawn.
+
 ## 26.2-1.49.4 — 2026-11-14
 
 ### Fixed

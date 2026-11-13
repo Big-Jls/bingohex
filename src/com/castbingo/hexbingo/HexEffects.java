@@ -197,6 +197,7 @@ import net.minecraft.world.scores.TeamColor;
 import net.minecraft.world.phys.Vec3;
 import com.castbingo.hexbingo.network.HexDiceRollPayload;
 import com.castbingo.hexbingo.network.HexSealPayload;
+import com.castbingo.hexbingo.network.HexAllMineLockPayload;
 import net.minecraft.world.phys.HitResult.Type;
 import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
@@ -447,6 +448,8 @@ public final class HexEffects {
    private static final long WORLD_SHRINK_DURATION_MS = 300000L;
    // 全是我的：已使用过（一局内一次性）
    private static final Set<UUID> ALL_MINE_USED = new HashSet<>();
+   // 全是我的：被锁定任务的下标（客户端卡面画小锁）
+   private static final Set<Integer> ALL_MINE_LOCKED = new HashSet<>();
    // 缩小术：被缩小玩家 -> 到期时间
    private static final Map<UUID, Long> SHRINK_UNTIL = new HashMap<>();
    private static final Map<UUID, Long> SHRINK_COOLDOWN = new HashMap<>();
@@ -11676,6 +11679,10 @@ public final class HexEffects {
 
       ALL_MINE_USED.add(var0.getUUID());
 
+      // 记录被锁定的格子并同步客户端（卡面右下角画小锁）
+      ALL_MINE_LOCKED.add(var1);
+      sendAllMineLockSync(var2);
+
       // 消耗掉「全是我的」道具
       for (int var5 = 0; var5 < var0.getInventory().getContainerSize(); var5++) {
          ItemStack var6 = var0.getInventory().getItem(var5);
@@ -11700,6 +11707,28 @@ public final class HexEffects {
       for (ServerPlayer var11 : var2.getPlayerList().getPlayers()) {
          var11.sendSystemMessage(var9);
       }
+   }
+
+   private static void sendAllMineLockSync(MinecraftServer var0) {
+      int[] var1 = new int[ALL_MINE_LOCKED.size()];
+      int var2 = 0;
+
+      for (int var3 : ALL_MINE_LOCKED) {
+         var1[var2++] = var3;
+      }
+
+      PacketDistributor.sendToAllPlayers(new HexAllMineLockPayload(var1), new CustomPacketPayload[0]);
+   }
+
+   public static void syncAllMineLocksTo(MinecraftServer var0, ServerPlayer var1) {
+      int[] var2 = new int[ALL_MINE_LOCKED.size()];
+      int var3 = 0;
+
+      for (int var4 : ALL_MINE_LOCKED) {
+         var2[var3++] = var4;
+      }
+
+      PacketDistributor.sendToPlayer(var1, new HexAllMineLockPayload(var2), new CustomPacketPayload[0]);
    }
 
    // 钓鱼佬：发放海之眷顾 X 鱼竿；钓鱼掉落改为随机物品（仆从大师同款池，除鱼外）
@@ -11939,6 +11968,7 @@ public final class HexEffects {
       // 世界缩小：对局结束恢复原边界与 PVP
       restoreWorldShrink(var0);
       ALL_MINE_USED.clear();
+      ALL_MINE_LOCKED.clear();
 
       END_EXILE.clear();
       XRAY_MARKERS.clear();

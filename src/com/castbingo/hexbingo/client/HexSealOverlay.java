@@ -20,6 +20,9 @@ import net.neoforged.neoforge.client.gui.GuiLayer;
 public final class HexSealOverlay implements GuiLayer {
    public static final HexSealOverlay INSTANCE = new HexSealOverlay();
    private static final Identifier BARRIER_TEXTURE = Identifier.fromNamespaceAndPath("minecraft", "textures/item/barrier.png");
+   private static final Identifier LOCK_TEXTURE = Identifier.fromNamespaceAndPath(
+      "minecraft", "textures/gui/sprites/container/cartography_table/locked.png"
+   );
    private static final int SLOTS = 5;
 
    private HexSealOverlay() {
@@ -67,6 +70,17 @@ public final class HexSealOverlay implements GuiLayer {
             var0.pose().translate((float)(2 + 27 * var12), (float)(2 + 27 * var13));
             var0.pose().scale(1.65F, 1.65F);
             var0.blit(RenderPipelines.GUI_TEXTURED, BARRIER_TEXTURE, 0, 0, 0.0F, 0.0F, 16, 16, 16, 16);
+            var0.pose().popMatrix();
+         }
+
+         // 全是我的：被锁定的任务右下角画一把小锁
+         if (HexClient.isAllMineLocked(var11)) {
+            int var14 = var11 % SLOTS;
+            int var15 = var11 / SLOTS;
+            var0.pose().pushMatrix();
+            var0.pose().translate((float)(2 + 27 * var14 + 14), (float)(2 + 27 * var15 + 14));
+            var0.pose().scale(0.5F, 0.5F);
+            var0.blit(RenderPipelines.GUI_TEXTURED, LOCK_TEXTURE, 0, 0, 0.0F, 0.0F, 16, 16, 16, 16);
             var0.pose().popMatrix();
          }
       }

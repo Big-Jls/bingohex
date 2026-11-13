@@ -21,6 +21,7 @@ import com.castbingo.hexbingo.network.HexRosterPayload;
 import com.castbingo.hexbingo.network.HexRefreshPayload;
 import com.castbingo.hexbingo.network.HexRosterRequestPayload;
 import com.castbingo.hexbingo.network.HexSealPayload;
+import com.castbingo.hexbingo.network.HexAllMineLockPayload;
 import com.castbingo.hexbingo.network.HexSelectPayload;
 import com.castbingo.hexbingo.network.HexSpiderTogglePayload;
 import com.castbingo.hexbingo.network.HexSwordFlyTogglePayload;
@@ -118,6 +119,7 @@ public final class HexBingo {
          }))
          .playToClient(HexDiceRollPayload.TYPE, HexDiceRollPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexDiceAnim.start(var0.durationTicks())))
          .playToClient(HexSealPayload.TYPE, HexSealPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexClient.applySeals(var0.indices())))
+         .playToClient(HexAllMineLockPayload.TYPE, HexAllMineLockPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexClient.applyAllMineLocks(var0.indices())))
          .playToServer(HexRefreshPayload.TYPE, HexRefreshPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
                HexManager.refresh(var2);
