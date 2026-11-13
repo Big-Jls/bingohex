@@ -1,5 +1,20 @@
 # Changelog
 
+## 26.2-1.46.0 — 2026-11-13
+
+### Added
+
+- **Team Backpack Expansion** (`team_backpack`, silver): expands the team
+  `/bp` backpack from 54 to 72 slots (existing items are kept).
+- **Near Line** (`near_line`, gold): when your team is 1 cell away from a
+  bingo line, the whole team gains Haste II and Speed I.
+- **Card Recast** (`card_recast`, prismatic): immediately rerolls the contents
+  of your team's completed tasks (replaced with new tasks from the pool),
+  keeping them completed.
+- **Seal** (`seal`, prismatic): right-click to open the Bingo card and pick a
+  task; no player can complete it and a barrier icon is drawn over its cell.
+  Cooldown 15 minutes.
+
 ## 26.2-1.45.0 — 2026-11-13
 
 ### Added

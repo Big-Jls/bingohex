@@ -870,6 +870,10 @@ public final class HexManager {
          if (!HexEffects.canUseBlankCell(var0) || var5 == null) {
             return;
          }
+      } else if ("seal".equals(var1)) {
+         if (!HexEffects.sealReady(var0)) {
+            return;
+         }
       } else {
          return;
       }
@@ -883,12 +887,16 @@ public final class HexManager {
                continue;
             }
 
+            if ("seal".equals(var1) && HexEffects.isSealed(var7)) {
+               continue;
+            }
+
             var6.add(new HexTaskListPayload.Entry(var7, var8.contentName(var2)));
          }
       }
 
       if (var6.isEmpty()) {
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.blank_none").withStyle(ChatFormatting.GRAY));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.seal_none").withStyle(ChatFormatting.GRAY));
          return;
       }
 
@@ -905,6 +913,8 @@ public final class HexManager {
 
       if ("blank".equals(var2)) {
          HexEffects.applyBlankCell(var0, var1);
+      } else if ("seal".equals(var2)) {
+         HexEffects.applySeal(var0, var1);
       } else {
          HexEffects.applyObjectiveDeny(var0, var1);
       }
@@ -949,6 +959,7 @@ public final class HexManager {
             HexEffects.reapply(var1);
             HexEffects.ensureFae(var1);
             HexEffects.ensureQuestItems(var1);
+            HexEffects.syncSealsTo(var3, var1);
             resume(var1);
          } else {
             HexEffects.clearAll(var1);
@@ -968,6 +979,7 @@ public final class HexManager {
             HexEffects.reapply(var1);
             HexEffects.ensureFae(var1);
             HexEffects.ensureQuestItems(var1);
+            HexEffects.syncSealsTo(var3, var1);
             resume(var1);
          } else {
             HexEffects.clearAll(var1);

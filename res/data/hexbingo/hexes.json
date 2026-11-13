@@ -1391,6 +1391,42 @@
                                           "type":  "loot_hunter"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "team_backpack",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "team_backpack"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "near_line",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "near_line"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "card_recast",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "card_recast"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "seal",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "seal"
+                                      }
+                                  ]
                   }
               ]
 }

@@ -187,6 +187,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import com.castbingo.hexbingo.network.HexDiceRollPayload;
+import com.castbingo.hexbingo.network.HexSealPayload;
 import net.minecraft.world.phys.HitResult.Type;
 import net.neoforged.neoforge.event.CommandEvent;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
@@ -195,6 +196,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -266,7 +268,7 @@ public final class HexEffects {
    );
    private static final Map<UUID, Holder<MobEffect>> SONG_BUFFS = new HashMap<>();
    private static final Set<UUID> SPY_USED = new HashSet<>();
-   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格", "缩小术", "背包小偷", "潘是对的");
+   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格", "缩小术", "背包小偷", "潘是对的", "封印");
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
@@ -430,6 +432,10 @@ public final class HexEffects {
    private static final Map<UUID, Long> THIEF_COOLDOWN = new HashMap<>();
    // 潘是对的：一次性全队重掷标记
    private static final Set<UUID> PAN_USED = new HashSet<>();
+   // 封印：被永久封印的任务下标（全员无法完成，客户端画屏障图标）
+   private static final Set<Integer> SEALED = new HashSet<>();
+   private static final Map<UUID, Long> SEAL_COOLDOWN = new HashMap<>();
+   private static final long SEAL_COOLDOWN_MS = 900000L;
    // 黑石行者：临时黑石 -> 还原回岩浆的时间
    private static final List<HexEffects.BlackstoneEntry> BLACKSTONE_PENDING = new ArrayList<>();
 
@@ -1040,6 +1046,22 @@ public final class HexEffects {
          case "loot_hunter":
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.loot_hunter_info").withStyle(ChatFormatting.GOLD));
             break;
+         // 团队背包扩容
+         case "team_backpack":
+            expandTeamBackpack(var0);
+            break;
+         // 临门一脚
+         case "near_line":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.near_line").withStyle(ChatFormatting.GOLD));
+            break;
+         // 卡牌重铸
+         case "card_recast":
+            recastCard(var0);
+            break;
+         // 封印
+         case "seal":
+            giveSealItem(var0);
+            break;
          // 路易十六
          case "louis_xvi":
             LOUIS_PENDING.add(var0.getUUID());
@@ -1528,6 +1550,13 @@ public final class HexEffects {
                      case "bad_omen":
                         if (var5.tickCount % 600 == 0) {
                            tickBadOmen(var5);
+                        }
+                        break;
+                     // 临门一脚：只差 1 格成线时全队获得急迫 II 与速度 I
+                     case "near_line":
+                        if (var5.tickCount % 40 == 0 && var8 != null && isNearLine(var8, var3.tasks().size())) {
+                           var5.addEffect(new MobEffectInstance(MobEffects.HASTE, 100, 1, false, false, true));
+                           var5.addEffect(new MobEffectInstance(MobEffects.SPEED, 100, 0, false, false, true));
                         }
                         break;
                   }
@@ -5918,6 +5947,10 @@ public final class HexEffects {
 
       if (hasHex(var0, "pan_is_right") && !PAN_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "潘是对的")) {
          givePanItem(var0);
+      }
+
+      if (hasHex(var0, "seal") && !hasNamedItem(var0, "封印")) {
+         giveSealItem(var0);
       }
 
       if (hasHex(var0, "mirror_hex") && !MIRROR_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "镜像复制")) {
@@ -10767,6 +10800,238 @@ public final class HexEffects {
       }
    }
 
+   // 团队背包扩容：把团队 /bp 背包扩容到 72 格（反射改 ItemStackHandler 大小，已有物品保留）
+   private static void expandTeamBackpack(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      Team var2 = Bingo.get(var1.overworld()).getTeam(var0);
+      if (var2 == null) {
+         return;
+      }
+
+      try {
+         Field var3 = Team.class.getDeclaredField("backpack");
+         var3.setAccessible(true);
+         if (var3.get(var2) instanceof ItemStackHandler var4) {
+            if (var4.getSlots() < 72) {
+               var4.setSize(72);
+            }
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.team_backpack").withStyle(ChatFormatting.GOLD));
+         }
+      } catch (Exception var5) {
+         HexBingo.LOGGER.warn("Failed to expand team backpack", var5);
+      }
+   }
+
+   // 临门一脚：判断队伍是否只差 1 格就能成线
+   private static boolean isNearLine(Team var0, int var1) {
+      int var2 = (int)Math.sqrt(var1);
+      if (var2 * var2 != var1 || var2 < 2) {
+         return false;
+      }
+
+      for (int var3 = 0; var3 < var2; var3++) {
+         int var4 = 0;
+         int var5 = 0;
+
+         for (int var6 = 0; var6 < var2; var6++) {
+            if (var0.completed(var3 * var2 + var6)) {
+               var4++;
+            }
+            if (var0.completed(var6 * var2 + var3)) {
+               var5++;
+            }
+         }
+
+         if (var4 == var2 - 1 || var5 == var2 - 1) {
+            return true;
+         }
+      }
+
+      int var7 = 0;
+      int var8 = 0;
+
+      for (int var9 = 0; var9 < var2; var9++) {
+         if (var0.completed(var9 * var2 + var9)) {
+            var7++;
+         }
+         if (var0.completed(var9 * var2 + (var2 - 1 - var9))) {
+            var8++;
+         }
+      }
+
+      return var7 == var2 - 1 || var8 == var2 - 1;
+   }
+
+   // 卡牌重铸：把本队已完成任务的内容重新随机（换成卡池里未出现的新任务），保持已完成状态
+   private static void recastCard(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      Bingo var2 = Bingo.get(var1.overworld());
+      Team var3 = var2.getTeam(var0);
+      if (var3 == null || !var2.running()) {
+         return;
+      }
+
+      ArrayList<Task> var4 = new ArrayList<>(var2.tasks());
+      int var5 = var4.size();
+      if (var5 == 0) {
+         return;
+      }
+
+      ArrayList<Task> var6 = new ArrayList<>();
+
+      for (GameTasks var8 : GameTasks.gameTasks().values()) {
+         var8.getBingoTasks().ifLeft(var6::addAll);
+      }
+
+      LinkedHashMap<String, Task> var9 = new LinkedHashMap<>();
+
+      for (Task var10 : var6) {
+         if (var10 != null && var10 != Task.EMPTY) {
+            var9.putIfAbsent(var10.contentName(var1).getString(), var10);
+         }
+      }
+
+      for (Task var20 : var4) {
+         var9.remove(var20.contentName(var1).getString());
+      }
+
+      if (var9.isEmpty()) {
+         return;
+      }
+
+      ArrayList<Task> var11 = new ArrayList<>(var9.values());
+      ThreadLocalRandom var12 = ThreadLocalRandom.current();
+      int var13 = 0;
+
+      for (int var14 = 0; var14 < var5 && !var11.isEmpty(); var14++) {
+         if (var3.completed(var14)) {
+            Task var15 = (Task)var4.get(var14);
+            Task var16 = (Task)var11.remove(var12.nextInt(var11.size()));
+            var4.set(var14, var16);
+            var13++;
+         }
+      }
+
+      if (var13 > 0) {
+         var2.setTasks(var4);
+         var2.markDirty(true);
+         var2.checkWin();
+         var0.sendSystemMessage(
+            Component.translatable("hexbingo.msg.card_recast", new Object[]{Component.literal(Integer.toString(var13))})
+               .withStyle(ChatFormatting.LIGHT_PURPLE)
+         );
+      }
+   }
+
+   // 封印：右键打开卡面选择一个任务，全服玩家都无法完成它（卡面不变，格子上画屏障图标）
+   private static void giveSealItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "封印")) {
+         var0.addItem(questItem(Items.BARRIER, "封印", "hexbingo.item.seal.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.seal_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean sealReady(ServerPlayer var0) {
+      if (!hasHex(var0, "seal")) {
+         return false;
+      }
+
+      Long var1 = SEAL_COOLDOWN.get(var0.getUUID());
+      if (var1 != null && System.currentTimeMillis() < var1) {
+         long var2 = (var1 - System.currentTimeMillis() + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.seal_cooldown", var2).withStyle(ChatFormatting.GRAY));
+         return false;
+      }
+
+      return true;
+   }
+
+   public static boolean isSealed(int var0) {
+      return SEALED.contains(var0);
+   }
+
+   public static void applySeal(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 != null && hasHex(var0, "seal") && sealReady(var0)) {
+         Bingo var3 = Bingo.get(var2.overworld());
+         if (var1 >= 0 && var1 < var3.tasks().size() && !SEALED.contains(var1)) {
+            SEALED.add(var1);
+            SEAL_COOLDOWN.put(var0.getUUID(), System.currentTimeMillis() + skillCooldown(var0, SEAL_COOLDOWN_MS));
+            sendSealSync(var2);
+            Component var4 = var3.task(var1).contentName(var2);
+            Component var5 = Component.translatable("hexbingo.msg.seal_cast", var0.getDisplayName(), var4).withStyle(ChatFormatting.RED);
+
+            for (ServerPlayer var7 : var2.getPlayerList().getPlayers()) {
+               var7.sendSystemMessage(var5);
+            }
+         }
+      }
+   }
+
+   private static void sendSealSync(MinecraftServer var0) {
+      int[] var1 = new int[SEALED.size()];
+      int var2 = 0;
+
+      for (int var3 : SEALED) {
+         var1[var2++] = var3;
+      }
+
+      PacketDistributor.sendToAllPlayers(new HexSealPayload(var1), new CustomPacketPayload[0]);
+   }
+
+   public static void syncSealsTo(MinecraftServer var0, ServerPlayer var1) {
+      int[] var2 = new int[SEALED.size()];
+      int var3 = 0;
+
+      for (int var4 : SEALED) {
+         var2[var3++] = var4;
+      }
+
+      PacketDistributor.sendToPlayer(var1, new HexSealPayload(var2), new CustomPacketPayload[0]);
+   }
+
+   /** 由 BingoTaskEvent 调用；命中被封印任务时立即退回并返回 true。 */
+   public static boolean handleSeal(BingoTaskEvent var0) {
+      if (SEALED.isEmpty()) {
+         return false;
+      }
+
+      Bingo var1 = var0.getBingo();
+      int var2 = -1;
+
+      for (int var3 = 0; var3 < var1.tasks().size(); var3++) {
+         if (var1.task(var3) == var0.getTask()) {
+            var2 = var3;
+            break;
+         }
+      }
+
+      if (var2 < 0 || !SEALED.contains(var2)) {
+         return false;
+      }
+
+      Team var4 = var1.getTeam(var0.getPlayer());
+      MinecraftServer var5 = var0.getLevel().getServer();
+      if (var4 != null && var5 != null) {
+         uncompleteSlot(var5, var1, var4, var2);
+         Component var6 = Component.translatable("hexbingo.msg.seal_blocked", var0.getTask().contentName(var5)).withStyle(ChatFormatting.RED);
+
+         for (ServerPlayer var8 : var5.getPlayerList().getPlayers()) {
+            var8.sendSystemMessage(var6);
+         }
+      }
+
+      return true;
+   }
+
    // 拾荒者：破坏方块有 3% 概率额外掉落自身（在 blockDrops 中调用）
    private static void scavengerDrop(ServerPlayer var0, BlockDropsEvent var1) {
       if (ThreadLocalRandom.current().nextDouble() < 0.03) {
@@ -10895,6 +11160,8 @@ public final class HexEffects {
       SHRINK_COOLDOWN.clear();
       THIEF_COOLDOWN.clear();
       PAN_USED.clear();
+      SEALED.clear();
+      SEAL_COOLDOWN.clear();
 
       for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
          endEndExile(var2, false);

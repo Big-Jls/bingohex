@@ -8,6 +8,7 @@ package com.castbingo.hexbingo;
 import com.castbingo.hexbingo.client.HexClient;
 import com.castbingo.hexbingo.client.HexDiceAnim;
 import com.castbingo.hexbingo.client.HexKeys;
+import com.castbingo.hexbingo.client.HexSealOverlay;
 import com.castbingo.hexbingo.network.HexDiceRollPayload;
 import com.castbingo.hexbingo.network.HexListPayload;
 import com.castbingo.hexbingo.network.HexMagnetTogglePayload;
@@ -19,19 +20,23 @@ import com.castbingo.hexbingo.network.HexPickPayload;
 import com.castbingo.hexbingo.network.HexRosterPayload;
 import com.castbingo.hexbingo.network.HexRefreshPayload;
 import com.castbingo.hexbingo.network.HexRosterRequestPayload;
+import com.castbingo.hexbingo.network.HexSealPayload;
 import com.castbingo.hexbingo.network.HexSelectPayload;
 import com.castbingo.hexbingo.network.HexSpiderTogglePayload;
 import com.castbingo.hexbingo.network.HexTaskListPayload;
 import com.castbingo.hexbingo.network.HexTaskPickPayload;
 import com.mojang.logging.LogUtils;
 import io.github.noeppi_noeppi.mods.bongo.task.TaskTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig.Type;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.slf4j.Logger;
@@ -55,9 +60,20 @@ public final class HexBingo {
       NeoForge.EVENT_BUS.register(new HexEvents());
       if (FMLEnvironment.getDist() == Dist.CLIENT) {
          var2.addListener(HexKeys::register);
+         var2.addListener(this::registerGuiLayers);
          NeoForge.EVENT_BUS.addListener(HexKeys::clientTick);
          NeoForge.EVENT_BUS.addListener(HexDiceAnim::render);
       }
+   }
+
+   @OnlyIn(Dist.CLIENT)
+   private void registerGuiLayers(RegisterGuiLayersEvent var1) {
+      // 注册在 bongo 卡面之上：封印格子的屏障图标盖在任务图标上
+      var1.registerAbove(
+         Identifier.fromNamespaceAndPath("bongo", "bongo"),
+         Identifier.fromNamespaceAndPath("hexbingo", "hex_seal"),
+         HexSealOverlay.INSTANCE
+      );
    }
 
    private void registerPayloads(RegisterPayloadHandlersEvent var1) {
@@ -95,6 +111,7 @@ public final class HexBingo {
             }
          }))
          .playToClient(HexDiceRollPayload.TYPE, HexDiceRollPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexDiceAnim.start(var0.durationTicks())))
+         .playToClient(HexSealPayload.TYPE, HexSealPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexClient.applySeals(var0.indices())))
          .playToServer(HexRefreshPayload.TYPE, HexRefreshPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
                HexManager.refresh(var2);

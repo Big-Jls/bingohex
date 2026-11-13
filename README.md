@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **139 个海克斯强化**：54 银色 / 48 金色 / 37 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **143 个海克斯强化**：55 银色 / 49 金色 / 39 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.45.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.46.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -69,9 +69,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（139）
+## 海克斯一览（143）
 
-### 银色（54）
+### 银色（55）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -129,8 +129,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 苦行者 | `ascetic` | 清空本队所有已完成格，立即获得 2 个随机彩色海克斯。只在第三次海克斯选择中出现。 |
 | DJ | `dj` | 获得音符盒×1 与随机唱片×3。 |
 | 兼容灾厄 | `bad_omen` | 每 30 秒获得一级不祥之兆，最高 III 级。 |
+| 团队背包扩容 | `team_backpack` | 你们团队的 /bp 背包容量扩容到 72 格。 |
 
-### 金色（48）
+### 金色（49）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -182,8 +183,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 黑石行者 | `blackstone_walker` | 像冰霜行者一样在岩浆上行走：脚下的岩浆会结成临时黑石，几秒后自动融化回岩浆。 |
 | 缩小术 | `shrink` | 获得「缩小术」：右键把最近敌人缩小到 25%（体型、跳跃与交互范围同步缩小），持续 60 秒。冷却 8 分钟。 |
 | 背包小偷 | `backpack_thief` | 获得「背包小偷」：右键随机偷取最近敌人背包里的 3 件物品（绑定技能物品除外）。冷却 3 分钟。 |
+| 临门一脚 | `near_line` | 本队只差 1 格就能成线时，全队获得急迫 II 与速度 I。 |
 
-### 彩色（37）
+### 彩色（39）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -224,10 +226,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 空白格 | `blank_cell` | 获得「空白格」：右键打开当前 Bingo 卡牌，点击任意未完成任务并直接点亮，只为本队点亮且保留原任务图标。道具一次性。 |
 | 潘是对的 | `pan_is_right` | 获得「潘是对的」：右键一次性重掷全队所有海克斯。道具一次性，使用后消失。 |
 | 战利品猎人 | `loot_hunter` | 击杀生物时有 3% 概率在原地生成一个装有随机原版战利品的箱子。 |
+| 卡牌重铸 | `card_recast` | 立即把自己队伍已完成的任务内容重新随机（换成卡池里的新任务），保持已完成状态。 |
+| 封印 | `seal` | 获得「封印」：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上会出现屏障图标。冷却 15 分钟。 |
 
 ## Hex list (English)
 
-### Silver (54)
+### Silver (55)
 
 | Name | id | Effect |
 |---|---|---|
@@ -285,8 +289,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Ascetic | `ascetic` | Clear all of your team's completed cells and immediately gain 2 random prismatic hexes. Only appears in the third hex selection. |
 | DJ | `dj` | Gain 1 note block and 3 random music discs. |
 | Omen Compatible | `bad_omen` | Gain one level of Bad Omen every 30 seconds, up to level III. |
+| Team Backpack Expansion | `team_backpack` | Expand your team's /bp backpack to 72 slots. |
 
-### Gold (48)
+### Gold (49)
 
 | Name | id | Effect |
 |---|---|---|
@@ -338,8 +343,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Blackstone Walker | `blackstone_walker` | Walk on lava like Frost Walker: the lava under your feet turns into temporary blackstone that melts back after a few seconds. |
 | Shrink | `shrink` | Gain 'Shrink': right-click to shrink the nearest enemy to 25% size (jump power and interaction range shrink too) for 60 seconds. Cooldown 8 minutes. |
 | Backpack Thief | `backpack_thief` | Gain 'Backpack Thief': right-click to randomly steal 3 items from the nearest enemy's inventory (bound skill items excluded). Cooldown 3 minutes. |
+| Near Line | `near_line` | When your team is 1 cell away from a bingo line, the whole team gains Haste II and Speed I. |
 
-### Prismatic (37)
+### Prismatic (39)
 
 | Name | id | Effect |
 |---|---|---|
@@ -380,6 +386,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to open the current Bingo card and click any incomplete task to light it up for your team only, keeping its original icon. One-time item. |
 | Pan Is Right | `pan_is_right` | Gain 'Pan Is Right': right-click to reroll every hex of your whole team. One-time item: it disappears after use. |
 | Loot Hunter | `loot_hunter` | Killing a creature has a 3% chance to spawn a chest with random vanilla loot at its death spot. |
+| Card Recast | `card_recast` | Immediately reroll the contents of your team's completed tasks (replaced with new tasks from the pool), keeping them completed. |
+| Seal | `seal` | Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. Cooldown 15 minutes. |
 
 <!-- HEX-TABLE-END -->
 
@@ -396,7 +404,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.45.0 `
+.\build.ps1 -Version 26.2-1.46.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -419,6 +427,13 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.46.0 新增
+
+- 新增银色 **团队背包扩容**（`team_backpack`）：团队 /bp 背包容量从 54 格扩容到 72 格。
+- 新增金色 **临门一脚**（`near_line`）：本队只差 1 格就能成线时，全队获得急迫 II 与速度 I。
+- 新增彩色 **卡牌重铸**（`card_recast`）：立即把自己队伍已完成的任务内容重新随机（换成卡池里的新任务），保持已完成状态。
+- 新增彩色 **封印**（`seal`）：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上显示屏障图标。冷却 15 分钟。
 
 ### 1.45.0 新增
 

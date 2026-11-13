@@ -11,10 +11,26 @@ import com.castbingo.hexbingo.HexRegistry;
 import com.castbingo.hexbingo.network.HexRosterPayload;
 import com.castbingo.hexbingo.network.HexTaskListPayload;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 
 public final class HexClient {
+   /** 客户端缓存：被「封印」海克斯封印的任务下标。 */
+   private static final Set<Integer> SEALED = new HashSet<>();
+
+   public static boolean isSealed(int var0) {
+      return SEALED.contains(var0);
+   }
+
+   public static void applySeals(int[] var0) {
+      SEALED.clear();
+      for (int var1 : var0) {
+         SEALED.add(var1);
+      }
+   }
+
    public static void open(int var0, List<String> var1, boolean var2) {
       ArrayList var3 = new ArrayList(3);
 

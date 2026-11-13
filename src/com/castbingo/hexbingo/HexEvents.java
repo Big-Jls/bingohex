@@ -376,6 +376,9 @@ public class HexEvents {
       } else if (var1.is(Items.PAPER) && var2.equals("空白格")) {
          HexManager.openTaskPick(var0, "blank");
          return true;
+      } else if (var1.is(Items.BARRIER) && var2.equals("封印")) {
+         HexManager.openTaskPick(var0, "seal");
+         return true;
       } else if (var1.is(Items.SPYGLASS) && var2.equals("矿物透视")) {
          return HexEffects.castXray(var0);
       } else if (var1.is(Items.SLIME_BALL) && var2.equals("缩小术")) {
@@ -590,6 +593,10 @@ public class HexEvents {
       MinecraftServer var2 = var1.getLevel().getServer();
       if (var2 != null && HexGameData.get(var2).mayhem()) {
          if (HexEffects.handleHexItemAdvancement(var1)) {
+            return;
+         }
+
+         if (HexEffects.handleSeal(var1)) {
             return;
          }
 
