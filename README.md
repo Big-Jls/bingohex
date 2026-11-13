@@ -41,8 +41,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.6.jar` 放入客户端与服务端的 `mods`。
+2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.10.jar`，`modId` 为 `bongo`）。
+3. 把 `HexBingo-26.2-1.49.7.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -419,11 +419,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.6 `
+.\build.ps1 -Version 26.2-1.49.7 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.9.jar"
+  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.10.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。
@@ -442,6 +442,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.49.7 修复
+
+- **团队背包扩容**（`team_backpack`）：修复 72 格界面里的改动不会落盘的问题——新建的团队背包菜单和扩容本身都没有标记 Bingo 存档为脏数据，下线/重启后可能丢失物品；现在扩容与每次背包内容变化都会标记存档。
 
 ### 1.49.6 修复
 

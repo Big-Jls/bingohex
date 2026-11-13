@@ -11302,6 +11302,9 @@ public final class HexEffects {
          for (int var6 = 0; var6 < var4.length; var6++) {
             var3.setStackInSlot(var6, var4[var6]);
          }
+
+         // 扩容改了团队背包内容，需要标记 Bingo 脏数据才会落盘
+         Bingo.get(var1.overworld()).setDirty();
       }
 
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.team_backpack").withStyle(ChatFormatting.GOLD));
@@ -11314,15 +11317,16 @@ public final class HexEffects {
          return false;
       }
 
-      Team var2 = Bingo.get(var1.overworld()).getTeam(var0);
-      if (var2 == null || !(var2.getBackPack() instanceof ItemStackHandler var3) || var3.getSlots() <= 54) {
+      Bingo var2 = Bingo.get(var1.overworld());
+      Team var3 = var2.getTeam(var0);
+      if (var3 == null || !(var3.getBackPack() instanceof ItemStackHandler var4) || var4.getSlots() <= 54) {
          return false;
       }
 
-      var0.openMenu(new HexBpMenu.Provider(var3, var2.getName()));
+      var0.openMenu(new HexBpMenu.Provider(var4, var3.getName(), var2::setDirty));
       // 原版界面表无法注册自定义菜单界面，由封包补开 72 格界面
       PacketDistributor.sendToPlayer(
-         var0, new HexBpOpenPayload(Component.translatable("bongo.backpack").append(var2.getName())), new CustomPacketPayload[0]
+         var0, new HexBpOpenPayload(Component.translatable("bongo.backpack").append(var3.getName())), new CustomPacketPayload[0]
       );
       return true;
    }

@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.49.7 — 2026-11-14
+
+### Fixed
+
+- **Team Backpack Expansion** (`team_backpack`): changes made in the 72-slot
+  backpack were never marked dirty on the Bingo saved data, so the contents
+  could be lost on logout or server restart. The expansion itself and every
+  later content change now call `Bingo.setDirty()`, matching the vanilla
+  `/bp` container behaviour.
+
 ## 26.2-1.49.6 — 2026-11-14
 
 ### Fixed

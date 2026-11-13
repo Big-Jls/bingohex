@@ -22,14 +22,22 @@ import net.neoforged.neoforge.items.SlotItemHandler;
  */
 public class HexBpMenu extends AbstractContainerMenu {
    private final ItemStackHandler handler;
+   private final Runnable dirty;
+   private final ItemStack[] snapshot;
 
-   public HexBpMenu(int var0, Inventory var1, ItemStackHandler var2) {
+   public HexBpMenu(int var0, Inventory var1, ItemStackHandler var2, Runnable var3) {
       super(HexMenus.TEAM_BP.get(), var0);
       this.handler = var2;
+      this.dirty = var3;
+      this.snapshot = var2 == null ? new ItemStack[0] : new ItemStack[var2.getSlots()];
       if (var2 != null) {
-         for (int var3 = 0; var3 < 8; var3++) {
-            for (int var4 = 0; var4 < 9; var4++) {
-               this.addSlot(new SlotItemHandler(var2, var3 * 9 + var4, 8 + 18 * var4, 17 + 18 * var3));
+         for (int var4 = 0; var4 < this.snapshot.length; var4++) {
+            this.snapshot[var4] = var2.getStackInSlot(var4).copy();
+         }
+
+         for (int var5 = 0; var5 < 8; var5++) {
+            for (int var6 = 0; var6 < 9; var6++) {
+               this.addSlot(new SlotItemHandler(var2, var5 * 9 + var6, 8 + 18 * var6, 17 + 18 * var5));
             }
          }
       }
@@ -47,7 +55,29 @@ public class HexBpMenu extends AbstractContainerMenu {
 
    /** 客户端侧：该版本打开界面封包不携带额外数据，先建 72 个空槽，内容由容器同步包填充。 */
    public static HexBpMenu createFromNetwork(int var0, Inventory var1, RegistryFriendlyByteBuf var2) {
-      return new HexBpMenu(var0, var1, new ItemStackHandler(72));
+      return new HexBpMenu(var0, var1, new ItemStackHandler(72), null);
+   }
+
+   /** 服务端每 tick 检测团队背包内容变化：ReBongo 的 SavedData 需要 setDirty 才会落盘，否则重启后物品丢失。 */
+   @Override
+   public void broadcastChanges() {
+      if (this.dirty != null && this.handler != null) {
+         boolean var1 = false;
+
+         for (int var2 = 0; var2 < this.snapshot.length && var2 < this.handler.getSlots(); var2++) {
+            ItemStack var3 = this.handler.getStackInSlot(var2);
+            if (!ItemStack.matches(var3, this.snapshot[var2])) {
+               this.snapshot[var2] = var3.copy();
+               var1 = true;
+            }
+         }
+
+         if (var1) {
+            this.dirty.run();
+         }
+      }
+
+      super.broadcastChanges();
    }
 
    @Override
@@ -80,14 +110,16 @@ public class HexBpMenu extends AbstractContainerMenu {
       return true;
    }
 
-   /** 服务端菜单提供器：直接持有队伍背包本身。 */
+   /** 服务端菜单提供器：直接持有队伍背包本身，内容变化时通知 Bingo 落盘。 */
    public static final class Provider implements MenuProvider {
       private final ItemStackHandler handler;
       private final Component team;
+      private final Runnable dirty;
 
-      public Provider(ItemStackHandler var1, Component var2) {
+      public Provider(ItemStackHandler var1, Component var2, Runnable var3) {
          this.handler = var1;
          this.team = var2;
+         this.dirty = var3;
       }
 
       @Override
@@ -97,7 +129,7 @@ public class HexBpMenu extends AbstractContainerMenu {
 
       @Override
       public AbstractContainerMenu createMenu(int var1, Inventory var2, Player var3) {
-         return new HexBpMenu(var1, var2, this.handler);
+         return new HexBpMenu(var1, var2, this.handler, this.dirty);
       }
    }
 }
