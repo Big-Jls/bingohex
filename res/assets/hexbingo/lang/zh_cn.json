@@ -685,5 +685,15 @@
     "hexbingo.hex.all_mine.desc":  "打开任务界面选择一个任务，其他所有队伍将永久无法完成它（自己的队伍不受影响）。一次性技能，只能在第三个海克斯出现，不能被质变获得。",
     "hexbingo.item.all_mine.lore":  "右键：选择一个任务，锁定其他所有队伍的这一格。一次性。",
     "hexbingo.msg.all_mine_cast":  "%s 使用「全是我的」锁定了任务「%s」，其他队伍无法再完成！",
-    "hexbingo.mine.title":  "全是我的：选择一个任务"
+    "hexbingo.mine.title":  "全是我的：选择一个任务",
+    "hexbingo.hex.fisherman.name":  "钓鱼佬",
+    "hexbingo.hex.fisherman.desc":  "获得一把附魔「海之眷顾 X」的鱼竿。钓鱼时除了鱼什么都能钓上来（随机物品池与仆从大师相同）。",
+    "hexbingo.item.fisherman.lore":  "钓鱼佬的鱼竿：除了鱼什么都能钓上来。",
+    "hexbingo.msg.fisherman":  "钓鱼佬：你获得了海之眷顾 X 鱼竿，钓鱼时除了鱼什么都能钓上来！",
+    "hexbingo.hex.silver_shift.name":  "质变白银阶",
+    "hexbingo.hex.silver_shift.desc":  "立刻获得 2 个随机银色海克斯。",
+    "hexbingo.hex.ended.name":  "结束了！",
+    "hexbingo.hex.ended.desc":  "击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会持续受到伤害（主世界与地狱不受影响）。",
+    "hexbingo.msg.ended_info":  "结束了！：击杀末影龙将直接结束比赛并让你的队伍获胜，但你们在末地会受到持续伤害。",
+    "hexbingo.msg.ended_win":  "末影龙被 %s 击杀——比赛结束了！"
 }

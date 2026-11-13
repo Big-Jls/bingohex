@@ -49,6 +49,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInte
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -158,6 +159,7 @@ public class HexEvents {
          HexEffects.tickSwordFly(var2);
          HexEffects.tickDice(var2);
          HexEffects.tickMindControl(var2);
+         HexEffects.tickEnded(var2);
          if (var2.tickCount % 10 == 0) {
             HexEffects.tickBoundItems(var2);
          }
@@ -296,6 +298,14 @@ public class HexEvents {
          && var1.getLevel().getBlockEntity(var1.getPos()) instanceof ChestBlockEntity var2
          && var2.getLootTable() != null) {
          HexEffects.tryHiddenPocket(var0);
+      }
+   }
+
+   @SubscribeEvent
+   public void itemFished(ItemFishedEvent var1) {
+      // 钓鱼佬：钓鱼掉落替换为随机物品（仆从大师同款池，除鱼外）
+      if (var1.getEntity() instanceof ServerPlayer var2 && HexEffects.hasHex(var2, "fisherman")) {
+         HexEffects.fishermanLoot(var1);
       }
    }
 

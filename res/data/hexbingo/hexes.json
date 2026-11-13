@@ -1463,6 +1463,35 @@
                                           "type":  "all_mine"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "fisherman",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "fisherman"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "silver_shift",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "grant_random_hex",
+                                          "key":  "silver",
+                                          "count":  2
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "ended",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "ended"
+                                      }
+                                  ]
                   }
               ]
 }

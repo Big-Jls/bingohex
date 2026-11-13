@@ -119,6 +119,7 @@ import net.minecraft.world.entity.animal.parrot.Parrot.Variant;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.wolf.WolfVariant;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.EnderMan;
@@ -208,6 +209,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
+import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
@@ -667,10 +669,15 @@ public final class HexEffects {
          case "quality_up":
             HexGameData.get(var0.level().getServer()).addQualityUp(var0.getUUID(), Math.max(1, (int)var3.amount));
             break;
-         // 质变黄金阶、质变棱彩阶
-         case "grant_random_hex":
-            grantRandomHex(var0, var3.key.isEmpty() ? "gold" : var3.key, "transformed");
+         // 质变黄金阶、质变棱彩阶、质变白银阶（count 为发放数量，默认 1）
+         case "grant_random_hex": {
+            int var20 = Math.max(1, var3.count);
+
+            for (int var21 = 0; var21 < var20; var21++) {
+               grantRandomHex(var0, var3.key.isEmpty() ? "gold" : var3.key, "transformed");
+            }
             break;
+         }
          // 我想要、我很想要、我真的很想要
          case "random_items":
             giveRandomItems(var0, Math.max(1, var3.count));
@@ -1119,6 +1126,14 @@ public final class HexEffects {
          // 全是我的：一次性技能，右键道具打开任务选择
          case "all_mine":
             giveAllMineItem(var0);
+            break;
+         // 钓鱼佬：发放海之眷顾 X 鱼竿，钓鱼掉落改为随机物品（除鱼外）
+         case "fisherman":
+            giveFishermanRod(var0);
+            break;
+         // 结束了！：击杀末影龙直接结束比赛（本队将在末地持续受到伤害）
+         case "ended":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.ended_info").withStyle(ChatFormatting.LIGHT_PURPLE));
             break;
          // 路易十六
          case "louis_xvi":
@@ -2368,6 +2383,11 @@ public final class HexEffects {
    }
 
    public static void death(LivingDeathEvent var0) {
+      // 结束了！：击杀末影龙直接结束比赛（击杀者的队伍获胜）
+      if (var0.getEntity() instanceof EnderDragon && var0.getSource().getEntity() instanceof ServerPlayer var22 && teamOwnsEnded(var22, team(var22))) {
+         endGameWithWin(var22);
+      }
+
       if (var0.getSource().getEntity() instanceof ServerPlayer var1 && var0.getEntity() != var1) {
          for (Hex var3 : hexes(var1)) {
             for (HexEffect var5 : var3.effects()) {
@@ -6020,6 +6040,10 @@ public final class HexEffects {
 
       if (hasHex(var0, "blank_cell") && !BLANK_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "空白格")) {
          giveBlankCellItem(var0);
+      }
+
+      if (hasHex(var0, "fisherman") && !hasNamedItem(var0, "钓鱼佬")) {
+         giveFishermanRod(var0);
       }
    }
 
@@ -11675,6 +11699,104 @@ public final class HexEffects {
 
       for (ServerPlayer var11 : var2.getPlayerList().getPlayers()) {
          var11.sendSystemMessage(var9);
+      }
+   }
+
+   // 钓鱼佬：发放海之眷顾 X 鱼竿；钓鱼掉落改为随机物品（仆从大师同款池，除鱼外）
+   private static void giveFishermanRod(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "钓鱼佬")) {
+         ItemStack var1 = questItem(Items.FISHING_ROD, "钓鱼佬", "hexbingo.item.fisherman.lore");
+         Registry<Enchantment> var2 = var0.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+         var1.enchant(var2.wrapAsHolder(var2.getValueOrThrow(Enchantments.LUCK_OF_THE_SEA)), 10);
+         var0.addItem(var1);
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.fisherman").withStyle(ChatFormatting.GOLD));
+      }
+   }
+
+   public static void fishermanLoot(ItemFishedEvent var0) {
+      NonNullList<ItemStack> var1 = var0.getDrops();
+      var1.clear();
+      ThreadLocalRandom var2 = ThreadLocalRandom.current();
+      int var3 = 1 + var2.nextInt(2);
+
+      for (int var4 = 0; var4 < var3; var4++) {
+         Item var5 = randomFishingItem();
+         if (var5 != null) {
+            var1.add(new ItemStack(var5));
+         }
+      }
+
+      var0.damageRodBy(1);
+   }
+
+   // 从仆从大师全物品池随机取一个物品，排除鱼（重试几次）
+   private static Item randomFishingItem() {
+      for (int var0 = 0; var0 < 8; var0++) {
+         Item var1 = randomPetItem();
+         if (var1 != null && var1 != Items.COD && var1 != Items.SALMON && var1 != Items.TROPICAL_FISH && var1 != Items.PUFFERFISH) {
+            return var1;
+         }
+      }
+
+      return null;
+   }
+
+   // 结束了！：该队伍是否有成员拥有此海克斯
+   private static boolean teamOwnsEnded(ServerPlayer var0, Team var1) {
+      if (var1 == null) {
+         return false;
+      }
+
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return false;
+      }
+
+      for (UUID var3 : var1.getPlayers()) {
+         ServerPlayer var4 = var2.getPlayerList().getPlayer(var3);
+         if (var4 != null && hasHex(var4, "ended")) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   // 结束了！：拥有者在末地每 3 秒受到 1 点伤害（主世界与地狱不受影响）
+   public static void tickEnded(ServerPlayer var0) {
+      if (var0.level().dimension() == Level.END && var0.tickCount % 60 == 0 && teamOwnsEnded(var0, team(var0))) {
+         var0.hurt(var0.damageSources().generic(), 1.0F);
+      }
+   }
+
+   // 结束了！：击杀末影龙直接结束当前比赛，击杀者的队伍获胜
+   private static void endGameWithWin(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return;
+      }
+
+      Bingo var2 = Bingo.get(var1.overworld());
+      if (!var2.running()) {
+         return;
+      }
+
+      Team var3 = team(var0);
+      if (var3 == null) {
+         return;
+      }
+
+      try {
+         Method var4 = Bingo.class.getDeclaredMethod("setWin", Team.class);
+         var4.setAccessible(true);
+         var4.invoke(var2, var3);
+      } catch (Exception var5) {
+         // 反射失败兜底：直接停赛
+         var2.stop();
+      }
+
+      for (ServerPlayer var7 : var1.getPlayerList().getPlayers()) {
+         var7.sendSystemMessage(Component.translatable("hexbingo.msg.ended_win", var3.getName()).withStyle(ChatFormatting.LIGHT_PURPLE));
       }
    }
 

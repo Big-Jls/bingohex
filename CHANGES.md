@@ -1,5 +1,19 @@
 # Changelog
 
+## 26.2-1.49.0 — 2026-11-14
+
+### Added
+
+- **Fisherman** (`fisherman`, gold): gain a fishing rod enchanted with Luck of
+  the Sea X. Fishing reels in anything except fish — drops are replaced with
+  1-2 random items from the Pet Master item pool (fish excluded).
+- **Silver Ascension** (`silver_shift`, silver): immediately gain 2 random
+  silver hexes.
+- **It's Over!** (`ended`, prismatic): killing the Ender Dragon immediately
+  ends the current game with the killer's team winning; but the owning team
+  takes 1 damage every 3 seconds while in the End (Overworld and Nether are
+  unaffected).
+
 ## 26.2-1.48.0 — 2026-11-14
 
 ### Added
