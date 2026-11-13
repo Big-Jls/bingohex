@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **143 个海克斯强化**：55 银色 / 49 金色 / 39 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **144 个海克斯强化**：55 银色 / 50 金色 / 39 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.46.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.47.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -53,6 +53,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | **K** | 打开「海克斯一览」：查看所有队伍/玩家已经选了哪些海克斯（只读名单），叠角龙会显示当前层数 |
 | **V** | 切换蜘蛛类效果（获得对应海克斯后可用） |
 | **T** | 开关吸铁石吸物功能（获得对应海克斯后可用） |
+| **R** | 开关踏剑飞行（获得对应海克斯后可用） |
 | **G** | 点石成金：把副手物品转化为等量金锭（获得对应海克斯后可用） |
 
 | 命令 | 权限 | 说明 |
@@ -69,7 +70,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（143）
+## 海克斯一览（144）
 
 ### 银色（55）
 
@@ -131,7 +132,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 兼容灾厄 | `bad_omen` | 每 30 秒获得一级不祥之兆，最高 III 级。 |
 | 团队背包扩容 | `team_backpack` | 你们团队的 /bp 背包容量扩容到 72 格。 |
 
-### 金色（49）
+### 金色（50）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -184,6 +185,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 缩小术 | `shrink` | 获得「缩小术」：右键把最近敌人缩小到 25%（体型、跳跃与交互范围同步缩小），持续 60 秒。冷却 8 分钟。 |
 | 背包小偷 | `backpack_thief` | 获得「背包小偷」：右键随机偷取最近敌人背包里的 3 件物品（绑定技能物品除外）。冷却 3 分钟。 |
 | 临门一脚 | `near_line` | 本队只差 1 格就能成线时，全队获得急迫 II 与速度 I。 |
+| 踏剑飞行 | `sword_fly` | 按 R 消耗背包与物品栏中剑的耐久来飞行：木剑满耐久可飞 10 秒，金剑 15 秒、石剑 20 秒、铁剑 30 秒、钻石剑 45 秒、下界合金剑 60 秒。飞行速度随剑档位渐变提升，最高不超过鞘翅，脚下会显示正在消耗的剑。 |
 
 ### 彩色（39）
 
@@ -404,7 +406,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.46.0 `
+.\build.ps1 -Version 26.2-1.47.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -427,6 +429,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.47.0 新增
+
+- 新增金色 **踏剑飞行**（`sword_fly`）：按 R 消耗背包与物品栏中剑的耐久获得创造式飞行——木剑满耐久可飞 10 秒，金剑 15 秒、石剑 20 秒、铁剑 30 秒、钻石剑 45 秒、下界合金剑 60 秒；主手→副手→背包取档位最低的剑优先消耗，剑碎自动换下一把，没剑时停止飞行并给 5 秒缓降。飞行速度随剑档位渐变提升，最高不超过鞘翅，脚下有展示实体显示正在消耗的剑。
 
 ### 1.46.0 新增
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## 26.2-1.47.0 — 2026-11-13
+
+### Added
+
+- **Sword Flight** (`sword_fly`, gold): press R to gain creative-style flight by
+  consuming sword durability from your inventory and team backpack — a wooden
+  sword lasts 10 seconds, gold 15s, stone 20s, iron 30s, diamond 45s, netherite
+  60s. The lowest-tier sword is consumed first (main hand, then offhand, then
+  the team backpack); when a sword breaks the next one is picked up
+  automatically, and with no swords left flight stops and grants 5 seconds of
+  Slow Falling. Flight speed ramps up with the sword tier, never faster than
+  elytra, and the sword being consumed is shown by a display entity at your
+  feet.
+
 ## 26.2-1.46.0 — 2026-11-13
 
 ### Added

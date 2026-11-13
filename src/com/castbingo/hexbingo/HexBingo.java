@@ -23,6 +23,7 @@ import com.castbingo.hexbingo.network.HexRosterRequestPayload;
 import com.castbingo.hexbingo.network.HexSealPayload;
 import com.castbingo.hexbingo.network.HexSelectPayload;
 import com.castbingo.hexbingo.network.HexSpiderTogglePayload;
+import com.castbingo.hexbingo.network.HexSwordFlyTogglePayload;
 import com.castbingo.hexbingo.network.HexTaskListPayload;
 import com.castbingo.hexbingo.network.HexTaskPickPayload;
 import com.mojang.logging.LogUtils;
@@ -108,6 +109,11 @@ public final class HexBingo {
          .playToServer(HexMagnetTogglePayload.TYPE, HexMagnetTogglePayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
             if (var1x.player() instanceof ServerPlayer var2) {
                HexEffects.toggleMagnet(var2);
+            }
+         }))
+         .playToServer(HexSwordFlyTogglePayload.TYPE, HexSwordFlyTogglePayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> {
+            if (var1x.player() instanceof ServerPlayer var2) {
+               HexEffects.toggleSwordFly(var2);
             }
          }))
          .playToClient(HexDiceRollPayload.TYPE, HexDiceRollPayload.STREAM_CODEC, (var0, var1x) -> var1x.enqueueWork(() -> HexDiceAnim.start(var0.durationTicks())))

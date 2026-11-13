@@ -1427,6 +1427,15 @@
                                           "type":  "seal"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "sword_fly",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "sword_fly"
+                                      }
+                                  ]
                   }
               ]
 }

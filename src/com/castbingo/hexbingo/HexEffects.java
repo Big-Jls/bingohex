@@ -126,6 +126,7 @@ import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.EyeOfEnder;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -300,6 +301,12 @@ public final class HexEffects {
    private static final long CHAOS_MIND_COOLDOWN_MS = 480000L;
    private static final Set<UUID> SPIDER_CLIMB_OFF = new HashSet<>();
    private static final Set<UUID> MAGNET_OFF = new HashSet<>();
+   // 踏剑飞行：开启状态 / 原飞行速度 / 耐久消耗累加器 / 脚下的剑展示实体
+   private static final Set<UUID> SWORD_FLY_ON = new HashSet<>();
+   private static final Map<UUID, Float> SWORD_FLY_SAVED_SPEED = new HashMap<>();
+   private static final Map<UUID, Double> SWORD_FLY_CONSUME = new HashMap<>();
+   private static final Map<UUID, Display.ItemDisplay> SWORD_FLY_DISPLAYS = new HashMap<>();
+   private static final Map<UUID, Item> SWORD_FLY_DISPLAY_ITEM = new HashMap<>();
    private static final Set<Item> VALUABLE_PET_ITEMS = Set.of(
       Items.DIAMOND,
       Items.DIAMOND_BLOCK,
@@ -1062,6 +1069,10 @@ public final class HexEffects {
          case "seal":
             giveSealItem(var0);
             break;
+         // 踏剑飞行
+         case "sword_fly":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.sword_fly").withStyle(ChatFormatting.GOLD));
+            break;
          // 路易十六
          case "louis_xvi":
             LOUIS_PENDING.add(var0.getUUID());
@@ -1320,6 +1331,7 @@ public final class HexEffects {
       DRAGON_SOUND_TIMER.remove(var0.getUUID());
       cancelIncubation(var0.getUUID(), false);
       endBatForm(var0, false);
+      endSwordFly(var0, false);
       endEndExile(var0, false);
       clearXrayMarkers(var0);
       BLIND_COOLDOWN.remove(var0.getUUID());
@@ -9269,6 +9281,277 @@ public final class HexEffects {
       var0.sendOverlayMessage(Component.translatable(var1 ? "hexbingo.msg.magnet_on" : "hexbingo.msg.magnet_off"));
    }
 
+   // ============ 踏剑飞行 ============
+   // 消耗背包与物品栏中剑的耐久获得创造式飞行（R 键开关）：
+   // 主手→副手→团队背包，取档位最低的剑优先（保好剑）；剑耐久按"满耐久飞行时长"匀速消耗，
+   // 剑碎自动换下一把；没有剑时停止飞行并给 5 秒缓降。
+   // 水平速度上限与鞘翅最大水平速度一致（1.8 格/tick），木剑最慢，随剑档位渐变提升。
+
+   // 剑档位：满耐久可飞秒数
+   private static float swordFlySeconds(Item var0) {
+      if (var0 == Items.WOODEN_SWORD) {
+         return 10.0F;
+      } else if (var0 == Items.GOLDEN_SWORD) {
+         return 15.0F;
+      } else if (var0 == Items.STONE_SWORD) {
+         return 20.0F;
+      } else if (var0 == Items.IRON_SWORD) {
+         return 30.0F;
+      } else if (var0 == Items.DIAMOND_SWORD) {
+         return 45.0F;
+      } else {
+         return var0 == Items.NETHERITE_SWORD ? 60.0F : 20.0F;
+      }
+   }
+
+   // 剑档位：水平速度上限（格/tick），下界合金剑与鞘翅最高速度一致
+   private static float swordFlyCap(Item var0) {
+      if (var0 == Items.WOODEN_SWORD) {
+         return 0.4F;
+      } else if (var0 == Items.GOLDEN_SWORD) {
+         return 0.6F;
+      } else if (var0 == Items.STONE_SWORD) {
+         return 0.8F;
+      } else if (var0 == Items.IRON_SWORD) {
+         return 1.1F;
+      } else if (var0 == Items.DIAMOND_SWORD) {
+         return 1.45F;
+      } else {
+         return var0 == Items.NETHERITE_SWORD ? 1.8F : 0.8F;
+      }
+   }
+
+   // 剑档位排序：木 0 < 金 1 < 石 2 < 铁 3 < 钻 4 < 下界合金 5，未知剑按石剑算
+   private static int swordFlyTier(Item var0) {
+      if (var0 == Items.WOODEN_SWORD) {
+         return 0;
+      } else if (var0 == Items.GOLDEN_SWORD) {
+         return 1;
+      } else if (var0 == Items.STONE_SWORD) {
+         return 2;
+      } else if (var0 == Items.IRON_SWORD) {
+         return 3;
+      } else if (var0 == Items.DIAMOND_SWORD) {
+         return 4;
+      } else {
+         return var0 == Items.NETHERITE_SWORD ? 5 : 2;
+      }
+   }
+
+   private static boolean swordFlyCandidate(ItemStack var0) {
+      return !var0.isEmpty() && var0.isDamageableItem() && var0.is(ItemTags.SWORDS);
+   }
+
+   // 当前消耗的剑（每一 tick 重新挑选）
+   private static final class SwordFlyPick {
+      ItemStack stack = ItemStack.EMPTY;
+      Item item = Items.AIR;
+      Runnable onBreak = () -> {};
+      float cap = 0.4F;
+      double rate = 0.0;
+   }
+
+   private static HexEffects.SwordFlyPick pickSwordFlySword(ServerPlayer var0, Team var1) {
+      HexEffects.SwordFlyPick var2 = new HexEffects.SwordFlyPick();
+      int var3 = Integer.MAX_VALUE;
+      ItemStack var4 = var0.getMainHandItem();
+      if (swordFlyCandidate(var4)) {
+         var3 = swordFlyTier(var4.getItem());
+         var2.stack = var4;
+         var2.item = var4.getItem();
+         var2.onBreak = () -> var0.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+      }
+
+      ItemStack var5 = var0.getOffhandItem();
+      if (swordFlyCandidate(var5) && swordFlyTier(var5.getItem()) < var3) {
+         var3 = swordFlyTier(var5.getItem());
+         var2.stack = var5;
+         var2.item = var5.getItem();
+         var2.onBreak = () -> var0.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+      }
+
+      if (var1 != null) {
+         IItemHandlerModifiable var6 = var1.getBackPack();
+         for (int var7 = 0; var7 < var6.getSlots(); var7++) {
+            ItemStack var8 = var6.getStackInSlot(var7);
+            if (swordFlyCandidate(var8) && swordFlyTier(var8.getItem()) < var3) {
+               var3 = swordFlyTier(var8.getItem());
+               var2.stack = var8;
+               var2.item = var8.getItem();
+               int var9 = var7;
+               var2.onBreak = () -> {
+                  var6.setStackInSlot(var9, ItemStack.EMPTY);
+                  var1.setDirty();
+               };
+            }
+         }
+      }
+
+      if (!var2.stack.isEmpty()) {
+         var2.cap = swordFlyCap(var2.item);
+         // 每 tick 消耗的耐久点数 = 满耐久 ÷（可飞秒数 × 20）
+         var2.rate = (double)var2.stack.getMaxDamage() / (double)(swordFlySeconds(var2.item) * 20.0F);
+      }
+
+      return var2;
+   }
+
+   public static void toggleSwordFly(ServerPlayer var0) {
+      if (!hasHex(var0, "sword_fly")) {
+         return;
+      }
+
+      if (SWORD_FLY_ON.contains(var0.getUUID())) {
+         endSwordFly(var0, true);
+         var0.sendOverlayMessage(Component.translatable("hexbingo.msg.sword_fly_off"));
+      } else {
+         SWORD_FLY_ON.add(var0.getUUID());
+         if (!SWORD_FLY_SAVED_SPEED.containsKey(var0.getUUID())) {
+            SWORD_FLY_SAVED_SPEED.put(var0.getUUID(), var0.getAbilities().getFlyingSpeed());
+         }
+         var0.sendOverlayMessage(Component.translatable("hexbingo.msg.sword_fly_on"));
+      }
+   }
+
+   public static void tickSwordFly(ServerPlayer var0) {
+      UUID var2 = var0.getUUID();
+      if (!hasHex(var0, "sword_fly")) {
+         if (SWORD_FLY_ON.contains(var2)) {
+            endSwordFly(var0, true);
+         }
+         return;
+      }
+
+      if (!SWORD_FLY_ON.contains(var2)) {
+         return;
+      }
+
+      if (var0.isSpectator()) {
+         endSwordFly(var0, true);
+         return;
+      }
+
+      Team var3 = Bingo.get(var0.level()).getTeam(var0);
+      HexEffects.SwordFlyPick var4 = pickSwordFlySword(var0, var3);
+      if (var4.stack.isEmpty()) {
+         var0.sendOverlayMessage(Component.translatable("hexbingo.msg.sword_fly_no_sword"));
+         endSwordFly(var0, true);
+         return;
+      }
+
+      // 开启创造式飞行
+      Abilities var5 = var0.getAbilities();
+      if (!var5.mayfly) {
+         if (!SWORD_FLY_SAVED_SPEED.containsKey(var2)) {
+            SWORD_FLY_SAVED_SPEED.put(var2, var5.getFlyingSpeed());
+         }
+         var5.mayfly = true;
+         var5.flying = true;
+         var0.onUpdateAbilities();
+      }
+
+      // 飞行速度随当前剑档位调整：flyingSpeed ≈ 速度上限 ÷ 10.1（每 tick 0.91 摩擦的稳态）
+      float var6 = var4.cap * 0.0989F;
+      if (Math.abs(var5.getFlyingSpeed() - var6) > 1.0E-4F) {
+         var5.setFlyingSpeed(var6);
+         var0.onUpdateAbilities();
+      }
+
+      // 离地飞行时消耗耐久（落地休息不消耗）
+      if (!var0.onGround()) {
+         double var7 = SWORD_FLY_CONSUME.getOrDefault(var2, 0.0) + var4.rate;
+         int var9 = (int)var7;
+         if (var9 > 0) {
+            SWORD_FLY_CONSUME.put(var2, var7 - (double)var9);
+            var4.stack.setDamageValue(Math.min(var4.stack.getMaxDamage(), var4.stack.getDamageValue() + var9));
+            if (var4.stack.getDamageValue() >= var4.stack.getMaxDamage()) {
+               // 剑碎：清空对应槽位，下一 tick 自动换下一把
+               var4.onBreak.run();
+               var0.level().playSound(
+                  null, var0.getX(), var0.getY(), var0.getZ(), SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 0.8F, 0.8F + var0.getRandom().nextFloat() * 0.4F
+               );
+            }
+         } else {
+            SWORD_FLY_CONSUME.put(var2, var7);
+         }
+      }
+
+      // 水平速度钳制在鞘翅上限内（防止冲刺把飞行速度翻倍）
+      Vec3 var10 = var0.getDeltaMovement();
+      double var11 = var10.horizontalDistance();
+      if (var11 > (double)var4.cap) {
+         double var12 = (double)var4.cap / var11;
+         var0.setDeltaMovement(var10.x * var12, var10.y, var10.z * var12);
+      }
+
+      // 脚下展示正在消耗的剑
+      ensureSwordFlyDisplay(var0, var4.item);
+   }
+
+   private static void endSwordFly(ServerPlayer var0, boolean var1) {
+      UUID var2 = var0.getUUID();
+      discardSwordFlyDisplay(var2);
+      SWORD_FLY_CONSUME.remove(var2);
+      if (!SWORD_FLY_ON.remove(var2)) {
+         return;
+      }
+
+      Float var3 = SWORD_FLY_SAVED_SPEED.remove(var2);
+      if (var3 != null) {
+         var0.getAbilities().setFlyingSpeed(var3);
+      }
+
+      if (!var0.isCreative() && !var0.isSpectator()) {
+         var0.getAbilities().mayfly = false;
+         var0.getAbilities().flying = false;
+      }
+
+      var0.onUpdateAbilities();
+      if (var1) {
+         // 结束给 5 秒缓降，避免从飞行状态直接摔死
+         var0.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 0, true, false, true));
+      }
+   }
+
+   private static void discardSwordFlyDisplay(UUID var0) {
+      Display.ItemDisplay var1 = SWORD_FLY_DISPLAYS.remove(var0);
+      if (var1 != null && !var1.isRemoved()) {
+         var1.discard();
+      }
+
+      SWORD_FLY_DISPLAY_ITEM.remove(var0);
+   }
+
+   // 脚下生成正在消耗的剑的展示实体并跟随玩家
+   private static void ensureSwordFlyDisplay(ServerPlayer var0, Item var1) {
+      UUID var2 = var0.getUUID();
+      Display.ItemDisplay var3 = SWORD_FLY_DISPLAYS.get(var2);
+      Item var4 = SWORD_FLY_DISPLAY_ITEM.get(var2);
+      if (var3 != null && (var3.isRemoved() || var4 != var1 || var3.level() != var0.level())) {
+         var3.discard();
+         var3 = null;
+      }
+
+      if (var3 == null && var0.level() instanceof ServerLevel var5) {
+         Display.ItemDisplay var6 = EntityTypes.ITEM_DISPLAY.create(var5, EntitySpawnReason.MOB_SUMMONED);
+         if (var6 != null) {
+            var6.setPos(var0.getX(), var0.getY() + 0.35, var0.getZ());
+            var6.setNoGravity(true);
+            var6.setInvulnerable(true);
+            var6.setSilent(true);
+            var6.getSlot(0).set(new ItemStack(var1));
+            var5.addFreshEntity(var6);
+            SWORD_FLY_DISPLAYS.put(var2, var6);
+            SWORD_FLY_DISPLAY_ITEM.put(var2, var1);
+            var3 = var6;
+         }
+      }
+
+      if (var3 != null && !var3.isRemoved() && var3.level() == var0.level()) {
+         var3.teleportTo(var0.getX(), var0.getY() + 0.35, var0.getZ());
+      }
+   }
+
    // 3面骰：每 5 分钟投 d6，按点数给速度/缓慢/禁锢；先播放掷骰动画，动画结束后才结算
    public static void tickDice(ServerPlayer var0) {
       UUID var1 = var0.getUUID();
@@ -11165,6 +11448,7 @@ public final class HexEffects {
 
       for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
          endEndExile(var2, false);
+         endSwordFly(var2, false);
          clearXrayMarkers(var2);
          applyShrinkModifiers(var2, false);
       }
@@ -11172,6 +11456,13 @@ public final class HexEffects {
       END_EXILE.clear();
       XRAY_MARKERS.clear();
       TASK_SHIELDS.clear();
+      // 踏剑飞行：在线玩家已在上方循环中还原，这里清掉离线玩家的残留状态
+      SWORD_FLY_ON.clear();
+      SWORD_FLY_SAVED_SPEED.clear();
+      SWORD_FLY_CONSUME.clear();
+      SWORD_FLY_DISPLAYS.values().forEach(Entity::discard);
+      SWORD_FLY_DISPLAYS.clear();
+      SWORD_FLY_DISPLAY_ITEM.clear();
 
       // 黑石行者：对局结束把未还原的临时黑石还原回岩浆
       for (HexEffects.BlackstoneEntry var7 : BLACKSTONE_PENDING) {

@@ -154,6 +154,7 @@ public class HexEvents {
          HexEffects.tickSoulOut(var2);
          HexEffects.tickSpiderMan(var2);
          HexEffects.tickMagnet(var2);
+         HexEffects.tickSwordFly(var2);
          HexEffects.tickDice(var2);
          HexEffects.tickMindControl(var2);
          if (var2.tickCount % 10 == 0) {
