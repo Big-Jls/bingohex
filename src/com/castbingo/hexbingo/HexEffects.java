@@ -196,6 +196,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.TeamColor;
 import net.minecraft.world.phys.Vec3;
 import com.castbingo.hexbingo.network.HexDiceRollPayload;
+import com.castbingo.hexbingo.network.HexBpOpenPayload;
 import com.castbingo.hexbingo.network.HexSealPayload;
 import com.castbingo.hexbingo.network.HexAllMineLockPayload;
 import net.minecraft.world.phys.HitResult.Type;
@@ -11277,7 +11278,7 @@ public final class HexEffects {
       }
    }
 
-   // 团队背包扩容：把团队 /bp 背包扩容到 72 格（反射改 ItemStackHandler 大小，已有物品保留）
+   // 团队背包扩容：把团队 /bp 背包扩容到 72 格（setSize 会重建列表，先备份再回填，避免清空原物品）
    private static void expandTeamBackpack(ServerPlayer var0) {
       MinecraftServer var1 = var0.level().getServer();
       if (var1 == null) {
@@ -11285,22 +11286,45 @@ public final class HexEffects {
       }
 
       Team var2 = Bingo.get(var1.overworld()).getTeam(var0);
-      if (var2 == null) {
+      if (var2 == null || !(var2.getBackPack() instanceof ItemStackHandler var3)) {
          return;
       }
 
-      try {
-         Field var3 = Team.class.getDeclaredField("backpack");
-         var3.setAccessible(true);
-         if (var3.get(var2) instanceof ItemStackHandler var4) {
-            if (var4.getSlots() < 72) {
-               var4.setSize(72);
-            }
-            var0.sendSystemMessage(Component.translatable("hexbingo.msg.team_backpack").withStyle(ChatFormatting.GOLD));
+      if (var3.getSlots() < 72) {
+         ItemStack[] var4 = new ItemStack[var3.getSlots()];
+
+         for (int var5 = 0; var5 < var4.length; var5++) {
+            var4[var5] = var3.getStackInSlot(var5);
          }
-      } catch (Exception var5) {
-         HexBingo.LOGGER.warn("Failed to expand team backpack", var5);
+
+         var3.setSize(72);
+
+         for (int var6 = 0; var6 < var4.length; var6++) {
+            var3.setStackInSlot(var6, var4[var6]);
+         }
       }
+
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.team_backpack").withStyle(ChatFormatting.GOLD));
+   }
+
+   // 已扩容的队伍改用 72 格界面打开 /bp；返回 true 表示已由本模组接管
+   public static boolean openExpandedBackpack(ServerPlayer var0) {
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return false;
+      }
+
+      Team var2 = Bingo.get(var1.overworld()).getTeam(var0);
+      if (var2 == null || !(var2.getBackPack() instanceof ItemStackHandler var3) || var3.getSlots() <= 54) {
+         return false;
+      }
+
+      var0.openMenu(new HexBpMenu.Provider(var3, var2.getName()));
+      // 原版界面表无法注册自定义菜单界面，由封包补开 72 格界面
+      PacketDistributor.sendToPlayer(
+         var0, new HexBpOpenPayload(Component.translatable("bongo.backpack").append(var2.getName())), new CustomPacketPayload[0]
+      );
+      return true;
    }
 
    // 临门一脚：判断队伍是否只差 1 格就能成线

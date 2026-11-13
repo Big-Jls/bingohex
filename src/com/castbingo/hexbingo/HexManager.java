@@ -147,6 +147,12 @@ public final class HexManager {
                var0.setCanceled(true);
                return;
             }
+
+            // 团队背包已扩容：交给本模组的 72 格界面（原版 /bp 固定 54 格）
+            if (var18 && HexEffects.openExpandedBackpack(var4)) {
+               var0.setCanceled(true);
+               return;
+            }
          }
       }
 

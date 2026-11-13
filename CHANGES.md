@@ -1,5 +1,16 @@
 # Changelog
 
+## 26.2-1.49.6 — 2026-11-14
+
+### Fixed
+
+- **Team Backpack Expansion** (`team_backpack`): no longer wipes the team
+  backpack — resizing the handler rebuilt its internal list and dropped every
+  stored item; the contents are now backed up and restored.
+- **Team Backpack Expansion**: `/bp` (`/bingo backpack`) now opens a dedicated
+  72-slot menu (8 backpack rows + player inventory) instead of the fixed
+  54-slot vanilla chest, so the extra 18 slots are actually visible and usable.
+
 ## 26.2-1.49.5 — 2026-11-14
 
 ### Changed

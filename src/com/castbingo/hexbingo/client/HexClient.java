@@ -44,6 +44,14 @@ public final class HexClient {
       }
    }
 
+   /** 团队背包扩容：服务端已打开 72 格菜单，这里补上对应界面。 */
+   public static void openBpScreen(net.minecraft.network.chat.Component var0) {
+      Minecraft var1 = Minecraft.getInstance();
+      if (var1.player != null && var1.player.containerMenu instanceof com.castbingo.hexbingo.HexBpMenu var2) {
+         var1.setScreenAndShow(new HexBpScreen(var2, var1.player.getInventory(), var0));
+      }
+   }
+
    public static void open(int var0, List<String> var1, boolean var2) {
       ArrayList var3 = new ArrayList(3);
 
