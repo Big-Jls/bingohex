@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **150 个海克斯强化**：56 银色 / 53 金色 / 41 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **150 个海克斯强化**：55 银色 / 55 金色 / 40 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.2.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.49.3.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -72,14 +72,13 @@ ReBongo：https://github.com/Big-Jls/rebongo
 <!-- HEX-TABLE-START -->
 ## 海克斯一览（150）
 
-### 银色（56）
+### 银色（55）
 
 | 名称 | id | 效果 |
 |---|---|---|
 | 经验专精 | `experience_mastery` | 获得 500 点经验和 8–32 个随机青金石。 |
 | 我看到你了 | `i_see_you` | 每 2 秒使周围 20 格内的敌对生物发光。 |
 | 质变黄金阶 | `golden_shift` | 获得一个随机金色海克斯。 |
-| 质变白银阶 | `silver_shift` | 立刻获得 2 个随机银色海克斯。 |
 | 我想要 | `want_items` | 获得 5 个随机物品（与仆从大师宠物同款加权随机池）。 |
 | 枯木生花 | `random_wood` | 获得 5 种随机木头和 5 种随机花。 |
 | 练腿日 | `leg_day` | 永久获得速度 I。 |
@@ -133,7 +132,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 兼容灾厄 | `bad_omen` | 每 30 秒获得一级不祥之兆，最高 III 级。 |
 | 团队背包扩容 | `team_backpack` | 你们团队的 /bp 背包容量扩容到 72 格。 |
 
-### 金色（53）
+### 金色（55）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -144,6 +143,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 我很想要 | `want_more_items` | 获得 10 个随机物品（与仆从大师宠物同款加权随机池）。 |
 | 更更万用瞄准镜 | `scope_2` | 方块交互距离 +5，实体交互距离 +5。可与其他瞄准镜叠加。 |
 | 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
+| 质变白银阶 | `silver_shift` | 立刻获得 2 个随机银色海克斯。 |
 | 小蜜蜂 | `bees` | 在其他所有队伍附近召唤 10 只愤怒的蜜蜂。蜜蜂可以无视无敌蜇伤玩家。 |
 | 饕餮盛宴 | `gluttonous_feast` | 永久获得饥饿 II；每次吃下食物，随机获得一个等级 II 的增益，持续 15 秒。 |
 | 超强大脑 | `big_brain` | 你的所有物品变成随机物品持续 5 秒，之后恢复原背包。注意：期间新放进主物品栏的物品会被清除。 |
@@ -190,8 +190,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 隐藏夹层 | `hidden_pocket` | 开带战利品的箱子时有 3% 概率在你身边额外生成一个随机战利品箱。 |
 | 世界缩小 | `world_shrink` | 获得「世界缩小」：右键使用后全服标题警告 20 秒（期间允许 PVP），随后世界边界收缩到 500 格并把所有玩家随机传送到圈内，5 分钟后恢复。一次性；不会在第四个海克斯或游戏剩余不足 15 分钟时刷出。 |
 | 钓鱼佬 | `fisherman` | 获得一把附魔「海之眷顾 X」的鱼竿；钓鱼时除了鱼什么都能钓上来（随机物品池与仆从大师相同）。 |
+| 结束了！ | `ended` | 击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护——末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。 |
 
-### 彩色（41）
+### 彩色（40）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -235,18 +236,16 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 卡牌重铸 | `card_recast` | 立即把自己队伍已完成的任务内容重新随机（换成卡池里的新任务），保持已完成状态。 |
 | 封印 | `seal` | 获得「封印」：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上会出现屏障图标。冷却 15 分钟。 |
 | 全是我的 | `all_mine` | 获得「全是我的」：右键打开任务界面选择一个任务，其他所有队伍永久无法完成它（自己的队伍不受影响）。一次性；只能在第三个海克斯出现，不能被质变获得。 |
-| 结束了！ | `ended` | 击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护——末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。 |
 
 ## Hex list (English)
 
-### Silver (56)
+### Silver (55)
 
 | Name | id | Effect |
 |---|---|---|
 | Experience Mastery | `experience_mastery` | Gain 500 experience and 8-32 random lapis lazuli. |
 | I See You | `i_see_you` | Every 2s, hostile mobs within 20 blocks glow. |
 | Golden Ascension | `golden_shift` | Gain a random gold hex. |
-| Silver Ascension | `silver_shift` | Immediately gain 2 random silver hexes. |
 | I Want It | `want_items` | Gain 5 random items (same weighted pool as the Pet Master pet). |
 | Dead Wood Blooms | `random_wood` | Gain 5 random wood types and 5 random flower types. |
 | Leg Day | `leg_day` | Permanent Speed I. |
@@ -300,7 +299,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Omen Compatible | `bad_omen` | Gain one level of Bad Omen every 30 seconds, up to level III. |
 | Team Backpack Expansion | `team_backpack` | Expand your team's /bp backpack to 72 slots. |
 
-### Gold (53)
+### Gold (55)
 
 | Name | id | Effect |
 |---|---|---|
@@ -311,6 +310,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | I Want More | `want_more_items` | Gain 10 random items (same weighted pool as the Pet Master pet). |
 | Greater Utility Scope | `scope_2` | Gain +2 block interaction range and +2 entity interaction range. |
 | Prismatic Ascension | `prismatic_shift` | Gain a random prismatic hex. |
+| Silver Ascension | `silver_shift` | Immediately gain 2 random silver hexes. |
 | Little Bees | `bees` | Summon 10 angry bees around every enemy team. Bees can sting through invulnerability. |
 | Gluttonous Feast | `gluttonous_feast` | Permanently gain Hunger II. Eating any food grants a random level II buff for 15s. |
 | Big Brain | `big_brain` | All your inventory items become random items for 5s, then are restored. |
@@ -357,8 +357,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Hidden Compartment | `hidden_pocket` | Opening a loot chest has a 3% chance to spawn an extra random loot chest near you. |
 | World Shrink | `world_shrink` | Gain 'World Shrink': right-click to warn the whole server for 20 seconds (PVP enabled), then the world border shrinks to 500 blocks and all players are teleported to random spots inside the circle, restoring after 5 minutes. Single use; never offered as the fourth hex or with less than 15 minutes of game time left. |
 | Fisherman | `fisherman` | Gain a fishing rod enchanted with Luck of the Sea X; fishing reels in anything except fish (same random item pool as Pet Master). |
+| It's Over! | ended | Killing the Ender Dragon immediately ends the current game with the killer's team winning; but in the End your team loses invulnerability — enderman, dragon and fall damage all apply normally (the Overworld and Nether are unaffected). |
 
-### Prismatic (41)
+### Prismatic (40)
 
 | Name | id | Effect |
 |---|---|---|
@@ -402,7 +403,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Card Recast | `card_recast` | Immediately reroll the contents of your team's completed tasks (replaced with new tasks from the pool), keeping them completed. |
 | Seal | `seal` | Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. Cooldown 15 minutes. |
 | All Mine | `all_mine` | Gain 'All Mine': right-click to open the task UI and pick a task; every other team can never complete it (your own team is unaffected). Single use; only offered as the third hex and never obtained through transformations. |
-| It's Over! | `ended` | Killing the Ender Dragon immediately ends the current game with the killer's team winning; but in the End your team loses invulnerability — enderman, dragon and fall damage all apply normally (the Overworld and Nether are unaffected). |
 
 <!-- HEX-TABLE-END -->
 
@@ -419,7 +419,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.2 `
+.\build.ps1 -Version 26.2-1.49.3 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -443,6 +443,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 ## 更新日志
 
+### 1.49.3 调整
+
+- **质变白银阶**（`silver_shift`）：从银色调整为金色。
+- **结束了！**（`ended`）：从彩色调整为金色。
+
 ### 1.49.2 修复
 
 - **钓鱼佬**（`fisherman`）：移除钓鱼事件中重复的 `damageRodBy(1)` 调用——原版会按事件的初始耐久消耗扣鱼竿耐久，重复调用导致每次钓鱼鱼竿双倍掉耐久。
@@ -454,8 +459,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ### 1.49.0 新增
 
 - 新增金色 **钓鱼佬**（`fisherman`）：获得一把附魔「海之眷顾 X」的鱼竿；钓鱼时除了鱼什么都能钓上来（随机物品池与仆从大师相同，每次 1–2 件）。
-- 新增银色 **质变白银阶**（`silver_shift`）：立刻获得 2 个随机银色海克斯。
-- 新增彩色 **结束了！**（`ended`）：击杀末影龙会立即结束当前比赛并让击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护，末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。
+- 新增 **质变白银阶**（`silver_shift`）：立刻获得 2 个随机银色海克斯（1.49.3 起定为金色）。
+- 新增 **结束了！**（`ended`）：击杀末影龙会立即结束当前比赛并让击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护，末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响；1.49.3 起定为金色）。
 
 ### 1.48.0 新增与调整
 

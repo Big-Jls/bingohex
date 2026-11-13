@@ -1,5 +1,12 @@
 # Changelog
 
+## 26.2-1.49.3 — 2026-11-14
+
+### Changed
+
+- **Silver Ascension** (`silver_shift`): moved from silver to gold tier.
+- **It's Over!** (`ended`): moved from prismatic to gold tier.
+
 ## 26.2-1.49.2 — 2026-11-14
 
 ### Fixed
@@ -25,12 +32,12 @@
 - **Fisherman** (`fisherman`, gold): gain a fishing rod enchanted with Luck of
   the Sea X. Fishing reels in anything except fish — drops are replaced with
   1-2 random items from the Pet Master item pool (fish excluded).
-- **Silver Ascension** (`silver_shift`, silver): immediately gain 2 random
-  silver hexes.
-- **It's Over!** (`ended`, prismatic): killing the Ender Dragon immediately
-  ends the current game with the killer's team winning; the owning team loses
-  invulnerability in the End and takes normal damage there (Overworld and
-  Nether are unaffected).
+- **Silver Ascension** (`silver_shift`, gold since 1.49.3): immediately gain 2
+  random silver hexes.
+- **It's Over!** (`ended`, gold since 1.49.3): killing the Ender Dragon
+  immediately ends the current game with the killer's team winning; the owning
+  team loses invulnerability in the End and takes normal damage there
+  (Overworld and Nether are unaffected).
 
 ## 26.2-1.48.0 — 2026-11-14
 

@@ -1475,7 +1475,7 @@
                   },
                   {
                       "id":  "silver_shift",
-                      "color":  "silver",
+                      "color":  "gold",
                       "effects":  [
                                       {
                                           "type":  "grant_random_hex",
@@ -1486,7 +1486,7 @@
                   },
                   {
                       "id":  "ended",
-                      "color":  "prismatic",
+                      "color":  "gold",
                       "effects":  [
                                       {
                                           "type":  "ended"
