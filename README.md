@@ -22,7 +22,7 @@
   - 第 3 个：开局 10 分钟
   - 第 4 个：开局 15 分钟，且必为彩色
 - 部分海克斯会发放右键使用的技能物品（例如「混沌智」「不可触碰」「冲冲冲」），有独立冷却，不能被丢弃或塞进容器。
-- 「冲冲冲」是持续 8 秒的自动冲刺：无需按前进键，只用视线控制方向、保持施放高度，沿途 3×3 范围方块会掉落，撞到黑曜石或基岩会中断，结束后进入 15 秒冷却。
+- 「冲冲冲」是持续 5 秒的自动冲刺：无需按前进键，只用视线控制方向、保持施放高度，沿途 3×3 范围方块会掉落，撞到黑曜石或基岩会中断，结束后进入 30 秒冷却。
 - 「终极刷新」的刷新按钮只在拥有该海克斯且仍有次数时出现在选择界面底部；每获得一次只能用一次，可以保留到之后的某次选择，对局结束清空。
 - 海克斯分三档：银色偏基础属性/资源，金色偏战术能力，彩色偏强力或改变规则。
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.17.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.18.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -154,7 +154,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 和朋友一起困在这里 | `friends_here` | 附近每有一位队友，获得 +2% 移速和急迫 I（最多 +10%）。 |
 | 得吃小曲 | `dechi_song` | 播放村民版《得吃小曲》；期间获得随机幸运 III–V，背包里的镐子获得时运 II–III。 |
 | 理想国 | `utopia` | 打乱你身上所有药水效果，并重新获得 5 种永久随机增益或减益。 |
-| 冲冲冲 | `dash_charge` | 获得「冲冲冲」：右键后自动向前冲刺 8 秒（无需按前进键），可用视线控制方向，破坏沿途 3×3 范围内除黑曜石、基岩外的方块并使其掉落，对撞到的生物造成 10 点伤害。冲刺结束后冷却 15 秒。 |
+| 冲冲冲 | `dash_charge` | 获得「冲冲冲」：右键后自动向前冲刺 5 秒（无需按前进键），可用视线控制方向，破坏沿途 3×3 范围内除黑曜石、基岩外的方块并使其掉落，对撞到的生物造成 10 点伤害。冲刺结束后冷却 30 秒。 |
 | 灵魂出窍 | `soul_out` | 选中后立即进入旁观状态 30 秒，期间可以自由飞行观察，结束后回到进入旁观前的位置。 |
 | 九九八十一难 | `eighty_one_trials` | 传送到最近的试炼大厅。 |
 | 混沌智 | `inventory_shuffle` | 右键使用技能物品：随机打乱其他队伍玩家的背包、副手与盔甲槽位（物品可能与装备互换位置）。绑定技能物品不受影响。冷却 8 分钟。 |
@@ -212,7 +212,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 恶魔契约 | `demon_pact` | 永久失去 10 点生命上限，但允许你受到伤害，获得一整套随机附魔铁套，并立即完成当前权重最高的 1 个 Bingo 任务。 |
 | 精神控制 | `mind_control` | 获得「精神控制」：右键控制一名敌人 15 秒的移动方向。冷却 5 分钟。 |
 | 目标封锁 | `objective_deny` | 获得「目标封锁」：右键打开当前 Bingo 卡牌，点击一个任务，30 秒内所有队伍无法完成它。冷却 6 分钟。 |
-| 透视 | `xray` | 获得「矿物透视」：右键获得 20 秒矿物透视。冷却 5 分钟。 |
+| 透视 | `xray` | 获得「矿物透视」：右键获得 1 分钟矿物透视。冷却 5 分钟。 |
 | 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
 | 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。道具一次性，使用后消失。 |
@@ -303,7 +303,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Trapped With Friends | `friends_here` | Each nearby teammate grants +2% speed and Haste I (max +10%). |
 | Dechi Song | `dechi_song` | Plays the villager version of the Dechi song; grants random Luck III-V during it, and all pickaxes in your inventory gain Fortune II-III. |
 | Utopia | `utopia` | Scrambles all your potion effects and grants 5 new permanent random buffs or debuffs. |
-| Rush Rush Rush | `dash_charge` | Gain "Rush Rush Rush": right-click to dash forward for 8 seconds, steering with your view. Blocks in the way are broken and drop (except obsidian and bedrock), and creatures hit take 10 damage. 15 second cooldown after the dash ends. |
+| Rush Rush Rush | `dash_charge` | Gain "Rush Rush Rush": right-click to dash forward for 5 seconds, steering with your view. Blocks in the way are broken and drop (except obsidian and bedrock), and creatures hit take 10 damage. 30 second cooldown after the dash ends. |
 | Soul Out | `soul_out` | Immediately enter spectator mode for 30 seconds to scout freely, then return to the position where you entered spectator mode. |
 | Eighty-One Trials | `eighty_one_trials` | Teleport to the nearest trial chambers. |
 | Chaos Mind | `inventory_shuffle` | Right-click the skill item: randomly shuffle the inventory, offhand and armor slots of all enemy players (items may end up in equipment slots). Bound skill items are unaffected. 8 minute cooldown. |
@@ -361,7 +361,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Demon Pact | `demon_pact` | Permanently lose 10 max health, but you can take damage; gain a full set of randomly enchanted iron armor and immediately complete the highest-weight Bingo task. |
 | Mind Control | `mind_control` | Gain 'Mind Control': right-click to control one enemy's movement direction for 15 seconds. Cooldown 5 minutes. |
 | Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click to open the current Bingo card and click a task; no team can complete it for 30 seconds. Cooldown 6 minutes. |
-| X-Ray | `xray` | Gain 'Ore Vision': right-click for 20 seconds of ore x-ray. Cooldown 5 minutes. |
+| X-Ray | `xray` | Gain 'Ore Vision': right-click for 1 minute of ore x-ray. Cooldown 5 minutes. |
 | Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
 | Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
@@ -382,7 +382,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.17 `
+.\build.ps1 -Version 26.2-1.43.18 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -405,6 +405,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.43.18 修复
+
+- **透视**：矿物标记的发光潜影贝缩小到 0.5 倍——碰撞箱藏进方块内部，玩家可以正常挖掘被标记的矿石；透视持续时间从 20 秒延长到 1 分钟。
+- **冲冲冲**：冲刺时长从 8 秒调整为 5 秒，冷却从 15 秒调整为 30 秒。
 
 ### 1.43.17 修复
 

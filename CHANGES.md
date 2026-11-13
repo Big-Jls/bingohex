@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.43.18 — 2026-11-13
+
+### Fixed / Adjusted
+
+- **X-Ray** (`xray`): the glowing invisible shulker markers were scaled down
+  to 0.5 so their hitboxes sit inside the ore block; players can now mine the
+  marked ores normally. X-ray duration increased from 20 seconds to 1 minute.
+- **Rush Rush Rush** (`dash_charge`): dash duration reduced from 8 seconds to
+  5 seconds, and the cooldown increased from 15 seconds to 30 seconds.
+
 ## 26.2-1.43.17 — 2026-11-13
 
 ### Fixed

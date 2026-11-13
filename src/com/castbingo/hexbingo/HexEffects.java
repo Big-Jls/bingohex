@@ -222,8 +222,8 @@ public final class HexEffects {
    private static final Map<UUID, Long> HOOK_COOLDOWN = new HashMap<>();
    private static final long HOOK_COOLDOWN_MS = 5000L;
    private static final Map<UUID, Long> DASH_COOLDOWN = new HashMap<>();
-   private static final long DASH_COOLDOWN_MS = 15000L;
-   private static final long DASH_DURATION_MS = 8000L;
+   private static final long DASH_COOLDOWN_MS = 30000L;
+   private static final long DASH_DURATION_MS = 5000L;
    private static final Map<UUID, HexEffects.DashState> DASHING = new HashMap<>();
    private static final Map<UUID, HexEffects.PortableFurnace> PORTABLE_FURNACES = new HashMap<>();
    private static final Map<UUID, List<BlockPos>> BOOSTED_FURNACES = new HashMap<>();
@@ -10294,7 +10294,7 @@ public final class HexEffects {
       return false;
    }
 
-   // 透视：右键 20 秒矿物透视（用发光物品实体标出附近矿石）
+   // 透视：右键 1 分钟矿物透视（用发光物品实体标出附近矿石）
    private static void giveXrayItem(ServerPlayer var0) {
       if (!hasNamedItem(var0, "矿物透视")) {
          var0.addItem(questItem(Items.SPYGLASS, "矿物透视", "hexbingo.item.xray.lore"));
@@ -10315,7 +10315,7 @@ public final class HexEffects {
          return true;
       }
 
-      XRAY_UNTIL.put(var0.getUUID(), var1 + 20000L);
+      XRAY_UNTIL.put(var0.getUUID(), var1 + 60000L);
       XRAY_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 300000L));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.xray_start").withStyle(ChatFormatting.AQUA));
       tickXray(var0);
@@ -10342,6 +10342,7 @@ public final class HexEffects {
                      BlockState var11 = var4.getBlockState(var10);
                      if (isOreBlock(var11)) {
                         // 不会开口的发光隐身潜影贝：矿石位置只显示发光轮廓，不再用漂浮掉落物
+                        // 缩小到 0.5 倍，让碰撞箱藏进方块内部，玩家可以正常挖掘矿石
                         Shulker var13 = (Shulker)EntityTypes.SHULKER.create(var4, EntitySpawnReason.MOB_SUMMONED);
                         if (var13 != null) {
                            var13.setPos(var10.getX() + 0.5, var10.getY() + 0.5, var10.getZ() + 0.5);
@@ -10353,6 +10354,7 @@ public final class HexEffects {
                            var13.noPhysics = true;
                            var13.setCustomNameVisible(false);
                            var13.addTag(XRAY_TAG);
+                           var13.getAttribute(Attributes.SCALE).setBaseValue(0.5);
                            var4.addFreshEntity(var13);
                            var5.add(var13);
                         }
