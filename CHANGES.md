@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.49.10 — 2026-11-14
+
+### Changed
+
+- **World Shrink** (`world_shrink`): the shrunken-border period is now 3
+  minutes instead of 5 (the 20-second warning is unchanged); the border, PVP
+  state and player positions are still restored when it ends.
+- **Ascetic** (`ascetic`): third-hex injection chance lowered from 15% to 5%.
+
 ## 26.2-1.49.9 — 2026-11-14
 
 ### Fixed

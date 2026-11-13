@@ -443,10 +443,10 @@ public final class HexEffects {
    private static final Map<UUID, Long> XRAY_COOLDOWN = new HashMap<>();
    private static final Map<UUID, List<Shulker>> XRAY_MARKERS = new HashMap<>();
    private static final String XRAY_TAG = "hexbingo_xray_marker";
-   // 世界缩小：全局唯一状态（警告 20 秒 → 缩圈到 500 直径并传送 → 5 分钟后恢复）
+   // 世界缩小：全局唯一状态（警告 20 秒 → 缩圈到 500 直径并传送 → 3 分钟后恢复）
    private static HexEffects.WorldShrinkState WORLD_SHRINK;
    private static final long WORLD_SHRINK_WARN_MS = 20000L;
-   private static final long WORLD_SHRINK_DURATION_MS = 300000L;
+   private static final long WORLD_SHRINK_DURATION_MS = 180000L;
    // 世界缩小：已使用过（一局内一次性，重登/复活不再补发）
    private static final Set<UUID> WORLD_SHRINK_USED = new HashSet<>();
    // 全是我的：已使用过（一局内一次性）
@@ -11589,7 +11589,7 @@ public final class HexEffects {
    }
 
    // 世界缩小：一次性技能。施放后先全服标题警告 20 秒，期间开启 PVP；
-   // 20 秒后边界收缩到 500 直径并把所有主世界玩家随机传送到圈内；5 分钟后恢复原边界与 PVP。
+   // 20 秒后边界收缩到 500 直径并把所有主世界玩家随机传送到圈内；3 分钟后恢复原边界与 PVP。
    private static void giveWorldShrinkItem(ServerPlayer var0) {
       if (!WORLD_SHRINK_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "世界缩小")) {
          var0.addItem(questItem(Items.COMPASS, "世界缩小", "hexbingo.item.world_shrink.lore"));

@@ -134,7 +134,7 @@ public final class HexRegistry {
    private static void maybeAddAscetic(List<Hex> var0, Collection<String> var1, boolean var2) {
       if (var2 && !var1.contains(ASCETIC) && !var0.isEmpty()) {
          Hex var3 = BY_ID.get(ASCETIC);
-         if (var3 != null && !var0.contains(var3) && ThreadLocalRandom.current().nextDouble() < 0.15) {
+         if (var3 != null && !var0.contains(var3) && ThreadLocalRandom.current().nextDouble() < 0.05) {
             var0.set(ThreadLocalRandom.current().nextInt(var0.size()), var3);
          }
       }

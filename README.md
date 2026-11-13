@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.11.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.9.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.49.10.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -188,7 +188,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 临门一脚 | `near_line` | 本队只差 1 格就能成线时，全队获得急迫 II 与速度 I。 |
 | 踏剑飞行 | `sword_fly` | 按 R 消耗剑的耐久来飞行（顺序：主手 → 副手 → 物品栏 → 团队背包，始终优先消耗档位最低的剑）：木剑满耐久可飞 10 秒，金剑 15 秒、石剑 20 秒、铁剑 30 秒、钻石剑 45 秒、下界合金剑 60 秒。飞行速度随剑档位渐变提升，最高不超过鞘翅，脚下会显示正在消耗的剑。 |
 | 隐藏夹层 | `hidden_pocket` | 开带战利品的箱子时有 3% 概率在你身边额外生成一个随机战利品箱。 |
-| 世界缩小 | `world_shrink` | 获得「世界缩小」：右键使用后全服标题警告 20 秒（期间允许 PVP），随后世界边界收缩到 500 格并把所有玩家随机传送到圈内，5 分钟后恢复边界与 PVP、把玩家传送回原位。一次性；不会在第四个海克斯或游戏剩余不足 15 分钟时刷出。 |
+| 世界缩小 | `world_shrink` | 获得「世界缩小」：右键使用后全服标题警告 20 秒（期间允许 PVP），随后世界边界收缩到 500 格并把所有玩家随机传送到圈内，3 分钟后恢复边界与 PVP、把玩家传送回原位。一次性；不会在第四个海克斯或游戏剩余不足 15 分钟时刷出。 |
 | 钓鱼佬 | `fisherman` | 获得一把附魔「海之眷顾 X」的鱼竿；钓鱼时除了鱼什么都能钓上来（随机物品池与仆从大师相同）。 |
 | 结束了！ | `ended` | 击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护——末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。 |
 
@@ -355,7 +355,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Near Line | `near_line` | When your team is 1 cell away from a bingo line, the whole team gains Haste II and Speed I. |
 | Sword Fly | `sword_fly` | Press R to fly by consuming sword durability (order: main hand → offhand → inventory → team backpack, always the lowest-tier sword first): a wooden sword flies 10 seconds at full durability, gold 15s, stone 20s, iron 30s, diamond 45s, netherite 60s. Flight speed ramps up with sword tier, never exceeding elytra speed; the sword being consumed is shown under your feet. |
 | Hidden Compartment | `hidden_pocket` | Opening a loot chest has a 3% chance to spawn an extra random loot chest near you. |
-| World Shrink | `world_shrink` | Gain 'World Shrink': right-click to warn the whole server for 20 seconds (PVP enabled), then the world border shrinks to 500 blocks and all players are teleported to random spots inside the circle; after 5 minutes the border and PVP are restored and players return to their original positions. Single use; never offered as the fourth hex or with less than 15 minutes of game time left. |
+| World Shrink | `world_shrink` | Gain 'World Shrink': right-click to warn the whole server for 20 seconds (PVP enabled), then the world border shrinks to 500 blocks and all players are teleported to random spots inside the circle; after 3 minutes the border and PVP are restored and players return to their original positions. Single use; never offered as the fourth hex or with less than 15 minutes of game time left. |
 | Fisherman | `fisherman` | Gain a fishing rod enchanted with Luck of the Sea X; fishing reels in anything except fish (same random item pool as Pet Master). |
 | It's Over! | ended | Killing the Ender Dragon immediately ends the current game with the killer's team winning; but in the End your team loses invulnerability — enderman, dragon and fall damage all apply normally (the Overworld and Nether are unaffected). |
 
@@ -419,7 +419,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.9 `
+.\build.ps1 -Version 26.2-1.49.10 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -442,6 +442,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.49.10 调整
+
+- **世界缩小**（`world_shrink`）：缩圈持续时间由 5 分钟缩短为 3 分钟（警告 20 秒不变），结束后仍会恢复边界、PVP 并把玩家送回原位。
+- **苦行者**（`ascetic`）：第 3 个海克斯的出现概率由 15% 下调至 5%。
 
 ### 1.49.9 修复
 
