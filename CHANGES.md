@@ -1,5 +1,26 @@
 # Changelog
 
+## 26.2-1.49.8 — 2026-11-14
+
+### Fixed
+
+- **World Shrink** (`world_shrink`): the destination chunk is now loaded before
+  reading the surface height, so players are no longer teleported onto the
+  bedrock layer; a top-down fallback scan is used if the heightmap still
+  returns the world minimum.
+- **World Shrink**: player-vs-player damage is now allowed while the effect is
+  active (same `LivingIncomingDamageEvent` override used by Trap Room),
+  instead of being cancelled by Bingo's invulnerability.
+- **World Shrink**: the item is now genuinely single-use — it is consumed on a
+  successful cast and the player is recorded as having used it, so relogging
+  does not re-grant it and it cannot be cast again.
+- **World Shrink**: the pre-cast position of every teleported player is
+  recorded and restored when the effect ends (or when the game ends).
+
+### Changed
+
+- **Ascetic** (`ascetic`): third-hex injection chance lowered from 35% to 15%.
+
 ## 26.2-1.49.7 — 2026-11-14
 
 ### Fixed

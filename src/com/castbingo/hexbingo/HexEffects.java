@@ -447,6 +447,8 @@ public final class HexEffects {
    private static HexEffects.WorldShrinkState WORLD_SHRINK;
    private static final long WORLD_SHRINK_WARN_MS = 20000L;
    private static final long WORLD_SHRINK_DURATION_MS = 300000L;
+   // 世界缩小：已使用过（一局内一次性，重登/复活不再补发）
+   private static final Set<UUID> WORLD_SHRINK_USED = new HashSet<>();
    // 全是我的：已使用过（一局内一次性）
    private static final Set<UUID> ALL_MINE_USED = new HashSet<>();
    // 全是我的：被锁定任务的下标（客户端卡面画小锁）
@@ -477,7 +479,7 @@ public final class HexEffects {
       }
    }
 
-   // 世界缩小：记录施放时刻、警告期、原边界与原 PVP 状态，结束时还原
+   // 世界缩小：记录施放时刻、警告期、原边界与原 PVP 状态，结束时还原并传送回原位
    private static final class WorldShrinkState {
       final ServerLevel level;
       final long startMs;
@@ -486,6 +488,7 @@ public final class HexEffects {
       final double origCenterX;
       final double origCenterZ;
       final double origSize;
+      final Map<UUID, HexEffects.ShrinkReturn> returns = new HashMap<>();
       boolean active;
 
       WorldShrinkState(ServerLevel var0, long var1, long var2, boolean var3, double var4, double var6, double var8) {
@@ -496,6 +499,25 @@ public final class HexEffects {
          this.origCenterX = var4;
          this.origCenterZ = var6;
          this.origSize = var8;
+      }
+   }
+
+   // 世界缩小：被传送玩家在施放前的原位置
+   private static final class ShrinkReturn {
+      final ServerLevel level;
+      final double x;
+      final double y;
+      final double z;
+      final float yaw;
+      final float pitch;
+
+      ShrinkReturn(ServerLevel var0, double var1, double var2, double var3, float var4, float var5) {
+         this.level = var0;
+         this.x = var1;
+         this.y = var2;
+         this.z = var3;
+         this.yaw = var4;
+         this.pitch = var5;
       }
    }
 
@@ -11548,13 +11570,13 @@ public final class HexEffects {
    // 世界缩小：一次性技能。施放后先全服标题警告 20 秒，期间开启 PVP；
    // 20 秒后边界收缩到 500 直径并把所有主世界玩家随机传送到圈内；5 分钟后恢复原边界与 PVP。
    private static void giveWorldShrinkItem(ServerPlayer var0) {
-      if (!hasNamedItem(var0, "世界缩小")) {
+      if (!WORLD_SHRINK_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "世界缩小")) {
          var0.addItem(questItem(Items.COMPASS, "世界缩小", "hexbingo.item.world_shrink.lore"));
          var0.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_item").withStyle(ChatFormatting.GOLD));
       }
    }
 
-   public static boolean castWorldShrink(ServerPlayer var0) {
+   public static boolean castWorldShrink(ServerPlayer var0, ItemStack usedItem) {
       if (!hasHex(var0, "world_shrink")) {
          return false;
       }
@@ -11591,6 +11613,10 @@ public final class HexEffects {
          var3.getGameRules().set(GameRules.PVP, true, var1);
       }
 
+      // 一次性：立刻消耗道具并记录，重登/复活也不再补发
+      WORLD_SHRINK_USED.add(var0.getUUID());
+      usedItem.shrink(1);
+
       worldShrinkTitle(
          var1,
          Component.translatable("hexbingo.msg.world_shrink_warn_title").withStyle(ChatFormatting.RED),
@@ -11624,7 +11650,7 @@ public final class HexEffects {
          WorldBorder var6 = var1.level.getWorldBorder();
          var6.setCenter(0.0, 0.0);
          var6.setSize(500.0);
-         teleportWorldShrinkPlayers(var1.level);
+         teleportWorldShrinkPlayers(var1);
          worldShrinkTitle(var0, Component.translatable("hexbingo.msg.world_shrink_go").withStyle(ChatFormatting.RED), null);
          return;
       }
@@ -11634,10 +11660,11 @@ public final class HexEffects {
       }
    }
 
-   private static void teleportWorldShrinkPlayers(ServerLevel var0) {
+   private static void teleportWorldShrinkPlayers(HexEffects.WorldShrinkState var0) {
       ThreadLocalRandom var1 = ThreadLocalRandom.current();
+      ServerLevel var2 = var0.level;
 
-      for (ServerPlayer var3 : var0.players()) {
+      for (ServerPlayer var3 : var2.players()) {
          if (var3.isSpectator()) {
             continue;
          }
@@ -11646,10 +11673,32 @@ public final class HexEffects {
          double var5 = var1.nextDouble() * Math.PI * 2.0;
          int var6 = (int)Math.floor(var4 * Math.cos(var5));
          int var7 = (int)Math.floor(var4 * Math.sin(var5));
-         int var8 = var0.getHeight(Types.MOTION_BLOCKING, var6, var7);
-         var3.teleportTo(var0, (double)var6 + 0.5, (double)(var8 + 1), (double)var7 + 0.5, Set.of(), var1.nextFloat() * 360.0F, 0.0F, false);
+         // 记录施放前的位置，技能结束后传送回原位
+         var0.returns.put(
+            var3.getUUID(), new HexEffects.ShrinkReturn(var2, var3.getX(), var3.getY(), var3.getZ(), var3.getYRot(), var3.getXRot())
+         );
+         int var8 = worldShrinkSurfaceY(var2, var6, var7);
+         var3.teleportTo(var2, (double)var6 + 0.5, (double)var8, (double)var7 + 0.5, Set.of(), var1.nextFloat() * 360.0F, 0.0F, false);
          var3.resetFallDistance();
       }
+   }
+
+   // 先加载目标区块再取高度：未加载区块的 getHeight 会返回世界最低点，导致玩家被传送到基岩层
+   private static int worldShrinkSurfaceY(ServerLevel var0, int var1, int var2) {
+      var0.getChunk(var1 >> 4, var2 >> 4);
+      int var3 = var0.getHeight(Types.MOTION_BLOCKING, var1, var2);
+      if (var3 > var0.getMinY() + 1) {
+         return Math.min(var3, var0.getMaxY() - 2);
+      }
+
+      for (int var4 = var0.getMaxY() - 1; var4 > var0.getMinY(); var4--) {
+         BlockState var5 = var0.getBlockState(new BlockPos(var1, var4, var2));
+         if (!var5.isAir() && var5.blocksMotion()) {
+            return Math.min(var4 + 1, var0.getMaxY() - 2);
+         }
+      }
+
+      return var0.getMinY() + 2;
    }
 
    private static void restoreWorldShrink(MinecraftServer var0) {
@@ -11666,8 +11715,43 @@ public final class HexEffects {
          var1.level.getGameRules().set(GameRules.PVP, false, var0);
       }
 
-      for (ServerPlayer var4 : var0.getPlayerList().getPlayers()) {
-         var4.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_end").withStyle(ChatFormatting.GREEN));
+      // 把被传送的玩家送回施放前的位置
+      for (Entry<UUID, HexEffects.ShrinkReturn> var3 : var1.returns.entrySet()) {
+         ServerPlayer var4 = var0.getPlayerList().getPlayer(var3.getKey());
+         if (var4 != null && var4.isAlive()) {
+            HexEffects.ShrinkReturn var5 = var3.getValue();
+            var4.teleportTo(var5.level, var5.x, var5.y, var5.z, Set.of(), var5.yaw, var5.pitch, false);
+            var4.resetFallDistance();
+            var4.setRemainingFireTicks(0);
+         }
+      }
+
+      for (ServerPlayer var6 : var0.getPlayerList().getPlayers()) {
+         var6.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_end").withStyle(ChatFormatting.GREEN));
+      }
+   }
+
+   // 世界缩小：施放期间放行玩家之间的伤害（Bingo 的无敌保护会取消伤害，这里参考「和我一起困在这里」放行）
+   public static void worldShrinkIncomingDamage(LivingIncomingDamageEvent var0) {
+      HexEffects.WorldShrinkState var1 = WORLD_SHRINK;
+      if (var1 == null || !(var0.getEntity() instanceof ServerPlayer var2)) {
+         return;
+      }
+
+      Entity var3 = var0.getSource().getEntity();
+      if (var3 == null) {
+         var3 = var0.getSource().getDirectEntity();
+      }
+
+      ServerPlayer var4 = null;
+      if (var3 instanceof ServerPlayer var5) {
+         var4 = var5;
+      } else if (var3 instanceof Projectile var6 && var6.getOwner() instanceof ServerPlayer var7) {
+         var4 = var7;
+      }
+
+      if (var4 != null && var4 != var2 && var2.level() == var1.level) {
+         var0.setCanceled(false);
       }
    }
 
@@ -11995,6 +12079,7 @@ public final class HexEffects {
 
       // 世界缩小：对局结束恢复原边界与 PVP
       restoreWorldShrink(var0);
+      WORLD_SHRINK_USED.clear();
       ALL_MINE_USED.clear();
       ALL_MINE_LOCKED.clear();
 

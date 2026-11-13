@@ -135,6 +135,11 @@ public class HexEvents {
    }
 
    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+   public void worldShrinkDamage(LivingIncomingDamageEvent var1) {
+      HexEffects.worldShrinkIncomingDamage(var1);
+   }
+
+   @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
    public void demonPactDamage(LivingIncomingDamageEvent var1) {
       if (var1.getEntity() instanceof ServerPlayer var2 && HexEffects.isDemonPact(var2)) {
          var1.setCanceled(false);
@@ -419,7 +424,7 @@ public class HexEvents {
       } else if (var1.is(Items.BUNDLE) && var2.equals("背包小偷")) {
          return HexEffects.castBackpackThief(var0);
       } else if (var1.is(Items.COMPASS) && var2.equals("世界缩小")) {
-         return HexEffects.castWorldShrink(var0);
+         return HexEffects.castWorldShrink(var0, var1);
       } else if (var1.is(Items.BARRIER) && var2.equals("全是我的")) {
          HexManager.openTaskPick(var0, "mine");
          return true;
