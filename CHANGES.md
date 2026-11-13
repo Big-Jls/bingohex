@@ -1,5 +1,14 @@
 # Changelog
 
+## 26.2-1.49.4 — 2026-11-14
+
+### Fixed
+
+- **Ascetic** (`ascetic`): no longer injected into the third hex offer in
+  all-prismatic games — the all-prismatic branch previously reused the normal
+  35% third-slot injection, so a silver hex could show up in an all-prismatic
+  offer. Normal games still roll Ascetic in the third selection as before.
+
 ## 26.2-1.49.3 — 2026-11-14
 
 ### Changed

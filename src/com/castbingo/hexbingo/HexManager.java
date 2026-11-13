@@ -481,9 +481,12 @@ public final class HexManager {
          // 第四档海克斯固定为纯彩色，但静水监狱不能出现在最后一个海克斯中
          var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), "still_water");
       } else if (var0.allPrismatic()) {
-         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), null, var2 == 2);
+         // 全彩对局：第三次海克斯也保持纯彩色，苦行者不注入
+         var5 = HexRegistry.offerPrismatic(var3, var0.hasExtraChoice(var1), null, false);
          if (var5.size() < 3) {
             var5 = HexRegistry.offer(var2, var3, var0.hasExtraChoice(var1), var4);
+            // 兜底池也可能注入苦行者，全彩对局里剔除
+            var5.removeIf(var6 -> var6.id().equals(HexRegistry.ASCETIC));
          }
       } else if (var2 >= 2 && !ownsPrismatic(var0, var1)) {
          // 第三次海克斯池子允许出现苦行者，第四次仍然排除
