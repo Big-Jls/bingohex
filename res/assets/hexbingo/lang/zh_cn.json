@@ -590,7 +590,7 @@
     "hexbingo.hex.great_migration.desc":  "所有玩家被随机传送到主世界彼此 1000 格内的位置。",
     "hexbingo.msg.great_migration":  "随机大迁徙：所有玩家已被打散到主世界各处。",
     "hexbingo.hex.dragon_rider.name":  "驯龙高手",
-    "hexbingo.hex.dragon_rider.desc":  "获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方显示倒计时，挖掉或移走会重新计时。孵化出的幼龙环绕你，经过的方块会掉落，碰到的生物会被击退并受到 4 点伤害，且不会攻击你或其它拥有该海克斯的玩家。",
+    "hexbingo.hex.dragon_rider.desc":  "获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方显示倒计时，挖掉或移走会重新计时。孵化出的幼龙环绕你，经过的方块会掉落（不会破坏工作台、熔炉、铁砧、锻造台等工作站与容器，也不会破坏黑曜石、基岩和传送门），碰到的生物会被击退并受到 4 点伤害，且不会攻击你或其它拥有该海克斯的玩家。",
     "hexbingo.msg.dragon_egg":  "驯龙高手：获得了一颗龙蛋，找个地方放下它。",
     "hexbingo.msg.dragon_hatched":  "龙蛋孵化成了一只幼龙。",
     "hexbingo.msg.dragon_hatched_team":  "%s 的龙蛋孵化成了一只幼龙。",

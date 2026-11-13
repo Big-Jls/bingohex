@@ -41,8 +41,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 ## 安装
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
-2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.10.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.8.jar` 放入客户端与服务端的 `mods`。
+2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.11.jar`，`modId` 为 `bongo`）。
+3. 把 `HexBingo-26.2-1.49.9.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -180,7 +180,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰（播放动画后揭晓）随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
-| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，跨维度、远距离传送与区块卸载后都会回到你身边继续环绕；经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，不会攻击任何玩家，且完全无敌（任何伤害都会被取消，包括创造模式攻击）。 |
+| 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，跨维度、远距离传送与区块卸载后都会回到你身边继续环绕；经过的方块会掉落（不会破坏工作台、熔炉、铁砧、锻造台等工作站与容器，也不会破坏黑曜石、基岩和传送门），碰到的非玩家生物会被击退并受到 4 点伤害，不会攻击任何玩家，且完全无敌（任何伤害都会被取消，包括创造模式攻击）。 |
 | 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图。 |
 | 黑石行者 | `blackstone_walker` | 像冰霜行者一样在岩浆上行走：脚下的岩浆会结成临时黑石，几秒后自动融化回岩浆。 |
 | 缩小术 | `shrink` | 获得「缩小术」：右键把最近敌人缩小到 25%（体型、跳跃与交互范围同步缩小），持续 60 秒。冷却 8 分钟。 |
@@ -347,7 +347,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
 | Destiny Dice | `destiny_dice` | Roll a die (revealed after an animation): complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
 | Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
-| Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
+| Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops (but never workstations/containers such as crafting tables, furnaces, anvils or smithing tables, nor obsidian, bedrock or portals), knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
 | Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome. |
 | Blackstone Walker | `blackstone_walker` | Walk on lava like Frost Walker: the lava under your feet turns into temporary blackstone that melts back after a few seconds. |
 | Shrink | `shrink` | Gain 'Shrink': right-click to shrink the nearest enemy to 25% size (jump power and interaction range shrink too) for 60 seconds. Cooldown 8 minutes. |
@@ -419,11 +419,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.8 `
+.\build.ps1 -Version 26.2-1.49.9 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
-  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.10.jar"
+  -BongoJar ".\..\rebongo\dist\ReBongo-26.2-1.0.0-port.11.jar"
 ```
 
 产物：`dist/HexBingo-<version>.jar`。
@@ -442,6 +442,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.49.9 修复
+
+- **驯龙高手**（`dragon_rider`）：幼龙不再破坏工作台、熔炉、铁砧、锻造台、高炉、箱子等工作站与容器（带方块实体的方块一律跳过），也不再破坏黑曜石、基岩、末地石、铁栏杆与下界/末地传送门（参考原版末影龙免疫标签与传送门标签），只破坏普通地形方块。
 
 ### 1.49.8 修复
 

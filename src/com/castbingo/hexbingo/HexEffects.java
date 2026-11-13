@@ -8789,7 +8789,7 @@ public final class HexEffects {
                   Mth.floor(var3.getX()) - 1, Mth.floor(var3.getY()) - 1, Mth.floor(var3.getZ()) - 1, Mth.floor(var3.getX()) + 1, Mth.floor(var3.getY()) + 1, Mth.floor(var3.getZ()) + 1
                )) {
                   BlockState var20 = var5.getBlockState(var19);
-                  if (!var20.isAir() && var20.getDestroySpeed(var5, var19) >= 0.0F) {
+                  if (!isDragonProtectedBlock(var20) && !var20.isAir() && var20.getDestroySpeed(var5, var19) >= 0.0F) {
                      var5.destroyBlock(var19.immutable(), true, var4);
                      if (++var17 >= 6) {
                         break;
@@ -8809,6 +8809,27 @@ public final class HexEffects {
             }
          }
       }
+   }
+
+   /** 幼龙不破坏可交互容器/工作站、黑曜石、基岩与传送门等方块（参考末影龙的免疫标签）。 */
+   private static boolean isDragonProtectedBlock(BlockState var0) {
+      return var0.is(BlockTags.DRAGON_IMMUNE)
+         || var0.is(BlockTags.PORTALS)
+         || var0.hasBlockEntity()
+         || var0.is(BlockTags.ANVIL)
+         || var0.is(Blocks.CRAFTING_TABLE)
+         || var0.is(Blocks.SMITHING_TABLE)
+         || var0.is(Blocks.STONECUTTER)
+         || var0.is(Blocks.GRINDSTONE)
+         || var0.is(Blocks.LOOM)
+         || var0.is(Blocks.CARTOGRAPHY_TABLE)
+         || var0.is(Blocks.FLETCHING_TABLE)
+         || var0.is(Blocks.ENCHANTING_TABLE)
+         || var0.is(Blocks.COMPOSTER)
+         || var0.is(Blocks.CAULDRON)
+         || var0.is(Blocks.WATER_CAULDRON)
+         || var0.is(Blocks.LAVA_CAULDRON)
+         || var0.is(Blocks.POWDER_SNOW_CAULDRON);
    }
 
    /** 服务器重启/区块重载后残留的旧幼龙不在宠物表里：关闭 AI 并直接移除，避免它恢复成敌对幻翼或变成无敌孤儿。 */

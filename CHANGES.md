@@ -1,5 +1,16 @@
 # Changelog
 
+## 26.2-1.49.9 — 2026-11-14
+
+### Fixed
+
+- **Dragon Tamer** (`dragon_rider`): the baby dragon no longer breaks
+  interactive workstations/containers (crafting table, furnaces, anvil,
+  smithing table, blast furnace, chests and any other block with a block
+  entity) nor obsidian, bedrock, end stone, iron bars or nether/end portals.
+  It now only destroys ordinary terrain blocks (uses `DRAGON_IMMUNE` and
+  `PORTALS` block tags plus an explicit workstation list).
+
 ## 26.2-1.49.8 — 2026-11-14
 
 ### Fixed
