@@ -1,5 +1,24 @@
 # Changelog
 
+## 26.2-1.45.0 — 2026-11-13
+
+### Added
+
+- **Omen Compatible** (`bad_omen`, silver): gain one level of Bad Omen every
+  30 seconds, up to level III.
+- **Backpack Thief** (`backpack_thief`, gold): right-click to randomly steal
+  3 items from the nearest enemy's inventory (bound skill items and glass
+  cannon lock markers excluded). Cooldown 3 minutes.
+- **Pan Is Right** (`pan_is_right`, prismatic): right-click to reroll every
+  hex of your whole team. One-time item.
+- **Loot Hunter** (`loot_hunter`, prismatic): kills have a 3% chance to spawn
+  a chest with a random vanilla loot table at the mob's death spot.
+
+### Fixed
+
+- **Ender Slayer** (`ender_slayer`): drop chance raised from 1% to 3% (the
+  code and description both said 1%; 3% was the intended value).
+
 ## 26.2-1.44.0 — 2026-11-13
 
 ### Added

@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **135 个海克斯强化**：53 银色 / 47 金色 / 35 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **139 个海克斯强化**：54 银色 / 48 金色 / 37 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.44.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.45.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -69,9 +69,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（135）
+## 海克斯一览（139）
 
-### 银色（53）
+### 银色（54）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -128,8 +128,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 地心游记 | `journey_core` | 传送到 Y=-50 的地下洞穴。 |
 | 苦行者 | `ascetic` | 清空本队所有已完成格，立即获得 2 个随机彩色海克斯。只在第三次海克斯选择中出现。 |
 | DJ | `dj` | 获得音符盒×1 与随机唱片×3。 |
+| 兼容灾厄 | `bad_omen` | 每 30 秒获得一级不祥之兆，最高 III 级。 |
 
-### 金色（47）
+### 金色（48）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -166,7 +167,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 快递到了 | `airdrop` | 在你头顶空投一个装有随机战利品箱奖励的箱子。 |
 | 海神 | `sea_god` | 获得一把附魔三叉戟（忠诚 III、引雷 I、经验修补 I），掷出后自动回收。 |
 | 图腾批发 | `totem_bulk` | 获得 3 个不死图腾；手持不死图腾时可受到伤害，用于完成不死图腾成就。 |
-| 末影杀手 | `ender_slayer` | 击杀末影人时有 1% 概率掉落一本附魔书：精准采集 I、经验修补 I 或无限 I。 |
+| 末影杀手 | `ender_slayer` | 击杀末影人时有 3% 概率掉落一本附魔书：精准采集 I、经验修补 I 或无限 I。 |
 | 终极刷新 | `ultimate_refresh` | 下次海克斯选择可以额外刷新一次，并随机获得 2 个战利品箱。 |
 | 自动熔炼 | `auto_smelt` | 挖掘矿物时自动烧炼掉落物，并额外获得经验。 |
 | 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
@@ -180,8 +181,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图。 |
 | 黑石行者 | `blackstone_walker` | 像冰霜行者一样在岩浆上行走：脚下的岩浆会结成临时黑石，几秒后自动融化回岩浆。 |
 | 缩小术 | `shrink` | 获得「缩小术」：右键把最近敌人缩小到 25%（体型、跳跃与交互范围同步缩小），持续 60 秒。冷却 8 分钟。 |
+| 背包小偷 | `backpack_thief` | 获得「背包小偷」：右键随机偷取最近敌人背包里的 3 件物品（绑定技能物品除外）。冷却 3 分钟。 |
 
-### 彩色（35）
+### 彩色（37）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -220,10 +222,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
 | 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。道具一次性，使用后消失。 |
 | 空白格 | `blank_cell` | 获得「空白格」：右键打开当前 Bingo 卡牌，点击任意未完成任务并直接点亮，只为本队点亮且保留原任务图标。道具一次性。 |
+| 潘是对的 | `pan_is_right` | 获得「潘是对的」：右键一次性重掷全队所有海克斯。道具一次性，使用后消失。 |
+| 战利品猎人 | `loot_hunter` | 击杀生物时有 3% 概率在原地生成一个装有随机原版战利品的箱子。 |
 
 ## Hex list (English)
 
-### Silver (53)
+### Silver (54)
 
 | Name | id | Effect |
 |---|---|---|
@@ -280,8 +284,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Journey to the Core | `journey_core` | Teleport to a cave at Y=-50. |
 | Ascetic | `ascetic` | Clear all of your team's completed cells and immediately gain 2 random prismatic hexes. Only appears in the third hex selection. |
 | DJ | `dj` | Gain 1 note block and 3 random music discs. |
+| Omen Compatible | `bad_omen` | Gain one level of Bad Omen every 30 seconds, up to level III. |
 
-### Gold (47)
+### Gold (48)
 
 | Name | id | Effect |
 |---|---|---|
@@ -318,7 +323,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Delivery Arrived | `airdrop` | Airdrop a chest above you filled with loot from a random vanilla chest loot table. |
 | Sea God | `sea_god` | Gain an enchanted trident (Loyalty III, Channeling I, Mending I) that returns when thrown. |
 | Totem Wholesale | `totem_bulk` | Gain 3 Totems of Undying. While holding one, you can take damage, so the 'Postmortal' advancement can be completed. |
-| Ender Slayer | `ender_slayer` | Killing an Enderman has a 1% chance to drop an enchanted book: Silk Touch I, Mending I or Infinity I. |
+| Ender Slayer | `ender_slayer` | Killing an Enderman has a 3% chance to drop an enchanted book: Silk Touch I, Mending I or Infinity I. |
 | Ultimate Refresh | `ultimate_refresh` | Your next hex selection can be refreshed one extra time, and you immediately gain 2 loot chests. |
 | Auto Smelt | `auto_smelt` | Mining ores automatically smelts the drops and grants extra experience. |
 | Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
@@ -332,8 +337,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome. |
 | Blackstone Walker | `blackstone_walker` | Walk on lava like Frost Walker: the lava under your feet turns into temporary blackstone that melts back after a few seconds. |
 | Shrink | `shrink` | Gain 'Shrink': right-click to shrink the nearest enemy to 25% size (jump power and interaction range shrink too) for 60 seconds. Cooldown 8 minutes. |
+| Backpack Thief | `backpack_thief` | Gain 'Backpack Thief': right-click to randomly steal 3 items from the nearest enemy's inventory (bound skill items excluded). Cooldown 3 minutes. |
 
-### Prismatic (35)
+### Prismatic (37)
 
 | Name | id | Effect |
 |---|---|---|
@@ -372,6 +378,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
 | Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
 | Blank Cell | `blank_cell` | Gain 'Blank Cell': right-click to open the current Bingo card and click any incomplete task to light it up for your team only, keeping its original icon. One-time item. |
+| Pan Is Right | `pan_is_right` | Gain 'Pan Is Right': right-click to reroll every hex of your whole team. One-time item: it disappears after use. |
+| Loot Hunter | `loot_hunter` | Killing a creature has a 3% chance to spawn a chest with random vanilla loot at its death spot. |
 
 <!-- HEX-TABLE-END -->
 
@@ -388,7 +396,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.44.0 `
+.\build.ps1 -Version 26.2-1.45.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -411,6 +419,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.45.0 新增
+
+- 新增银色 **兼容灾厄**（`bad_omen`）：每 30 秒获得一级不祥之兆，最高 III 级。
+- 新增金色 **背包小偷**（`backpack_thief`）：右键随机偷取最近敌人背包里的 3 件物品（绑定技能物品除外），冷却 3 分钟。
+- 新增彩色 **潘是对的**（`pan_is_right`）：右键一次性重掷全队所有海克斯，道具使用后消失。
+- 新增彩色 **战利品猎人**（`loot_hunter`）：击杀生物时有 3% 概率在原地生成一个装有随机原版战利品的箱子。
+- **末影杀手**：掉率从 1% 提高到 3%（经核查原代码与描述均为 1%，已按预期修正为 3%）。
 
 ### 1.44.0 新增
 

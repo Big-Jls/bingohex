@@ -380,6 +380,10 @@ public class HexEvents {
          return HexEffects.castXray(var0);
       } else if (var1.is(Items.SLIME_BALL) && var2.equals("缩小术")) {
          return HexEffects.castShrink(var0);
+      } else if (var1.is(Items.BUNDLE) && var2.equals("背包小偷")) {
+         return HexEffects.castBackpackThief(var0);
+      } else if (var1.is(Items.NETHER_STAR) && var2.equals("潘是对的")) {
+         return HexEffects.castPanIsRight(var0, var1);
       } else if (var1.is(Items.ECHO_SHARD) && var2.equals("镜像复制")) {
          return HexEffects.castMirror(var0, var1);
       } else {

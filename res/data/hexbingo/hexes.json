@@ -1355,6 +1355,42 @@
                                           "type":  "shrink"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "bad_omen",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "bad_omen"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "backpack_thief",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "backpack_thief"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "pan_is_right",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "pan_is_right"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "loot_hunter",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "loot_hunter"
+                                      }
+                                  ]
                   }
               ]
 }

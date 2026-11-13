@@ -266,7 +266,7 @@ public final class HexEffects {
    );
    private static final Map<UUID, Holder<MobEffect>> SONG_BUFFS = new HashMap<>();
    private static final Set<UUID> SPY_USED = new HashSet<>();
-   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格", "缩小术");
+   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格", "缩小术", "背包小偷", "潘是对的");
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
@@ -426,6 +426,10 @@ public final class HexEffects {
    // 缩小术：被缩小玩家 -> 到期时间
    private static final Map<UUID, Long> SHRINK_UNTIL = new HashMap<>();
    private static final Map<UUID, Long> SHRINK_COOLDOWN = new HashMap<>();
+   // 背包小偷
+   private static final Map<UUID, Long> THIEF_COOLDOWN = new HashMap<>();
+   // 潘是对的：一次性全队重掷标记
+   private static final Set<UUID> PAN_USED = new HashSet<>();
    // 黑石行者：临时黑石 -> 还原回岩浆的时间
    private static final List<HexEffects.BlackstoneEntry> BLACKSTONE_PENDING = new ArrayList<>();
 
@@ -1020,6 +1024,22 @@ public final class HexEffects {
          case "shrink":
             giveShrinkItem(var0);
             break;
+         // 兼容灾厄
+         case "bad_omen":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.bad_omen").withStyle(ChatFormatting.GRAY));
+            break;
+         // 背包小偷
+         case "backpack_thief":
+            giveThiefItem(var0);
+            break;
+         // 潘是对的
+         case "pan_is_right":
+            givePanItem(var0);
+            break;
+         // 战利品猎人
+         case "loot_hunter":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.loot_hunter_info").withStyle(ChatFormatting.GOLD));
+            break;
          // 路易十六
          case "louis_xvi":
             LOUIS_PENDING.add(var0.getUUID());
@@ -1502,6 +1522,12 @@ public final class HexEffects {
                      case "blackstone_walker":
                         if (var5.tickCount % 2 == 0) {
                            tickBlackstoneWalker(var5);
+                        }
+                        break;
+                     // 兼容灾厄：每 30 秒不祥之兆 +1 级（最高 III）
+                     case "bad_omen":
+                        if (var5.tickCount % 600 == 0) {
+                           tickBadOmen(var5);
                         }
                         break;
                   }
@@ -4727,6 +4753,7 @@ public final class HexEffects {
                var7.addAll(HexRegistry.byColor(HexColor.PRISMATIC));
                var7.removeIf(
                   var1x -> var1x.id().equals("pandora")
+                     || var1x.id().equals("pan_is_right")
                      || var1x.id().equals(HexRegistry.OFFER_UPGRADE)
                      || var1x.id().equals(HexRegistry.ASCETIC)
                      || var4.contains(var1x.id())
@@ -5883,6 +5910,14 @@ public final class HexEffects {
 
       if (hasHex(var0, "shrink") && !hasNamedItem(var0, "缩小术")) {
          giveShrinkItem(var0);
+      }
+
+      if (hasHex(var0, "backpack_thief") && !hasNamedItem(var0, "背包小偷")) {
+         giveThiefItem(var0);
+      }
+
+      if (hasHex(var0, "pan_is_right") && !PAN_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "潘是对的")) {
+         givePanItem(var0);
       }
 
       if (hasHex(var0, "mirror_hex") && !MIRROR_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "镜像复制")) {
@@ -7215,16 +7250,20 @@ public final class HexEffects {
             enderSlayerDrop(var1, var0, var2);
          }
 
+         if (hasHex(var1, "loot_hunter") && !(var0.getEntity() instanceof Player)) {
+            lootHunterDrop(var1, var0, var2);
+         }
+
          if (LOUIS_PENDING.contains(var1.getUUID()) && hasHex(var1, "louis_xvi")) {
             louisXviDrop(var1, var0, var2);
          }
       }
    }
 
-   // 末影杀手：击杀末影人 1% 掉落附魔书（精准采集 0.2% / 经验修补 0.4% / 无限 0.4%）
+   // 末影杀手：击杀末影人 3% 掉落附魔书（精准采集 0.6% / 经验修补 1.2% / 无限 1.2%）
    private static void enderSlayerDrop(ServerPlayer var0, LivingDropsEvent var1, ServerLevel var2) {
       ThreadLocalRandom var3 = ThreadLocalRandom.current();
-      if (var3.nextDouble() < 0.01) {
+      if (var3.nextDouble() < 0.03) {
          Registry<Enchantment> var4 = var0.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
          double var5 = var3.nextDouble();
          Holder<Enchantment> var6;
@@ -10588,6 +10627,146 @@ public final class HexEffects {
       }
    }
 
+   // 兼容灾厄：每 30 秒不祥之兆 +1 级，最高 III
+   private static void tickBadOmen(ServerPlayer var0) {
+      MobEffectInstance var1 = var0.getEffect(MobEffects.BAD_OMEN);
+      int var2 = var1 == null ? 0 : var1.getAmplifier() + 1;
+      if (var2 < 3) {
+         var0.addEffect(new MobEffectInstance(MobEffects.BAD_OMEN, -1, var2, false, false, true));
+      }
+   }
+
+   // 背包小偷：右键随机偷取最近敌人背包里 3 件物品（绑定技能物品与锁定槽除外）
+   private static void giveThiefItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "背包小偷")) {
+         var0.addItem(questItem(Items.BUNDLE, "背包小偷", "hexbingo.item.thief.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.thief_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean castBackpackThief(ServerPlayer var0) {
+      if (!hasHex(var0, "backpack_thief")) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      Long var3 = THIEF_COOLDOWN.get(var0.getUUID());
+      if (var3 != null && var1 < var3) {
+         long var4 = (var3 - var1 + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.thief_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      ServerPlayer var6 = nearestEnemy(var0, -1.0);
+      if (var6 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.thief_none").withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      ArrayList<Integer> var7 = new ArrayList<>();
+      NonNullList<ItemStack> var8 = var6.getInventory().getNonEquipmentItems();
+
+      for (int var9 = 0; var9 < var8.size(); var9++) {
+         ItemStack var10 = var8.get(var9);
+         if (!var10.isEmpty() && !isBoundItem(var10) && !isLockMarker(var10)) {
+            var7.add(var9);
+         }
+      }
+
+      Collections.shuffle(var7, ThreadLocalRandom.current());
+      int var11 = 0;
+
+      for (int var12 = 0; var12 < var7.size() && var11 < 3; var12++) {
+         ItemStack var13 = var8.get(var7.get(var12));
+         if (var13.isEmpty()) {
+            continue;
+         }
+
+         ItemStack var14 = var13.copy();
+         var8.set(var7.get(var12), ItemStack.EMPTY);
+         if (var0.addItem(var14)) {
+            var11++;
+         } else {
+            // 小偷背包满了：把没偷走的还回去
+            var8.set(var7.get(var12), var14);
+         }
+      }
+
+      var6.containerMenu.broadcastChanges();
+      THIEF_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 180000L));
+      var0.sendSystemMessage(
+         Component.translatable("hexbingo.msg.thief_cast", new Object[]{var6.getDisplayName(), Component.literal(Integer.toString(var11))})
+            .withStyle(ChatFormatting.LIGHT_PURPLE)
+      );
+      var6.sendSystemMessage(
+         Component.translatable("hexbingo.msg.thief_stolen", new Object[]{Component.literal(Integer.toString(var11))})
+            .withStyle(ChatFormatting.DARK_PURPLE)
+      );
+      return true;
+   }
+
+   // 潘是对的：一次性重掷全队所有海克斯
+   private static void givePanItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "潘是对的")) {
+         var0.addItem(questItem(Items.NETHER_STAR, "潘是对的", "hexbingo.item.pan.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pan_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean castPanIsRight(ServerPlayer var0, ItemStack var1) {
+      if (!hasHex(var0, "pan_is_right") || PAN_USED.contains(var0.getUUID())) {
+         return false;
+      }
+
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null) {
+         return false;
+      }
+
+      Team var3 = team(var0);
+      if (var3 == null) {
+         rerollHexes(var0);
+      } else {
+         for (ServerPlayer var4 : onlineTeamPlayers(var2, var3)) {
+            rerollHexes(var4);
+         }
+      }
+
+      // 一次性道具：使用后消耗且不再补发
+      var1.shrink(1);
+      PAN_USED.add(var0.getUUID());
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.pan_cast").withStyle(ChatFormatting.LIGHT_PURPLE));
+      return true;
+   }
+
+   // 战利品猎人：击杀生物 3% 概率在死亡位置生成原版战利品箱
+   private static void lootHunterDrop(ServerPlayer var0, LivingDropsEvent var1, ServerLevel var2) {
+      if (ThreadLocalRandom.current().nextDouble() >= 0.03) {
+         return;
+      }
+
+      ThreadLocalRandom var3 = ThreadLocalRandom.current();
+      BlockPos var4 = var1.getEntity().blockPosition();
+      boolean var5 = false;
+
+      for (int var6 = 0; var6 < 16 && !var5; var6++) {
+         BlockPos var7 = var4.offset(var3.nextInt(5) - 2, var3.nextInt(3), var3.nextInt(5) - 2);
+         if (var2.getBlockState(var7).isAir()) {
+            var2.setBlockAndUpdate(var7, Blocks.CHEST.defaultBlockState());
+            if (var2.getBlockEntity(var7) instanceof ChestBlockEntity var8) {
+               var8.setLootTable(randomVanillaLootTable(var3));
+               var8.setLootTableSeed(var3.nextLong());
+               var8.setChanged();
+               var5 = true;
+            }
+         }
+      }
+
+      if (var5) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.loot_hunter").withStyle(ChatFormatting.GOLD));
+      }
+   }
+
    // 拾荒者：破坏方块有 3% 概率额外掉落自身（在 blockDrops 中调用）
    private static void scavengerDrop(ServerPlayer var0, BlockDropsEvent var1) {
       if (ThreadLocalRandom.current().nextDouble() < 0.03) {
@@ -10714,6 +10893,8 @@ public final class HexEffects {
       XRAY_COOLDOWN.clear();
       SHRINK_UNTIL.clear();
       SHRINK_COOLDOWN.clear();
+      THIEF_COOLDOWN.clear();
+      PAN_USED.clear();
 
       for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
          endEndExile(var2, false);
