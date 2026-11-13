@@ -266,7 +266,7 @@ public final class HexEffects {
    );
    private static final Map<UUID, Holder<MobEffect>> SONG_BUFFS = new HashMap<>();
    private static final Set<UUID> SPY_USED = new HashSet<>();
-   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格");
+   private static final Set<String> BOUND_ITEM_NAMES = Set.of("转到我眩晕了", "ok回力镖", "玻璃大炮锁定槽", "中国人会飞·鞘翅", "中国人会飞·烟花", "和我一起困在这里", "精怪魔法", "冲冲冲", "随身工作台", "便携熔炉", "The World", "维度放逐", "对方不在服务区", "海神", "你摸不到", "混沌智", "目标封锁", "致盲", "蝙蝠形态", "精神控制", "矿物透视", "镜像复制", "空白格", "缩小术");
    private static final Identifier WILDCARD_TEXTURE = Identifier.fromNamespaceAndPath("hexbingo", "textures/gui/wildcard.png");
    private static final String BLACK_MARKET_USED_TAG = "hexbingo_black_market_used";
    private static final Map<UUID, Long> DICE_NEXT = new HashMap<>();
@@ -423,6 +423,24 @@ public final class HexEffects {
    private static final Map<UUID, Long> XRAY_COOLDOWN = new HashMap<>();
    private static final Map<UUID, List<Shulker>> XRAY_MARKERS = new HashMap<>();
    private static final String XRAY_TAG = "hexbingo_xray_marker";
+   // 缩小术：被缩小玩家 -> 到期时间
+   private static final Map<UUID, Long> SHRINK_UNTIL = new HashMap<>();
+   private static final Map<UUID, Long> SHRINK_COOLDOWN = new HashMap<>();
+   // 黑石行者：临时黑石 -> 还原回岩浆的时间
+   private static final List<HexEffects.BlackstoneEntry> BLACKSTONE_PENDING = new ArrayList<>();
+
+   private static final class BlackstoneEntry {
+      final ServerLevel level;
+      final BlockPos pos;
+      final long revertMs;
+
+      BlackstoneEntry(ServerLevel var0, BlockPos var1, long var2) {
+         this.level = var0;
+         this.pos = var1;
+         this.revertMs = var2;
+      }
+   }
+
    // 任务护盾：队伍 -> 受保护的卡牌
    private static final Map<String, Set<Task>> TASK_SHIELDS = new HashMap<>();
    private static final Map<UUID, HexEffects.TransformState> TRANSFORMS = new HashMap<>();
@@ -990,6 +1008,18 @@ public final class HexEffects {
          case "toolbox":
             giveToolbox(var0);
             break;
+         // DJ
+         case "dj":
+            giveDj(var0);
+            break;
+         // 黑石行者
+         case "blackstone_walker":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.blackstone_walker").withStyle(ChatFormatting.GOLD));
+            break;
+         // 缩小术
+         case "shrink":
+            giveShrinkItem(var0);
+            break;
          // 路易十六
          case "louis_xvi":
             LOUIS_PENDING.add(var0.getUUID());
@@ -1467,6 +1497,13 @@ public final class HexEffects {
                      // 步步生花：脚下生成花朵
                      case "flowers_walk":
                         tickFlowersWalk(var5);
+                        break;
+                     // 黑石行者：岩浆上生成临时黑石
+                     case "blackstone_walker":
+                        if (var5.tickCount % 2 == 0) {
+                           tickBlackstoneWalker(var5);
+                        }
+                        break;
                   }
                }
             }
@@ -5844,6 +5881,10 @@ public final class HexEffects {
          giveXrayItem(var0);
       }
 
+      if (hasHex(var0, "shrink") && !hasNamedItem(var0, "缩小术")) {
+         giveShrinkItem(var0);
+      }
+
       if (hasHex(var0, "mirror_hex") && !MIRROR_USED.contains(var0.getUUID()) && !hasNamedItem(var0, "镜像复制")) {
          giveMirrorItem(var0);
       }
@@ -9055,6 +9096,22 @@ public final class HexEffects {
       );
    }
 
+   // DJ：获得音符盒×1 与随机唱片×3（唱片从 CREEPER_DROP_MUSIC_DISCS 标签动态取，避免版本差异）
+   private static final List<Item> MUSIC_DISCS = BuiltInRegistries.ITEM.stream()
+      .filter(var0 -> new ItemStack(var0).is(ItemTags.CREEPER_DROP_MUSIC_DISCS))
+      .toList();
+
+   private static void giveDj(ServerPlayer var0) {
+      var0.addItem(new ItemStack(Items.NOTE_BLOCK));
+      if (!MUSIC_DISCS.isEmpty()) {
+         int var1 = ThreadLocalRandom.current().nextInt(MUSIC_DISCS.size());
+         for (int var2 = 0; var2 < 3; var2++) {
+            var0.addItem(new ItemStack(MUSIC_DISCS.get((var1 + var2) % MUSIC_DISCS.size())));
+         }
+      }
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.dj").withStyle(ChatFormatting.GOLD));
+   }
+
    // Spider Man：与原版蜘蛛一致的爬墙判定——身体贴到任何墙（horizontalCollision）即吸附，
    // 按住前进向上爬，松开前进贴在墙上不下落，潜行可取消
    public static void tickSpiderMan(ServerPlayer var0) {
@@ -10382,6 +10439,155 @@ public final class HexEffects {
       }
    }
 
+   // 黑石行者：像冰霜行者一样在岩浆上行走——脚下岩浆结成临时黑石，几秒后还原回岩浆
+   private static void tickBlackstoneWalker(ServerPlayer var0) {
+      if (var0.isSpectator() || var0.isPassenger() || var0.getAbilities().flying || var0.isFallFlying() || !var0.onGround()) {
+         return;
+      }
+
+      if (var0.level() instanceof ServerLevel var1) {
+         boolean var2 = false;
+         BlockPos var3 = var0.blockPosition();
+
+         for (int var4 = -1; var4 <= 1; var4++) {
+            for (int var5 = -1; var5 <= 1; var5++) {
+               BlockPos var6 = var3.offset(var4, -1, var5);
+               BlockState var7 = var1.getBlockState(var6);
+               if (var7.is(Blocks.LAVA)) {
+                  var1.setBlockAndUpdate(var6, Blocks.BLACKSTONE.defaultBlockState());
+                  BLACKSTONE_PENDING.add(new HexEffects.BlackstoneEntry(var1, var6.immutable(), System.currentTimeMillis() + 4000L));
+                  var2 = true;
+               }
+            }
+         }
+
+         // 正在岩浆上结路时给短时抗火，防止贴边岩浆引燃
+         if (var2) {
+            var0.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 60, 0, false, false, true));
+         }
+      }
+   }
+
+   // 黑石行者：到期把临时黑石还原回岩浆（只有还是黑石才还原，避免覆盖玩家放置的方块）
+   public static void tickBlackstone(MinecraftServer var0) {
+      if (BLACKSTONE_PENDING.isEmpty()) {
+         return;
+      }
+
+      long var1 = System.currentTimeMillis();
+      Iterator<HexEffects.BlackstoneEntry> var2 = BLACKSTONE_PENDING.iterator();
+
+      while (var2.hasNext()) {
+         HexEffects.BlackstoneEntry var3 = var2.next();
+         if (var1 >= var3.revertMs) {
+            if (var3.level.isLoaded(var3.pos) && var3.level.getBlockState(var3.pos).is(Blocks.BLACKSTONE)) {
+               var3.level.setBlockAndUpdate(var3.pos, Blocks.LAVA.defaultBlockState());
+            }
+
+            var2.remove();
+         }
+      }
+
+      // 保险：列表异常增长时丢弃最老的记录
+      while (BLACKSTONE_PENDING.size() > 1024) {
+         BLACKSTONE_PENDING.remove(0);
+      }
+   }
+
+   // 缩小术：右键把最近敌人缩小到 25%（体型、跳跃与交互范围同步缩小），持续 60 秒
+   private static void giveShrinkItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "缩小术")) {
+         var0.addItem(questItem(Items.SLIME_BALL, "缩小术", "hexbingo.item.shrink.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.shrink_item").withStyle(ChatFormatting.LIGHT_PURPLE));
+      }
+   }
+
+   public static boolean castShrink(ServerPlayer var0) {
+      if (!hasHex(var0, "shrink")) {
+         return false;
+      }
+
+      long var1 = System.currentTimeMillis();
+      Long var3 = SHRINK_COOLDOWN.get(var0.getUUID());
+      if (var3 != null && var1 < var3) {
+         long var4 = (var3 - var1 + 999L) / 1000L;
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.shrink_cooldown", var4).withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      ServerPlayer var6 = nearestEnemy(var0, -1.0);
+      if (var6 == null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.shrink_none").withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      SHRINK_UNTIL.put(var6.getUUID(), var1 + 60000L);
+      SHRINK_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 480000L));
+      applyShrinkModifiers(var6, true);
+      var0.sendSystemMessage(Component.translatable("hexbingo.msg.shrink_cast", var6.getDisplayName()).withStyle(ChatFormatting.LIGHT_PURPLE));
+      var6.sendSystemMessage(Component.translatable("hexbingo.msg.shrunk").withStyle(ChatFormatting.DARK_PURPLE));
+      return true;
+   }
+
+   private static void applyShrinkModifiers(ServerPlayer var0, boolean var1) {
+      AttributeInstance var2 = var0.getAttribute(Attributes.SCALE);
+      if (var2 != null) {
+         if (var1) {
+            var2.addOrUpdateTransientModifier(new AttributeModifier(modifierId("shrink", 0), -0.75, Operation.ADD_MULTIPLIED_BASE));
+         } else {
+            var2.removeModifier(modifierId("shrink", 0));
+         }
+      }
+
+      AttributeInstance var3 = var0.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
+      if (var3 != null) {
+         if (var1) {
+            var3.addOrUpdateTransientModifier(new AttributeModifier(modifierId("shrink", 1), -0.75, Operation.ADD_MULTIPLIED_BASE));
+         } else {
+            var3.removeModifier(modifierId("shrink", 1));
+         }
+      }
+
+      AttributeInstance var4 = var0.getAttribute(Attributes.ENTITY_INTERACTION_RANGE);
+      if (var4 != null) {
+         if (var1) {
+            var4.addOrUpdateTransientModifier(new AttributeModifier(modifierId("shrink", 2), -0.75, Operation.ADD_MULTIPLIED_BASE));
+         } else {
+            var4.removeModifier(modifierId("shrink", 2));
+         }
+      }
+   }
+
+   public static boolean isShrunk(ServerPlayer var0) {
+      return SHRINK_UNTIL.containsKey(var0.getUUID());
+   }
+
+   public static void tickShrinks(MinecraftServer var0) {
+      if (SHRINK_UNTIL.isEmpty()) {
+         return;
+      }
+
+      long var1 = System.currentTimeMillis();
+
+      for (UUID var4 : new ArrayList<>(SHRINK_UNTIL.keySet())) {
+         Long var5 = SHRINK_UNTIL.get(var4);
+         if (var5 == null || var1 >= var5) {
+            SHRINK_UNTIL.remove(var4);
+            ServerPlayer var6 = var0.getPlayerList().getPlayer(var4);
+            if (var6 != null) {
+               applyShrinkModifiers(var6, false);
+               var6.sendSystemMessage(Component.translatable("hexbingo.msg.shrink_end").withStyle(ChatFormatting.GREEN));
+            }
+         }
+      }
+   }
+
+   public static void onShrinkLogout(ServerPlayer var0) {
+      if (SHRINK_UNTIL.remove(var0.getUUID()) != null) {
+         applyShrinkModifiers(var0, false);
+      }
+   }
+
    // 拾荒者：破坏方块有 3% 概率额外掉落自身（在 blockDrops 中调用）
    private static void scavengerDrop(ServerPlayer var0, BlockDropsEvent var1) {
       if (ThreadLocalRandom.current().nextDouble() < 0.03) {
@@ -10506,15 +10712,27 @@ public final class HexEffects {
       DENY_COOLDOWN.clear();
       XRAY_UNTIL.clear();
       XRAY_COOLDOWN.clear();
+      SHRINK_UNTIL.clear();
+      SHRINK_COOLDOWN.clear();
 
       for (ServerPlayer var2 : var0.getPlayerList().getPlayers()) {
          endEndExile(var2, false);
          clearXrayMarkers(var2);
+         applyShrinkModifiers(var2, false);
       }
 
       END_EXILE.clear();
       XRAY_MARKERS.clear();
       TASK_SHIELDS.clear();
+
+      // 黑石行者：对局结束把未还原的临时黑石还原回岩浆
+      for (HexEffects.BlackstoneEntry var7 : BLACKSTONE_PENDING) {
+         if (var7.level.isLoaded(var7.pos) && var7.level.getBlockState(var7.pos).is(Blocks.BLACKSTONE)) {
+            var7.level.setBlockAndUpdate(var7.pos, Blocks.LAVA.defaultBlockState());
+         }
+      }
+
+      BLACKSTONE_PENDING.clear();
 
       for (TamableAnimal var3 : PETS.values()) {
          var3.discard();

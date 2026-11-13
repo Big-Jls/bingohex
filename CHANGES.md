@@ -1,5 +1,17 @@
 # Changelog
 
+## 26.2-1.44.0 — 2026-11-13
+
+### Added
+
+- **DJ** (`dj`, silver): gain 1 note block and 3 random music discs.
+- **Blackstone Walker** (`blackstone_walker`, gold): walk on lava like Frost
+  Walker — the lava under your feet turns into temporary blackstone that melts
+  back to lava after a few seconds.
+- **Shrink** (`shrink`, gold): right-click to shrink the nearest enemy to 25%
+  size for 60 seconds; jump height and block/entity interaction range are
+  reduced to 25% as well. Cooldown 8 minutes.
+
 ## 26.2-1.43.18 — 2026-11-13
 
 ### Fixed / Adjusted

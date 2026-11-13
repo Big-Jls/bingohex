@@ -1328,6 +1328,33 @@
                                           "type":  "mangrove_map"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "dj",
+                      "color":  "silver",
+                      "effects":  [
+                                      {
+                                          "type":  "dj"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "blackstone_walker",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "blackstone_walker"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "shrink",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "shrink"
+                                      }
+                                  ]
                   }
               ]
 }
