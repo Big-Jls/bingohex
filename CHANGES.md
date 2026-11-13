@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.49.1 — 2026-11-14
+
+### Changed
+
+- **It's Over!** (`ended`): the End-side drawback is now "lose invulnerability"
+  instead of periodic damage — the owning team takes normal damage from
+  endermen, the dragon, fall damage and any other source while in the End
+  (like the duel arena of "Trapped With Me"). The Overworld and Nether keep
+  normal invulnerability, and the per-3-second damage tick is removed.
+
 ## 26.2-1.49.0 — 2026-11-14
 
 ### Added
@@ -10,9 +20,9 @@
 - **Silver Ascension** (`silver_shift`, silver): immediately gain 2 random
   silver hexes.
 - **It's Over!** (`ended`, prismatic): killing the Ender Dragon immediately
-  ends the current game with the killer's team winning; but the owning team
-  takes 1 damage every 3 seconds while in the End (Overworld and Nether are
-  unaffected).
+  ends the current game with the killer's team winning; the owning team loses
+  invulnerability in the End and takes normal damage there (Overworld and
+  Nether are unaffected).
 
 ## 26.2-1.48.0 — 2026-11-14
 

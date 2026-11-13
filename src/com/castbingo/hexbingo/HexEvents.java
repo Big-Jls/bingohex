@@ -79,6 +79,16 @@ public class HexEvents {
       }
    }
 
+   @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+   public void endedDamage(LivingIncomingDamageEvent var1) {
+      // 结束了！：拥有者的队伍在末地失去无敌保护——末影人、末影龙、摔落等伤害正常生效
+      if (var1.isCanceled()
+         && var1.getEntity() instanceof ServerPlayer var2
+         && HexEffects.endedTeamInEnd(var2)) {
+         var1.setCanceled(false);
+      }
+   }
+
    @SubscribeEvent
    public void incomingDamage(LivingIncomingDamageEvent var1) {
       HexEffects.incomingDamage(var1);
@@ -159,7 +169,6 @@ public class HexEvents {
          HexEffects.tickSwordFly(var2);
          HexEffects.tickDice(var2);
          HexEffects.tickMindControl(var2);
-         HexEffects.tickEnded(var2);
          if (var2.tickCount % 10 == 0) {
             HexEffects.tickBoundItems(var2);
          }

@@ -11762,11 +11762,9 @@ public final class HexEffects {
       return false;
    }
 
-   // 结束了！：拥有者在末地每 3 秒受到 1 点伤害（主世界与地狱不受影响）
-   public static void tickEnded(ServerPlayer var0) {
-      if (var0.level().dimension() == Level.END && var0.tickCount % 60 == 0 && teamOwnsEnded(var0, team(var0))) {
-         var0.hurt(var0.damageSources().generic(), 1.0F);
-      }
+   // 结束了！：拥有者的队伍在末地失去无敌保护，末影人/末影龙/摔落等伤害正常生效
+   public static boolean endedTeamInEnd(ServerPlayer var0) {
+      return var0.level().dimension() == Level.END && teamOwnsEnded(var0, team(var0));
    }
 
    // 结束了！：击杀末影龙直接结束当前比赛，击杀者的队伍获胜

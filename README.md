@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.0.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.49.1.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -235,7 +235,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 卡牌重铸 | `card_recast` | 立即把自己队伍已完成的任务内容重新随机（换成卡池里的新任务），保持已完成状态。 |
 | 封印 | `seal` | 获得「封印」：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上会出现屏障图标。冷却 15 分钟。 |
 | 全是我的 | `all_mine` | 获得「全是我的」：右键打开任务界面选择一个任务，其他所有队伍永久无法完成它（自己的队伍不受影响）。一次性；只能在第三个海克斯出现，不能被质变获得。 |
-| 结束了！ | `ended` | 击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会持续受到伤害（主世界与地狱不受影响）。 |
+| 结束了！ | `ended` | 击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护——末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。 |
 
 ## Hex list (English)
 
@@ -402,7 +402,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Card Recast | `card_recast` | Immediately reroll the contents of your team's completed tasks (replaced with new tasks from the pool), keeping them completed. |
 | Seal | `seal` | Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. Cooldown 15 minutes. |
 | All Mine | `all_mine` | Gain 'All Mine': right-click to open the task UI and pick a task; every other team can never complete it (your own team is unaffected). Single use; only offered as the third hex and never obtained through transformations. |
-| It's Over! | `ended` | Killing the Ender Dragon immediately ends the current game with the killer's team winning; but you and your team take continuous damage in the End (the Overworld and Nether are unaffected). |
+| It's Over! | `ended` | Killing the Ender Dragon immediately ends the current game with the killer's team winning; but in the End your team loses invulnerability — enderman, dragon and fall damage all apply normally (the Overworld and Nether are unaffected). |
 
 <!-- HEX-TABLE-END -->
 
@@ -419,7 +419,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.0 `
+.\build.ps1 -Version 26.2-1.49.1 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -443,11 +443,15 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 ## 更新日志
 
+### 1.49.1 调整
+
+- **结束了！**（`ended`）：末地的负面效果改为「失去无敌保护」——拥有者的队伍在末地会正常受到末影人、末影龙、摔落等所有伤害（类似「和我一起困在这里」的决斗场），主世界与地狱保持无敌不变；不再每 3 秒扣血。
+
 ### 1.49.0 新增
 
 - 新增金色 **钓鱼佬**（`fisherman`）：获得一把附魔「海之眷顾 X」的鱼竿；钓鱼时除了鱼什么都能钓上来（随机物品池与仆从大师相同，每次 1–2 件）。
 - 新增银色 **质变白银阶**（`silver_shift`）：立刻获得 2 个随机银色海克斯。
-- 新增彩色 **结束了！**（`ended`）：击杀末影龙会立即结束当前比赛并让击杀者的队伍获胜；但你和你的队伍在末地每 3 秒受到 1 点持续伤害（主世界与地狱不受影响）。
+- 新增彩色 **结束了！**（`ended`）：击杀末影龙会立即结束当前比赛并让击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护，末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。
 
 ### 1.48.0 新增与调整
 

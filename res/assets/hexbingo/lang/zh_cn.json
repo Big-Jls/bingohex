@@ -693,7 +693,7 @@
     "hexbingo.hex.silver_shift.name":  "质变白银阶",
     "hexbingo.hex.silver_shift.desc":  "立刻获得 2 个随机银色海克斯。",
     "hexbingo.hex.ended.name":  "结束了！",
-    "hexbingo.hex.ended.desc":  "击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会持续受到伤害（主世界与地狱不受影响）。",
-    "hexbingo.msg.ended_info":  "结束了！：击杀末影龙将直接结束比赛并让你的队伍获胜，但你们在末地会受到持续伤害。",
+    "hexbingo.hex.ended.desc":  "击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护——末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。",
+    "hexbingo.msg.ended_info":  "结束了！：击杀末影龙将直接结束比赛并让你的队伍获胜，但你们在末地会失去无敌保护，受到正常伤害。",
     "hexbingo.msg.ended_win":  "末影龙被 %s 击杀——比赛结束了！"
 }

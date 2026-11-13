@@ -693,7 +693,7 @@
     "hexbingo.hex.silver_shift.name":  "Silver Ascension",
     "hexbingo.hex.silver_shift.desc":  "Immediately gain 2 random silver hexes.",
     "hexbingo.hex.ended.name":  "It's Over!",
-    "hexbingo.hex.ended.desc":  "Killing the Ender Dragon immediately ends the current game with the killer's team winning; but you and your team take continuous damage in the End (the Overworld and Nether are unaffected).",
-    "hexbingo.msg.ended_info":  "It's Over!: killing the Ender Dragon ends the game instantly and makes your team win, but your team takes continuous damage in the End.",
+    "hexbingo.hex.ended.desc":  "Killing the Ender Dragon immediately ends the current game with the killer's team winning; but in the End your team loses invulnerability — endermen, the dragon, fall damage and more all apply normally (the Overworld and Nether are unaffected).",
+    "hexbingo.msg.ended_info":  "It's Over!: killing the Ender Dragon ends the game instantly and makes your team win, but your team loses invulnerability in the End and takes normal damage.",
     "hexbingo.msg.ended_win":  "The Ender Dragon was slain by %s — the game is over!"
 }
