@@ -10439,7 +10439,7 @@ public final class HexEffects {
       }
    }
 
-   // 精神控制：右键控制一名敌人 15 秒的移动方向
+   // 精神控制：右键控制一名敌人 15 秒——施放者定身站在原地，按 WASD 操控目标的移动
    private static void giveMindItem(ServerPlayer var0) {
       if (!hasNamedItem(var0, "精神控制")) {
          var0.addItem(questItem(Items.PRISMARINE_CRYSTALS, "精神控制", "hexbingo.item.mind.lore"));
@@ -10466,7 +10466,7 @@ public final class HexEffects {
          return true;
       }
 
-      MIND_CONTROL.put(var0.getUUID(), new HexEffects.MindState(var6.getUUID(), var1 + 15000L));
+      MIND_CONTROL.put(var0.getUUID(), new HexEffects.MindState(var6.getUUID(), var1 + 15000L, var0.getX(), var0.getY(), var0.getZ()));
       MIND_COOLDOWN.put(var0.getUUID(), var1 + skillCooldown(var0, 300000L));
       var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_cast", var6.getDisplayName()).withStyle(ChatFormatting.LIGHT_PURPLE));
       var6.sendSystemMessage(Component.translatable("hexbingo.msg.mind_controlled").withStyle(ChatFormatting.DARK_PURPLE));
@@ -10506,34 +10506,75 @@ public final class HexEffects {
       return var6 != null ? var6 : var8;
    }
 
-   /** 每 tick 由被控制者的 PlayerTickEvent 调用。 */
+   /** 每 tick 由施放者与目标的 PlayerTickEvent 调用。 */
    public static void tickMindControl(ServerPlayer var0) {
-      if (!MIND_CONTROL.isEmpty()) {
-         long var1 = System.currentTimeMillis();
-         Iterator<Map.Entry<UUID, HexEffects.MindState>> var3 = MIND_CONTROL.entrySet().iterator();
+      if (MIND_CONTROL.isEmpty()) {
+         return;
+      }
 
-         while (var3.hasNext()) {
-            Map.Entry<UUID, HexEffects.MindState> var4 = var3.next();
-            HexEffects.MindState var5 = var4.getValue();
-            if (!var5.target.equals(var0.getUUID())) {
-               continue;
+      UUID var2 = var0.getUUID();
+      long var1 = System.currentTimeMillis();
+      MinecraftServer var3 = var0.level().getServer();
+
+      for (Map.Entry<UUID, HexEffects.MindState> var4 : new ArrayList<>(MIND_CONTROL.entrySet())) {
+         HexEffects.MindState var5 = var4.getValue();
+         boolean var6 = var4.getKey().equals(var2);
+         boolean var7 = var5.target.equals(var2);
+         if (!var6 && !var7) {
+            continue;
+         }
+
+         ServerPlayer var8 = var6 ? var0 : var3 == null ? null : var3.getPlayerList().getPlayer(var4.getKey());
+         ServerPlayer var9 = var7 ? var0 : var3 == null ? null : var3.getPlayerList().getPlayer(var5.target);
+         // 任一方掉线/跨维度/超时 → 结束控制
+         if (var8 == null || var9 == null || var8.level() != var9.level() || var1 >= var5.until) {
+            MIND_CONTROL.remove(var4.getKey());
+            if (var8 != null) {
+               var8.sendSystemMessage(Component.translatable("hexbingo.msg.mind_end").withStyle(ChatFormatting.GRAY));
             }
 
-            if (var1 >= var5.until) {
-               var3.remove();
-               var0.sendSystemMessage(Component.translatable("hexbingo.msg.mind_end").withStyle(ChatFormatting.GRAY));
-               continue;
+            if (var9 != null && var9 != var8) {
+               var9.sendSystemMessage(Component.translatable("hexbingo.msg.mind_end").withStyle(ChatFormatting.GRAY));
+            }
+            continue;
+         }
+
+         if (var6) {
+            // 施放者：定身站在原地（清速度 + 拉回锚点），免疫击退与水流
+            var0.setDeltaMovement(Vec3.ZERO);
+            if (var0.distanceToSqr(var5.x, var5.y, var5.z) > 0.04) {
+               var0.teleportTo(var5.x, var5.y, var5.z);
             }
 
-            MinecraftServer var6 = var0.level().getServer();
-            ServerPlayer var7 = var6 == null ? null : var6.getPlayerList().getPlayer(var4.getKey());
-            if (var7 == null) {
-               var3.remove();
-               continue;
+            var0.hurtMarked = true;
+         } else {
+            // 目标：按施放者的 WASD 输入移动
+            Input var10 = var8.getLastClientInput();
+            Vec3 var11 = var0.getLookAngle();
+            double var12 = var11.x;
+            double var13 = var11.z;
+            double var14 = Math.sqrt(var12 * var12 + var13 * var13);
+            if (var14 > 1.0E-4) {
+               var12 /= var14;
+               var13 /= var14;
+            } else {
+               var12 = 0.0;
+               var13 = 1.0;
             }
 
-            Vec3 var8 = var7.getLookAngle();
-            var0.setDeltaMovement(var8.x * 0.35, var0.getDeltaMovement().y, var8.z * 0.35);
+            double var15 = (var10 != null && var10.forward() ? 1.0 : 0.0) - (var10 != null && var10.backward() ? 1.0 : 0.0);
+            double var16 = (var10 != null && var10.right() ? 1.0 : 0.0) - (var10 != null && var10.left() ? 1.0 : 0.0);
+            // 右向量 = up × forward = (fz, 0, -fx)
+            double var17 = var12 * var15 + var13 * var16;
+            double var18 = var13 * var15 - var12 * var16;
+            double var19 = Math.sqrt(var17 * var17 + var18 * var18);
+            if (var19 > 1.0E-4) {
+               var0.setDeltaMovement(var17 / var19 * 0.35, var0.getDeltaMovement().y, var18 / var19 * 0.35);
+            } else {
+               // 无输入：水平速度清零站住
+               var0.setDeltaMovement(0.0, var0.getDeltaMovement().y, 0.0);
+            }
+
             var0.hurtMarked = true;
          }
       }
@@ -11595,7 +11636,7 @@ public final class HexEffects {
    ) {
    }
 
-   private record MindState(UUID target, long until) {
+   private record MindState(UUID target, long until, double x, double y, double z) {
    }
 
    private record DenyState(int taskIndex, long until) {

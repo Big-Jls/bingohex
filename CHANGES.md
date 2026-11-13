@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.2-1.47.1 — 2026-11-14
+
+### Changed
+
+- **Mind Control** (`mind_control`): the caster now stands still (rooted in
+  place, immune to knockback and water currents) and steers the target's
+  movement with WASD, instead of the target automatically walking toward the
+  caster's look direction. Both players are notified when the control ends or
+  either side logs out / changes dimension.
+
 ## 26.2-1.47.0 — 2026-11-13
 
 ### Added
