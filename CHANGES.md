@@ -1,5 +1,20 @@
 # Changelog
 
+## 26.2-1.43.17 — 2026-11-13
+
+### Fixed
+
+- **Dice Roll / Destiny Dice**: the roll animation sampled degenerate UVs, which
+  made the die texture tile into hundreds of tiny copies across a screen area.
+  The full 32×32 die texture now renders as a single 96×96 die during the
+  animation.
+- **Structure / biome teleport hexes**: removed every "generate if not found"
+  mention from descriptions and messages (`boomerang_biome`, `gaze_abyss`,
+  `pillager_outpost`, `cherry_grove`, `pale_garden_map`, `mangrove_map`,
+  `eighty_one_trials`). The fallback generation still happens silently, but
+  players now only see the normal "teleported to the nearest …" / "received a
+  map" message.
+
 ## 26.2-1.43.16 — 2026-11-13
 
 ### Fixed

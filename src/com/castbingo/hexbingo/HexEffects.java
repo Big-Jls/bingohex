@@ -2794,7 +2794,7 @@ public final class HexEffects {
 
          var0.teleportTo(var2, var5.getX() + 0.5, var5.getY(), var5.getZ() + 0.5, Set.of(), var0.getYRot(), var0.getXRot(), false);
          var0.resetFallDistance();
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss_gen").withStyle(ChatFormatting.DARK_PURPLE));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.gaze_abyss").withStyle(ChatFormatting.DARK_PURPLE));
          return;
       }
 
@@ -2870,7 +2870,7 @@ public final class HexEffects {
          var6 = carveSafeSpot(var2, new BlockPos(var5.getX(), var7, var5.getZ()));
       }
 
-      teleportSurface(var0, var2, var6, "hexbingo.msg.pillager_outpost_gen");
+      teleportSurface(var0, var2, var6, "hexbingo.msg.pillager_outpost");
    }
 
    // 兜底生成：按 8 个方位各 200 格寻找陆地，实在找不到再退化为任意地表
@@ -2938,7 +2938,7 @@ public final class HexEffects {
             return;
          }
 
-         teleportSurface(var0, var2, var6, "hexbingo.msg.cherry_grove_gen");
+         teleportSurface(var0, var2, var6, "hexbingo.msg.cherry_grove");
          return;
       }
 
@@ -2968,7 +2968,7 @@ public final class HexEffects {
          }
 
          var0.addItem(paleGardenMap(var2, var6.getX(), var6.getZ()));
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_gen").withStyle(ChatFormatting.GOLD));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.pale_garden_map").withStyle(ChatFormatting.GOLD));
          return;
       }
 
@@ -3003,7 +3003,7 @@ public final class HexEffects {
          }
 
          var0.addItem(mangroveMap(var2, var6.getX(), var6.getZ()));
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mangrove_map_gen").withStyle(ChatFormatting.GOLD));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.mangrove_map").withStyle(ChatFormatting.GOLD));
          return;
       }
 
@@ -4239,7 +4239,7 @@ public final class HexEffects {
          }
 
          teleportUnderground(var0, var1, var5);
-         var0.sendSystemMessage(Component.translatable("hexbingo.msg.trial_chambers_gen").withStyle(ChatFormatting.GOLD));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.trial_chambers").withStyle(ChatFormatting.GOLD));
       }
    }
 
@@ -5135,22 +5135,16 @@ public final class HexEffects {
             ResourceKey var17 = ResourceKey.create(Registries.BIOME, var6);
             Predicate<Holder<Biome>> var8 = var1x -> var1x.unwrapKey().map(var1xx -> var1xx.equals(var17)).orElse(false);
             Pair var9 = var1.findClosestBiome3d(var8, var0.blockPosition(), 12800, 32, 96);
-            boolean var18 = false;
             BlockPos var10;
             if (var9 == null) {
-               // 附近找不到时直接在原地生成一处目标群系，保证回力镖一定能指向
+               // 附近找不到时直接在原地生成一处目标群系，保证回力镖一定能指向（不提示玩家）
                var10 = createArtificialBiomeGeneric(var1, var0, var6.toString());
                if (var10 == null) {
                   var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_none").withStyle(ChatFormatting.GRAY));
                   return true;
                }
-               var18 = true;
             } else {
                var10 = (BlockPos)var9.getFirst();
-            }
-
-            if (var18) {
-               var0.sendSystemMessage(Component.translatable("hexbingo.msg.boomerang_gen", var6.toString()).withStyle(ChatFormatting.GOLD));
             }
 
             Vec3 var11 = new Vec3(var10.getX() + 0.5 - var0.getX(), 0.0, var10.getZ() + 0.5 - var0.getZ()).normalize();

@@ -50,14 +50,15 @@ public final class HexDiceAnim {
       float var3 = 1.0F - (float)(endMs - var1) / (float)totalMs;
       int var4 = var2.getWindow().getGuiScaledWidth() / 2;
       int var5 = var2.getWindow().getGuiScaledHeight() / 2;
-      int var6 = 64;
+      int var6 = 96;
       // 弹跳轨迹：向上抛起再落下
       int var7 = (int)(Math.sin(var3 * Math.PI) * 70.0);
       int var8 = var4 - var6 / 2;
       int var9 = var5 - var6 / 2 - var7;
       // 快速轮换 8 帧形成旋转效果
       int var10 = (int)(var3 * 32.0F) % FRAMES.length;
-      var0.getGuiGraphics().blit(FRAMES[var10], var8, var9, var8 + var6, var9 + var6, 0.0F, 32.0F, 0.0F, 32.0F);
+      // UV 为归一化坐标（0..1）：整张 32×32 贴图拉伸到 var6×var6，避免退化 UV 导致贴图平铺
+      var0.getGuiGraphics().blit(FRAMES[var10], var8, var9, var8 + var6, var9 + var6, 0.0F, 0.0F, 1.0F, 1.0F);
    }
 
    private HexDiceAnim() {

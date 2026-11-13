@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.43.15.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.43.17.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -120,9 +120,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 品质提升 | `offer_upgrade` | 下一次海克斯选择必定出现至少 1 个彩色；只会在第一次海克斯选择中出现。 |
 | 致盲 | `blind` | 获得「致盲」：右键使所有敌人失明 8 秒。冷却 3 分钟。 |
 | 结束了? | `is_it_over` | 传送到末地外岛 10 分钟，期间无法被任何传送带走，结束后自动返回。 |
-| 谁才是掠夺者 | `pillager_outpost` | 传送到最近的掠夺者前哨站；附近没有时在 8 个方位 200 格外生成一座。 |
-| 故乡的樱花开了 | `cherry_grove` | 传送到最近的樱花群系；附近没有时在 500 格外改造出一片樱花林。 |
-| 一二三木头人 | `pale_garden_map` | 获得一张指向最近苍白花园群系的地图；附近没有时在 500 格外改造一片并标记。 |
+| 谁才是掠夺者 | `pillager_outpost` | 传送到最近的掠夺者前哨站。 |
+| 故乡的樱花开了 | `cherry_grove` | 传送到最近的樱花群系。 |
+| 一二三木头人 | `pale_garden_map` | 获得一张指向最近苍白花园群系的地图。 |
 | 预支胜利 | `advance_victory` | 立即点亮一格，但 5 分钟后熄灭，除非期间真正完成它。 |
 | 偷天换日 | `cell_swap` | 交换你与一名敌人的一个已完成格归属。 |
 | 地心游记 | `journey_core` | 传送到 Y=-50 的地下洞穴。 |
@@ -171,12 +171,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
 | 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，蝙蝠跟在玩家脚边；可飞行（飞行速度降低 35%）、无法攻击、血量与体型变小，结束后获得 1 分钟缓降。冷却 7 分钟。 |
-| 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点；附近没有时在 500 格外地下生成一处深暗洞穴。 |
+| 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点。 |
 | 万能牌 | `wildcard` | 在 Bingo 卡面随机点亮一格（所有队伍共享这一格）。 |
 | 命运骰子 | `destiny_dice` | 掷骰（播放动画后揭晓）随机触发：完成一格 / 取消敌人一格 / 双方各完成一格 / 全体卡面重排。 |
 | 随机大迁徙 | `great_migration` | 所有玩家被随机传送到主世界彼此 1000 格内的位置。 |
 | 驯龙高手 | `dragon_rider` | 获得一颗龙蛋；放下后需孵化 3 分钟，蛋上方的文字展示实体显示倒计时，挖掉或移走会重新计时。孵化出的幼龙使用幻翼 AI 环绕你飞行，跨维度、远距离传送与区块卸载后都会回到你身边继续环绕；经过的方块会掉落，碰到的非玩家生物会被击退并受到 4 点伤害，不会攻击任何玩家，且完全无敌（任何伤害都会被取消，包括创造模式攻击）。 |
-| 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图；附近没有时在 500 格外改造一片红树林并标记。 |
+| 初音未来 | `mangrove_map` | 获得一张指向最近红树林群系的地图。 |
 
 ### 彩色（35）
 
@@ -197,7 +197,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 仆从大师 | `pet_master` | 获得一只无敌宠物，每 8 秒从全物品池中随机给你一个物品（贵重物品概率较低）。 |
 | 尊我为王 | `crown_me_king` | 敌方位置出现信标光柱，抵达后获得一个彩色海克斯、一套随机附魔钻石盔甲、效率 IV 钻石镐与锋利 IV/火焰附加 I 钻石剑。 |
 | 掀桌子！ | `flip_table` | 重新随机所有未被任意队伍完成的任务。 |
-| ok回力镖 | `boomerang_biome` | 获得ok回力镖：投掷后飞向一个未完成群系任务所在的群系并返回；搜索范围内找不到时自动在前方生成一处目标群系。 |
+| ok回力镖 | `boomerang_biome` | 获得ok回力镖：投掷后飞向一个未完成群系任务所在的群系并返回。 |
 | 和我一起困在这里 | `rainbow_duel` | 获得一个绑定锁链。右键与最近的敌人进入基岩决斗场并允许 PVP：先死亡者失败，死亡者复活后额外坐牢 20 秒；胜者立即出来；5 分钟无人交战则双方自动出来。冷却 3 分钟。 |
 | 精怪魔法 | `fae_magic` | 获得「精怪魔法」：右键把敌对队伍变成小动物 1 分钟，冷却 5 分钟。 |
 | 中国人会飞 | `chinese_can_fly` | 获得一个无限耐久的鞘翅，以及一个用掉后会自动补充的绑定烟花火箭。 |
@@ -269,9 +269,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Quality Upgrade | `offer_upgrade` | Your next hex selection is guaranteed to contain at least 1 prismatic hex. Only offered during the first hex selection. |
 | Blind | `blind` | Gain 'Blind': right-click to blind all enemies for 8 seconds. Cooldown 3 minutes. |
 | Is It Over? | `is_it_over` | Teleport to the End outer islands for 10 minutes. You cannot be teleported during this time and return automatically when it ends. |
-| Who Is the Pillager Now | `pillager_outpost` | Teleport to the nearest pillager outpost; if none is nearby, one is generated 200 blocks away in one of 8 directions. |
-| The Cherry Blossoms of My Hometown Have Bloomed | `cherry_grove` | Teleport to the nearest cherry grove biome; if none is nearby, create one 500 blocks away. |
-| Red Light, Green Light | `pale_garden_map` | Receive a map pointing to the nearest pale garden biome; if none is nearby, create one 500 blocks away and mark it. |
+| Who Is the Pillager Now | `pillager_outpost` | Teleport to the nearest pillager outpost. |
+| The Cherry Blossoms of My Hometown Have Bloomed | `cherry_grove` | Teleport to the nearest cherry grove biome. |
+| Red Light, Green Light | `pale_garden_map` | Receive a map pointing to the nearest pale garden biome. |
 | Advance Victory | `advance_victory` | Instantly light up one cell, but it goes out after 5 minutes unless you genuinely complete it in time. |
 | Steal the Sky | `cell_swap` | Swap ownership of one completed cell between you and an enemy team. |
 | Journey to the Core | `journey_core` | Teleport to a cave at Y=-50. |
@@ -320,12 +320,12 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
 | Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight at 35% reduced speed, cannot attack, bat-sized health and body). The bat follows at your feet; the form ends with 1 minute of Slow Falling. Cooldown 7 minutes. |
-| Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves; if none is nearby, create an artificial deep dark cave 500 blocks away underground. |
+| Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves. |
 | Wildcard | `wildcard` | Randomly light up one cell on the Bingo card (shared by all teams). |
 | Destiny Dice | `destiny_dice` | Roll a die (revealed after an animation): complete a cell / remove an enemy cell / both complete a cell / reshuffle all cards. |
 | Great Migration | `great_migration` | All players are randomly teleported to overworld positions within 1000 blocks of each other. |
 | Dragon Tamer | `dragon_rider` | Gain a dragon egg; after placing it, it incubates for 3 minutes with a text-display countdown above it, and mining or moving it resets the timer. The hatched baby dragon circles you, breaks blocks it passes through with drops, knocks back creatures for 4 damage, and never attacks you or other players who own this hex. |
-| Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome; if none is nearby, create one 500 blocks away and mark it. |
+| Hatsune Miku | `mangrove_map` | Receive a map pointing to the nearest mangrove swamp biome. |
 
 ### Prismatic (35)
 
@@ -346,7 +346,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Pet Master | `pet_master` | Gain an invincible pet that gives you a random item from the full item pool every 8s (valuable items are rarer). |
 | Crown Me King | `crown_me_king` | A beacon marks an enemy position. Reach it to gain a prismatic hex, a randomly enchanted diamond armor set, an Efficiency IV diamond pickaxe and a Sharpness IV / Fire Aspect I diamond sword. |
 | Flip the Table! | `flip_table` | Reroll every task that no team has completed. |
-| OK Boomerang | `boomerang_biome` | Gain OK Boomerang: throw it toward an unfinished biome task and it returns; if the biome is not found nearby, one is generated ahead. |
+| OK Boomerang | `boomerang_biome` | Gain OK Boomerang: throw it toward an unfinished biome task and it returns. |
 | Trapped With Me | `rainbow_duel` | Gain a bound chain. Right-click to enter a bedrock duel with the nearest enemy; PvP is allowed, whoever dies first loses, the winner leaves at once, and both leave after 5 minutes without PvP. 3 minute cooldown. |
 | Fey Magic | `fae_magic` | Gain Fey Magic: right-click to turn the enemy team into critters for 1 minute. 5 minute cooldown. |
 | Chinese Can Fly | `chinese_can_fly` | Gain an unbreakable elytra and one bound firework rocket that is always replenished. |
@@ -382,7 +382,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.43.15 `
+.\build.ps1 -Version 26.2-1.43.17 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -405,6 +405,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.43.17 修复
+
+- **3面骰 / 命运骰子**：掷骰动画修复——UV 采样错误导致贴图退化平铺（屏幕上一片区域出现大量极小的骰子）；现在整张骰子贴图按 96×96 正常显示，动画结束后再揭晓结果。
+- **结构 / 传送群系类海克斯**：删除所有描述与提示里的「找不到就生成」信息（ok回力镖、凝视深渊、谁才是掠夺者、故乡的樱花开了、一二三木头人、初音未来、九九八十一难）；找不到目标群系/结构时仍会暗中生成兜底，但对玩家统一显示为「已传送到最近的…」/「已获得地图」，不再暴露生成机制。
 
 ### 1.43.16 修复
 
