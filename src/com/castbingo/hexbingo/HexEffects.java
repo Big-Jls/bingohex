@@ -9282,9 +9282,9 @@ public final class HexEffects {
    }
 
    // ============ 踏剑飞行 ============
-   // 消耗背包与物品栏中剑的耐久获得创造式飞行（R 键开关）：
-   // 主手→副手→团队背包，取档位最低的剑优先（保好剑）；剑耐久按"满耐久飞行时长"匀速消耗，
-   // 剑碎自动换下一把；没有剑时停止飞行并给 5 秒缓降。
+   // 消耗剑的耐久获得创造式飞行（R 键开关）：
+   // 消耗顺序：主手→副手→自己物品栏→团队背包，始终优先消耗档位最低的剑（保好剑）；
+   // 剑耐久按"满耐久飞行时长"匀速消耗，剑碎自动换下一把；没有剑时停止飞行并给 5 秒缓降。
    // 水平速度上限与鞘翅最大水平速度一致（1.8 格/tick），木剑最慢，随剑档位渐变提升。
 
    // 剑档位：满耐久可飞秒数
@@ -9368,6 +9368,19 @@ public final class HexEffects {
          var2.stack = var5;
          var2.item = var5.getItem();
          var2.onBreak = () -> var0.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+      }
+
+      // 自己物品栏（36 格）
+      NonNullList<ItemStack> var10 = var0.getInventory().getNonEquipmentItems();
+      for (int var11 = 0; var11 < var10.size(); var11++) {
+         ItemStack var12 = var10.get(var11);
+         if (swordFlyCandidate(var12) && swordFlyTier(var12.getItem()) < var3) {
+            var3 = swordFlyTier(var12.getItem());
+            var2.stack = var12;
+            var2.item = var12.getItem();
+            int var13 = var11;
+            var2.onBreak = () -> var0.getInventory().setItem(var13, ItemStack.EMPTY);
+         }
       }
 
       if (var1 != null) {

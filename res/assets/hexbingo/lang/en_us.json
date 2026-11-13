@@ -652,7 +652,7 @@
     "hexbingo.hex.seal.name":  "Seal",
     "hexbingo.hex.seal.desc":  "Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. Cooldown 15 minutes.",
     "hexbingo.hex.sword_fly.name":  "Sword Flight",
-    "hexbingo.hex.sword_fly.desc":  "Press R to fly by consuming sword durability from your inventory and team backpack: a wooden sword lasts 10 seconds, gold 15s, stone 20s, iron 30s, diamond 45s, netherite 60s. Speed scales with the sword tier, never faster than elytra, and the sword being consumed is shown at your feet.",
+    "hexbingo.hex.sword_fly.desc":  "Press R to fly by consuming sword durability: main hand, then offhand, then your inventory, then the team backpack — always the lowest-tier sword first. A wooden sword lasts 10 seconds, gold 15s, stone 20s, iron 30s, diamond 45s, netherite 60s. Speed scales with the sword tier, never faster than elytra, and the sword being consumed is shown at your feet.",
     "hexbingo.msg.sword_fly":  "Sword Flight: press R to toggle sword-powered flight (wooden sword 10s up to netherite 60s), capped at elytra speed.",
     "hexbingo.msg.sword_fly_on":  "Sword Flight: enabled.",
     "hexbingo.msg.sword_fly_off":  "Sword Flight: disabled.",

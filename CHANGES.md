@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.47.2 — 2026-11-14
+
+### Changed
+
+- **Sword Flight** (`sword_fly`): durability consumption order is now
+  main hand → offhand → own inventory → team backpack, always preferring the
+  lowest-tier sword first. Durability is only consumed while airborne.
+
 ## 26.2-1.47.1 — 2026-11-14
 
 ### Changed
