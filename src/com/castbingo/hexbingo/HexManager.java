@@ -13,6 +13,7 @@ import com.castbingo.hexbingo.network.HexTaskListPayload;
 import io.github.noeppi_noeppi.mods.bongo.Bingo;
 import io.github.noeppi_noeppi.mods.bongo.data.Team;
 import io.github.noeppi_noeppi.mods.bongo.data.TeamCompletion;
+import io.github.noeppi_noeppi.mods.bongo.data.WinCondition;
 import io.github.noeppi_noeppi.mods.bongo.event.BingoTaskEvent;
 import io.github.noeppi_noeppi.mods.bongo.task.Task;
 import java.util.ArrayList;
@@ -412,6 +413,30 @@ public final class HexManager {
          }
       }
 
+      MinecraftServer var7 = var0.level().getServer();
+      if (var7 != null) {
+         // 世界缩小：第四个海克斯不刷；游戏剩余不足 15 分钟不刷（不限时游戏不受限）
+         Bingo var8 = Bingo.get(var7.overworld());
+         long var9 = var8.runningUntil();
+         boolean var10 = var2 == 3 || (var9 != 0L && var9 - System.currentTimeMillis() < 900000L);
+         if (var10) {
+            for (int var11 = 0; var11 < 8 && var4.stream().anyMatch(var12 -> var12.id().equals("world_shrink")); var11++) {
+               var4 = rollOffer(var1, var0.getUUID(), var2, var3);
+            }
+         }
+
+         // 全是我的：仅第三个海克斯、非占点模式（default/海克斯模式）、30% 概率替换一个选项
+         if (var2 == 2 && !var3.contains(HexRegistry.ALL_MINE)) {
+            boolean var13 = !var8.getSettings().game().lockout() && var8.getSettings().game().winCondition() != WinCondition.LOCK;
+            if (var13 && ThreadLocalRandom.current().nextDouble() < 0.3) {
+               Hex var14 = HexRegistry.byId(HexRegistry.ALL_MINE);
+               if (var14 != null && !var4.isEmpty()) {
+                  var4.set(ThreadLocalRandom.current().nextInt(var4.size()), var14);
+               }
+            }
+         }
+      }
+
       return var4;
    }
 
@@ -650,7 +675,7 @@ public final class HexManager {
             }
 
             Hex var4 = HexRegistry.byId(var1);
-            if (var4 != null && !var1.equals(HexRegistry.OFFER_UPGRADE)) {
+            if (var4 != null && !var1.equals(HexRegistry.OFFER_UPGRADE) && !var1.equals(HexRegistry.ALL_MINE)) {
                if (var3.hexes(var0.getUUID()).contains(var1)) {
                   var0.sendSystemMessage(Component.translatable("hexbingo.msg.hex_pick_owned").withStyle(ChatFormatting.GRAY));
                } else {
@@ -874,6 +899,10 @@ public final class HexManager {
          if (!HexEffects.sealReady(var0)) {
             return;
          }
+      } else if ("mine".equals(var1)) {
+         if (!HexEffects.allMineReady(var0)) {
+            return;
+         }
       } else {
          return;
       }
@@ -915,6 +944,8 @@ public final class HexManager {
          HexEffects.applyBlankCell(var0, var1);
       } else if ("seal".equals(var2)) {
          HexEffects.applySeal(var0, var1);
+      } else if ("mine".equals(var2)) {
+         HexEffects.applyAllMine(var0, var1);
       } else {
          HexEffects.applyObjectiveDeny(var0, var1);
       }

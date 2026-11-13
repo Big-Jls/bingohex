@@ -11,7 +11,7 @@
 
 ## 简介
 
-为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **144 个海克斯强化**：55 银色 / 50 金色 / 39 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
+为 [ReBongo](https://github.com/Big-Jls/rebongo)（Bongo 的 NeoForge 26.2 移植版）增加 **147 个海克斯强化**：55 银色 / 52 金色 / 40 彩色。包含三选一选择界面、技能物品、被动效果，以及任务类与战斗类强化。
 
 ## 玩法
 
@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.47.2.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.48.0.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -70,7 +70,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
 
 <!-- HEX-TABLE-START -->
-## 海克斯一览（144）
+## 海克斯一览（147）
 
 ### 银色（55）
 
@@ -132,14 +132,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 兼容灾厄 | `bad_omen` | 每 30 秒获得一级不祥之兆，最高 III 级。 |
 | 团队背包扩容 | `team_backpack` | 你们团队的 /bp 背包容量扩容到 72 格。 |
 
-### 金色（50）
+### 金色（52）
 
 | 名称 | id | 效果 |
 |---|---|---|
 | 免疫护盾 | `immunity_shield` | 每 3 分钟免疫对手的下一个技能类海克斯。 |
 | 锻造大师 | `inventor` | 获得时附魔当前背包里的工具、武器和盔甲；以后制作的同类物品也会获得随机附魔。 |
 | 随机传送 | `random_teleport` | 获得 /bingo rtp 指令：在当前位置附近随机传送，冷却 5 秒。 |
-| 尖端发明家 | `cutting_edge` | 所有技能型海克斯的冷却时间缩短 30%。 |
+| 尖端发明家 | `cutting_edge` | 所有技能型海克斯的冷却时间缩短 50%。 |
 | 我很想要 | `want_more_items` | 获得 10 个随机物品（与仆从大师宠物同款加权随机池）。 |
 | 更更万用瞄准镜 | `scope_2` | 方块交互距离 +5，实体交互距离 +5。可与其他瞄准镜叠加。 |
 | 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
@@ -186,8 +186,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 背包小偷 | `backpack_thief` | 获得「背包小偷」：右键随机偷取最近敌人背包里的 3 件物品（绑定技能物品除外）。冷却 3 分钟。 |
 | 临门一脚 | `near_line` | 本队只差 1 格就能成线时，全队获得急迫 II 与速度 I。 |
 | 踏剑飞行 | `sword_fly` | 按 R 消耗剑的耐久来飞行（顺序：主手 → 副手 → 物品栏 → 团队背包，始终优先消耗档位最低的剑）：木剑满耐久可飞 10 秒，金剑 15 秒、石剑 20 秒、铁剑 30 秒、钻石剑 45 秒、下界合金剑 60 秒。飞行速度随剑档位渐变提升，最高不超过鞘翅，脚下会显示正在消耗的剑。 |
+| 隐藏夹层 | `hidden_pocket` | 开带战利品的箱子时有 3% 概率在你身边额外生成一个随机战利品箱。 |
+| 世界缩小 | `world_shrink` | 获得「世界缩小」：右键使用后全服标题警告 20 秒（期间允许 PVP），随后世界边界收缩到 500 格并把所有玩家随机传送到圈内，5 分钟后恢复。一次性；不会在第四个海克斯或游戏剩余不足 15 分钟时刷出。 |
 
-### 彩色（39）
+### 彩色（40）
 
 | 名称 | id | 效果 |
 |---|---|---|
@@ -221,7 +223,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 恶魔契约 | `demon_pact` | 永久失去 10 点生命上限，但允许你受到伤害，获得一整套随机附魔铁套，并立即完成当前权重最高的 1 个 Bingo 任务。 |
 | 精神控制 | `mind_control` | 获得「精神控制」：右键控制一名敌人 15 秒——期间你定身站在原地，按 WASD 操控目标的移动。冷却 5 分钟。 |
 | 目标封锁 | `objective_deny` | 获得「目标封锁」：右键打开当前 Bingo 卡牌，点击一个任务，30 秒内所有队伍无法完成它。冷却 6 分钟。 |
-| 透视 | `xray` | 获得「矿物透视」：右键获得 1 分钟矿物透视。冷却 5 分钟。 |
+| 透视 | `xray` | 获得「矿物透视」：右键获得 1 分钟矿物透视，矿石按种类显示颜色（红石红、青金石蓝、钻石青、绿宝石绿、金矿黄、铜矿橙…）。冷却 5 分钟。 |
 | 拾荒者 | `scavenger` | 破坏方块时有 3% 概率额外掉落该方块本身。 |
 | 洗牌 | `card_shuffle` | 所有队伍的卡面位置随机重排，完成与锁定状态跟随任务移动。 |
 | 镜像复制 | `mirror_hex` | 获得「镜像复制」：右键打开列表，复制最近一支其他队伍的一个你未拥有的海克斯。道具一次性，使用后消失。 |
@@ -230,6 +232,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 战利品猎人 | `loot_hunter` | 击杀生物时有 3% 概率在原地生成一个装有随机原版战利品的箱子。 |
 | 卡牌重铸 | `card_recast` | 立即把自己队伍已完成的任务内容重新随机（换成卡池里的新任务），保持已完成状态。 |
 | 封印 | `seal` | 获得「封印」：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上会出现屏障图标。冷却 15 分钟。 |
+| 全是我的 | `all_mine` | 获得「全是我的」：右键打开任务界面选择一个任务，其他所有队伍永久无法完成它（自己的队伍不受影响）。一次性；只能在第三个海克斯出现，不能被质变获得。 |
 
 ## Hex list (English)
 
@@ -293,14 +296,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Omen Compatible | `bad_omen` | Gain one level of Bad Omen every 30 seconds, up to level III. |
 | Team Backpack Expansion | `team_backpack` | Expand your team's /bp backpack to 72 slots. |
 
-### Gold (49)
+### Gold (52)
 
 | Name | id | Effect |
 |---|---|---|
 | Immunity Shield | `immunity_shield` | Every 3 minutes, become immune to the next skill-type hex from an opponent. |
 | Forge Master | `inventor` | Tools, weapons and armor you craft in the future gain random enchantments. |
 | Random Teleport | `random_teleport` | Unlocks /bingo rtp: randomly teleport nearby with a 5s cooldown. |
-| Cutting Edge Inventor | `cutting_edge` | All skill-type hex cooldowns are reduced by 30%. |
+| Cutting Edge Inventor | `cutting_edge` | All skill-type hex cooldowns are reduced by 50%. |
 | I Want More | `want_more_items` | Gain 10 random items (same weighted pool as the Pet Master pet). |
 | Greater Utility Scope | `scope_2` | Gain +2 block interaction range and +2 entity interaction range. |
 | Prismatic Ascension | `prismatic_shift` | Gain a random prismatic hex. |
@@ -346,8 +349,11 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Shrink | `shrink` | Gain 'Shrink': right-click to shrink the nearest enemy to 25% size (jump power and interaction range shrink too) for 60 seconds. Cooldown 8 minutes. |
 | Backpack Thief | `backpack_thief` | Gain 'Backpack Thief': right-click to randomly steal 3 items from the nearest enemy's inventory (bound skill items excluded). Cooldown 3 minutes. |
 | Near Line | `near_line` | When your team is 1 cell away from a bingo line, the whole team gains Haste II and Speed I. |
+| Sword Fly | `sword_fly` | Press R to fly by consuming sword durability (order: main hand → offhand → inventory → team backpack, always the lowest-tier sword first): a wooden sword flies 10 seconds at full durability, gold 15s, stone 20s, iron 30s, diamond 45s, netherite 60s. Flight speed ramps up with sword tier, never exceeding elytra speed; the sword being consumed is shown under your feet. |
+| Hidden Compartment | `hidden_pocket` | Opening a loot chest has a 3% chance to spawn an extra random loot chest near you. |
+| World Shrink | `world_shrink` | Gain 'World Shrink': right-click to warn the whole server for 20 seconds (PVP enabled), then the world border shrinks to 500 blocks and all players are teleported to random spots inside the circle, restoring after 5 minutes. Single use; never offered as the fourth hex or with less than 15 minutes of game time left. |
 
-### Prismatic (39)
+### Prismatic (40)
 
 | Name | id | Effect |
 |---|---|---|
@@ -379,9 +385,9 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Corrupt Backpacks | `corrupt_inventory` | For every team except yours, 5 random items of one random player turn into rotten flesh. |
 | Black Market | `black_market` | The next time you open a villager trade screen, that villager reaches max level and you gain Hero of the Village II permanently. |
 | Demon Pact | `demon_pact` | Permanently lose 10 max health, but you can take damage; gain a full set of randomly enchanted iron armor and immediately complete the highest-weight Bingo task. |
-| Mind Control | `mind_control` | Gain 'Mind Control': right-click to control one enemy's movement direction for 15 seconds. Cooldown 5 minutes. |
+| Mind Control | `mind_control` | Gain 'Mind Control': right-click to control one enemy for 15 seconds — you stand still and steer the target's movement with WASD. Cooldown 5 minutes. |
 | Objective Deny | `objective_deny` | Gain 'Objective Deny': right-click to open the current Bingo card and click a task; no team can complete it for 30 seconds. Cooldown 6 minutes. |
-| X-Ray | `xray` | Gain 'Ore Vision': right-click for 1 minute of ore x-ray. Cooldown 5 minutes. |
+| X-Ray | `xray` | Gain 'Ore Vision': right-click for 1 minute of ore x-ray, with ores glowing in their own colors (redstone red, lapis blue, diamond aqua, emerald green, gold yellow, copper orange...). Cooldown 5 minutes. |
 | Scavenger | `scavenger` | Breaking blocks has a 3% chance to drop the block itself as an extra drop. |
 | Card Shuffle | `card_shuffle` | Randomly rearrange every team's card positions; completion and lock states follow their tasks. |
 | Mirror Hex | `mirror_hex` | Gain 'Mirror Hex': right-click to open a list and copy one hex you do not own from the nearest other team. |
@@ -390,6 +396,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Loot Hunter | `loot_hunter` | Killing a creature has a 3% chance to spawn a chest with random vanilla loot at its death spot. |
 | Card Recast | `card_recast` | Immediately reroll the contents of your team's completed tasks (replaced with new tasks from the pool), keeping them completed. |
 | Seal | `seal` | Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. Cooldown 15 minutes. |
+| All Mine | `all_mine` | Gain 'All Mine': right-click to open the task UI and pick a task; every other team can never complete it (your own team is unaffected). Single use; only offered as the third hex and never obtained through transformations. |
 
 <!-- HEX-TABLE-END -->
 
@@ -406,7 +413,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.47.2 `
+.\build.ps1 -Version 26.2-1.48.0 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -429,6 +436,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.48.0 新增与调整
+
+- 调整：**尖端发明家**（`cutting_edge`）技能冷却缩短从 30% 提升到 50%。
+- 调整：**透视**（`xray`）矿石发光按种类上色——红石红、青金石蓝、钻石青、绿宝石绿、金矿黄、铜矿橙、煤深灰、铁白、远古残骸暗红。
+- 新增金色 **隐藏夹层**（`hidden_pocket`）：开带战利品表的箱子时有 3% 概率在身边额外生成一个随机战利品箱。
+- 新增金色 **世界缩小**（`world_shrink`）：一次性技能。右键使用后全服标题警告 20 秒（期间开启 PVP），随后世界边界收缩到 500 直径并把所有主世界玩家随机传送到圈内（半径 225 内），5 分钟后恢复原边界与 PVP。不会在第四个海克斯刷出，游戏剩余不足 15 分钟时不刷出（不限时游戏不受限）。
+- 新增彩色 **全是我的**（`all_mine`）：一次性技能。右键打开任务界面选择一个任务，其他所有队伍永久无法完成它（自己队伍不受影响）。只在第三个海克斯以 30% 概率出现（非占点/锁王模式），不能被任何质变获得。
 
 ### 1.47.2 调整
 

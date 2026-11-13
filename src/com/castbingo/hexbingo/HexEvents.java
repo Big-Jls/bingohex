@@ -25,6 +25,7 @@ import net.minecraft.world.entity.projectile.EyeOfEnder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -287,6 +288,18 @@ public class HexEvents {
    }
 
    @SubscribeEvent
+   public void openLootChest(RightClickBlock var1) {
+      // 隐藏夹层：开带战利品表的箱子时有 3% 概率在身边生成随机战利品箱
+      if (var1.getEntity() instanceof ServerPlayer var0
+         && HexEffects.hasHex(var0, "hidden_pocket")
+         && var1.getLevel().getBlockState(var1.getPos()).is(Blocks.CHEST)
+         && var1.getLevel().getBlockEntity(var1.getPos()) instanceof ChestBlockEntity var2
+         && var2.getLootTable() != null) {
+         HexEffects.tryHiddenPocket(var0);
+      }
+   }
+
+   @SubscribeEvent
    public void rightClickItem(RightClickItem var1) {
       if (var1.getEntity() instanceof ServerPlayer var0 && useAbilityItem(var0, var1.getItemStack())) {
          var1.setCanceled(true);
@@ -386,6 +399,11 @@ public class HexEvents {
          return HexEffects.castShrink(var0);
       } else if (var1.is(Items.BUNDLE) && var2.equals("背包小偷")) {
          return HexEffects.castBackpackThief(var0);
+      } else if (var1.is(Items.COMPASS) && var2.equals("世界缩小")) {
+         return HexEffects.castWorldShrink(var0);
+      } else if (var1.is(Items.BARRIER) && var2.equals("全是我的")) {
+         HexManager.openTaskPick(var0, "mine");
+         return true;
       } else if (var1.is(Items.NETHER_STAR) && var2.equals("潘是对的")) {
          return HexEffects.castPanIsRight(var0, var1);
       } else if (var1.is(Items.ECHO_SHARD) && var2.equals("镜像复制")) {
@@ -497,6 +515,7 @@ public class HexEvents {
       HexEffects.tickIncubations(var1.getServer());
       HexEffects.tickShrinks(var1.getServer());
       HexEffects.tickBlackstone(var1.getServer());
+      HexEffects.tickWorldShrink(var1.getServer());
    }
 
    @SubscribeEvent

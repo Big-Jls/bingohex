@@ -25,6 +25,8 @@ public final class HexRegistry {
    public static final String OFFER_UPGRADE = "offer_upgrade";
    /** 只在第三次海克斯三选一出现的海克斯，不能被质变/复制/其它卡池获得。 */
    public static final String ASCETIC = "ascetic";
+   /** 只在第三次海克斯三选一出现（非占点模式、有概率），不能被任何质变获得。 */
+   public static final String ALL_MINE = "all_mine";
    private static final Gson GSON = new Gson();
    private static final Map<String, Hex> BY_ID = new LinkedHashMap<>();
    private static final Map<HexColor, List<Hex>> BY_COLOR = new LinkedHashMap<>();
@@ -153,7 +155,8 @@ public final class HexRegistry {
          if (!var2.contains(var8.id())
             && !var3.contains(var8)
             && (var4 == null || !var4.equals(var8.id()))
-            && (var5 || !var8.id().equals(ASCETIC))) {
+            && (var5 || !var8.id().equals(ASCETIC))
+            && !var8.id().equals(ALL_MINE)) {
             var6.add(var8);
          }
       }
@@ -184,7 +187,8 @@ public final class HexRegistry {
                && !var0.contains(var7.id())
                && !var1.contains(var7)
                && (var2 == null || !var2.equals(var7.id()))
-               && (var3 || !var7.id().equals(ASCETIC))) {
+               && (var3 || !var7.id().equals(ASCETIC))
+               && !var7.id().equals(ALL_MINE)) {
                var5.add(var7);
             }
          }
@@ -207,7 +211,8 @@ public final class HexRegistry {
          if (!var0.contains(var8.id())
             && !var1.contains(var8)
             && !var8.id().equals(OFFER_UPGRADE)
-            && !var8.id().equals(ASCETIC)) {
+            && !var8.id().equals(ASCETIC)
+            && !var8.id().equals(ALL_MINE)) {
             var6.add(var8);
          }
       }
@@ -218,7 +223,8 @@ public final class HexRegistry {
                if (!var0.contains(var12.id())
                   && !var1.contains(var12)
                   && !var12.id().equals(OFFER_UPGRADE)
-                  && !var12.id().equals(ASCETIC)) {
+                  && !var12.id().equals(ASCETIC)
+                  && !var12.id().equals(ALL_MINE)) {
                   var6.add(var12);
                }
             }
@@ -241,7 +247,7 @@ public final class HexRegistry {
       ArrayList<Hex> var7 = new ArrayList<>();
 
       for (Hex var4 : BY_COLOR.get(HexColor.PRISMATIC)) {
-         if (!var1.contains(var4.id()) && !var0.contains(var4)) {
+         if (!var1.contains(var4.id()) && !var0.contains(var4) && !var4.id().equals(ALL_MINE)) {
             var7.add(var4);
          }
       }

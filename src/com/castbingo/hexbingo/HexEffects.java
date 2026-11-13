@@ -60,6 +60,9 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -179,6 +182,7 @@ import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -186,6 +190,9 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.TeamColor;
 import net.minecraft.world.phys.Vec3;
 import com.castbingo.hexbingo.network.HexDiceRollPayload;
 import com.castbingo.hexbingo.network.HexSealPayload;
@@ -432,6 +439,12 @@ public final class HexEffects {
    private static final Map<UUID, Long> XRAY_COOLDOWN = new HashMap<>();
    private static final Map<UUID, List<Shulker>> XRAY_MARKERS = new HashMap<>();
    private static final String XRAY_TAG = "hexbingo_xray_marker";
+   // 世界缩小：全局唯一状态（警告 20 秒 → 缩圈到 500 直径并传送 → 5 分钟后恢复）
+   private static HexEffects.WorldShrinkState WORLD_SHRINK;
+   private static final long WORLD_SHRINK_WARN_MS = 20000L;
+   private static final long WORLD_SHRINK_DURATION_MS = 300000L;
+   // 全是我的：已使用过（一局内一次性）
+   private static final Set<UUID> ALL_MINE_USED = new HashSet<>();
    // 缩小术：被缩小玩家 -> 到期时间
    private static final Map<UUID, Long> SHRINK_UNTIL = new HashMap<>();
    private static final Map<UUID, Long> SHRINK_COOLDOWN = new HashMap<>();
@@ -455,6 +468,28 @@ public final class HexEffects {
          this.level = var0;
          this.pos = var1;
          this.revertMs = var2;
+      }
+   }
+
+   // 世界缩小：记录施放时刻、警告期、原边界与原 PVP 状态，结束时还原
+   private static final class WorldShrinkState {
+      final ServerLevel level;
+      final long startMs;
+      final long warnUntilMs;
+      final boolean pvpWasAllowed;
+      final double origCenterX;
+      final double origCenterZ;
+      final double origSize;
+      boolean active;
+
+      WorldShrinkState(ServerLevel var0, long var1, long var2, boolean var3, double var4, double var6, double var8) {
+         this.level = var0;
+         this.startMs = var1;
+         this.warnUntilMs = var2;
+         this.pvpWasAllowed = var3;
+         this.origCenterX = var4;
+         this.origCenterZ = var6;
+         this.origSize = var8;
       }
    }
 
@@ -800,7 +835,7 @@ public final class HexEffects {
          case "mangrove_map":
             giveMangroveMap(var0);
             break;
-         // 尖端发明家：技能型海克斯冷却缩短 30%
+         // 尖端发明家：技能型海克斯冷却缩短 50%
          case "cutting_edge":
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.cutting_edge").withStyle(ChatFormatting.AQUA));
             break;
@@ -1072,6 +1107,18 @@ public final class HexEffects {
          // 踏剑飞行
          case "sword_fly":
             var0.sendSystemMessage(Component.translatable("hexbingo.msg.sword_fly").withStyle(ChatFormatting.GOLD));
+            break;
+         // 隐藏夹层：开战利品箱 3% 概率在身边生成随机战利品箱（被动，见 tryHiddenPocket）
+         case "hidden_pocket":
+            var0.sendSystemMessage(Component.translatable("hexbingo.msg.hidden_pocket_info").withStyle(ChatFormatting.GOLD));
+            break;
+         // 世界缩小：一次性技能，右键道具施放
+         case "world_shrink":
+            giveWorldShrinkItem(var0);
+            break;
+         // 全是我的：一次性技能，右键道具打开任务选择
+         case "all_mine":
+            giveAllMineItem(var0);
             break;
          // 路易十六
          case "louis_xvi":
@@ -2396,9 +2443,9 @@ public final class HexEffects {
       return var3.mayhem() && var3.hexes(var0.getUUID()).contains(var1);
    }
 
-   // 尖端发明家：所有技能型海克斯的冷却时间缩短 30%
+   // 尖端发明家：所有技能型海克斯的冷却时间缩短 50%
    private static long skillCooldown(ServerPlayer var0, long var1) {
-      return hasHex(var0, "cutting_edge") ? (long)(var1 * 0.7) : var1;
+      return hasHex(var0, "cutting_edge") ? (long)(var1 * 0.5) : var1;
    }
 
    public static boolean randomTeleport(ServerPlayer var0) {
@@ -3909,7 +3956,8 @@ public final class HexEffects {
          for (Hex var5 : HexRegistry.all()) {
             if (!var2.hexes(var0.getUUID()).contains(var5.id())
                && !var5.id().equals(HexRegistry.OFFER_UPGRADE)
-               && !var5.id().equals(HexRegistry.ASCETIC)) {
+               && !var5.id().equals(HexRegistry.ASCETIC)
+               && !var5.id().equals(HexRegistry.ALL_MINE)) {
                var3.add(var5);
             }
          }
@@ -4797,6 +4845,7 @@ public final class HexEffects {
                      || var1x.id().equals("pan_is_right")
                      || var1x.id().equals(HexRegistry.OFFER_UPGRADE)
                      || var1x.id().equals(HexRegistry.ASCETIC)
+                     || var1x.id().equals(HexRegistry.ALL_MINE)
                      || var4.contains(var1x.id())
                );
                GRANT_DEPTH.set(GRANT_DEPTH.get() + 1);
@@ -7467,7 +7516,8 @@ public final class HexEffects {
             for (Hex var7 : HexRegistry.byColor(HexColor.byId(var1))) {
                if (!var3.hexes(var4).contains(var7.id())
                   && !var7.id().equals(HexRegistry.OFFER_UPGRADE)
-                  && !var7.id().equals(HexRegistry.ASCETIC)) {
+                  && !var7.id().equals(HexRegistry.ASCETIC)
+                  && !var7.id().equals(HexRegistry.ALL_MINE)) {
                   var5.add(var7);
                }
             }
@@ -7532,7 +7582,8 @@ public final class HexEffects {
             for (Hex var10 : HexRegistry.byColor(var8)) {
                if (!var2.hexes(var3).contains(var10.id())
                   && !var10.id().equals(HexRegistry.OFFER_UPGRADE)
-                  && !var10.id().equals(HexRegistry.ASCETIC)) {
+                  && !var10.id().equals(HexRegistry.ASCETIC)
+                  && !var10.id().equals(HexRegistry.ALL_MINE)) {
                   var4.add(var10);
                }
             }
@@ -10821,6 +10872,21 @@ public final class HexEffects {
                            var13.setCustomNameVisible(false);
                            var13.addTag(XRAY_TAG);
                            var13.getAttribute(Attributes.SCALE).setBaseValue(0.5);
+                           // 按矿石类型给发光轮廓上色（红石红、青金石蓝、钻石青…），用计分板队伍实现
+                           TeamColor var14 = oreGlowColor(var11.getBlock());
+                           if (var14 != null) {
+                              String var15 = "hexbingo_xray_" + var14.name();
+                              var13.addTag(var15);
+                              Scoreboard var16 = var4.getScoreboard();
+                              PlayerTeam var17 = var16.getPlayerTeam(var15);
+                              if (var17 == null) {
+                                 var17 = var16.addPlayerTeam(var15);
+                                 var17.setColor(Optional.of(var14));
+                              }
+
+                              var16.addPlayerToTeam(var13.getStringUUID(), var17);
+                           }
+
                            var4.addFreshEntity(var13);
                            var5.add(var13);
                         }
@@ -10839,10 +10905,57 @@ public final class HexEffects {
       return var1.endsWith("_ore") || var1.equals("ancient_debris") || var1.equals("gilded_blackstone");
    }
 
+   /** 矿石类型对应的发光轮廓颜色（返回 null 表示用默认白色）。 */
+   private static TeamColor oreGlowColor(Block var0) {
+      String var1 = BuiltInRegistries.BLOCK.getKey(var0).getPath();
+      if (var1.startsWith("deepslate_")) {
+         var1 = var1.substring("deepslate_".length());
+      }
+
+      switch (var1) {
+         case "redstone_ore":
+            return TeamColor.RED;
+         case "coal_ore":
+            return TeamColor.DARK_GRAY;
+         case "iron_ore":
+            return TeamColor.WHITE;
+         case "gold_ore":
+         case "nether_gold_ore":
+         case "gilded_blackstone":
+            return TeamColor.YELLOW;
+         case "diamond_ore":
+            return TeamColor.AQUA;
+         case "emerald_ore":
+            return TeamColor.GREEN;
+         case "lapis_ore":
+            return TeamColor.BLUE;
+         case "copper_ore":
+            return TeamColor.GOLD;
+         case "ancient_debris":
+            return TeamColor.DARK_RED;
+         case "nether_quartz_ore":
+            return TeamColor.WHITE;
+         default:
+            return null;
+      }
+   }
+
    private static void clearXrayMarkers(ServerPlayer var0) {
       List<Shulker> var1 = XRAY_MARKERS.remove(var0.getUUID());
       if (var1 != null) {
+         Scoreboard var2 = var0.level().getScoreboard();
+
          for (Shulker var3 : var1) {
+            // 离队清理：从着色队伍移除后丢弃，避免计分板队伍残留
+            for (String var5 : var3.entityTags()) {
+               if (var5.startsWith("hexbingo_xray_")) {
+                  PlayerTeam var6 = var2.getPlayerTeam(var5);
+                  if (var6 != null) {
+                     var2.removePlayerFromTeam(var3.getStringUUID(), var6);
+                  }
+               }
+            }
+
             var3.discard();
          }
       }
@@ -11369,6 +11482,202 @@ public final class HexEffects {
       return true;
    }
 
+   // 隐藏夹层：开战利品箱有 3% 概率在身边生成一个随机战利品箱（HexEvents 右键战利品箱时调用）
+   public static void tryHiddenPocket(ServerPlayer var0) {
+      if (ThreadLocalRandom.current().nextDouble() < 0.03) {
+         spawnVanillaLootChest(var0);
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.hidden_pocket").withStyle(ChatFormatting.GOLD));
+      }
+   }
+
+   // 世界缩小：一次性技能。施放后先全服标题警告 20 秒，期间开启 PVP；
+   // 20 秒后边界收缩到 500 直径并把所有主世界玩家随机传送到圈内；5 分钟后恢复原边界与 PVP。
+   private static void giveWorldShrinkItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "世界缩小")) {
+         var0.addItem(questItem(Items.COMPASS, "世界缩小", "hexbingo.item.world_shrink.lore"));
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_item").withStyle(ChatFormatting.GOLD));
+      }
+   }
+
+   public static boolean castWorldShrink(ServerPlayer var0) {
+      if (!hasHex(var0, "world_shrink")) {
+         return false;
+      }
+
+      if (WORLD_SHRINK != null) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_running").withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      MinecraftServer var1 = var0.level().getServer();
+      if (var1 == null) {
+         return false;
+      }
+
+      Bingo var2 = Bingo.get(var1.overworld());
+      if (!var2.running()) {
+         var0.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_no_game").withStyle(ChatFormatting.GRAY));
+         return true;
+      }
+
+      ServerLevel var3 = var1.overworld();
+      WorldBorder var4 = var3.getWorldBorder();
+      boolean var5 = var3.getGameRules().get(GameRules.PVP);
+      WORLD_SHRINK = new HexEffects.WorldShrinkState(
+         var3,
+         System.currentTimeMillis(),
+         System.currentTimeMillis() + WORLD_SHRINK_WARN_MS,
+         var5,
+         var4.getCenterX(),
+         var4.getCenterZ(),
+         var4.getSize()
+      );
+      if (!var5) {
+         var3.getGameRules().set(GameRules.PVP, true, var1);
+      }
+
+      worldShrinkTitle(
+         var1,
+         Component.translatable("hexbingo.msg.world_shrink_warn_title").withStyle(ChatFormatting.RED),
+         Component.translatable("hexbingo.msg.world_shrink_warn_sub").withStyle(ChatFormatting.YELLOW)
+      );
+      return true;
+   }
+
+   public static void tickWorldShrink(MinecraftServer var0) {
+      HexEffects.WorldShrinkState var1 = WORLD_SHRINK;
+      if (var1 == null) {
+         return;
+      }
+
+      long var2 = System.currentTimeMillis();
+      if (!var1.active) {
+         if (var2 < var1.warnUntilMs) {
+            // 警告阶段：每秒用行动栏提示倒计时
+            if (var0.getTickCount() % 20 == 0) {
+               long var3 = (var1.warnUntilMs - var2 + 999L) / 1000L;
+
+               for (ServerPlayer var5 : var0.getPlayerList().getPlayers()) {
+                  var5.sendOverlayMessage(Component.translatable("hexbingo.msg.world_shrink_countdown", var3).withStyle(ChatFormatting.RED));
+               }
+            }
+
+            return;
+         }
+
+         var1.active = true;
+         WorldBorder var6 = var1.level.getWorldBorder();
+         var6.setCenter(0.0, 0.0);
+         var6.setSize(500.0);
+         teleportWorldShrinkPlayers(var1.level);
+         worldShrinkTitle(var0, Component.translatable("hexbingo.msg.world_shrink_go").withStyle(ChatFormatting.RED), null);
+         return;
+      }
+
+      if (var2 >= var1.startMs + WORLD_SHRINK_DURATION_MS) {
+         restoreWorldShrink(var0);
+      }
+   }
+
+   private static void teleportWorldShrinkPlayers(ServerLevel var0) {
+      ThreadLocalRandom var1 = ThreadLocalRandom.current();
+
+      for (ServerPlayer var3 : var0.players()) {
+         if (var3.isSpectator()) {
+            continue;
+         }
+
+         double var4 = 225.0 * Math.sqrt(var1.nextDouble());
+         double var5 = var1.nextDouble() * Math.PI * 2.0;
+         int var6 = (int)Math.floor(var4 * Math.cos(var5));
+         int var7 = (int)Math.floor(var4 * Math.sin(var5));
+         int var8 = var0.getHeight(Types.MOTION_BLOCKING, var6, var7);
+         var3.teleportTo(var0, (double)var6 + 0.5, (double)(var8 + 1), (double)var7 + 0.5, Set.of(), var1.nextFloat() * 360.0F, 0.0F, false);
+         var3.resetFallDistance();
+      }
+   }
+
+   private static void restoreWorldShrink(MinecraftServer var0) {
+      HexEffects.WorldShrinkState var1 = WORLD_SHRINK;
+      WORLD_SHRINK = null;
+      if (var1 == null) {
+         return;
+      }
+
+      WorldBorder var2 = var1.level.getWorldBorder();
+      var2.setCenter(var1.origCenterX, var1.origCenterZ);
+      var2.setSize(var1.origSize);
+      if (!var1.pvpWasAllowed) {
+         var1.level.getGameRules().set(GameRules.PVP, false, var0);
+      }
+
+      for (ServerPlayer var4 : var0.getPlayerList().getPlayers()) {
+         var4.sendSystemMessage(Component.translatable("hexbingo.msg.world_shrink_end").withStyle(ChatFormatting.GREEN));
+      }
+   }
+
+   private static void worldShrinkTitle(MinecraftServer var0, Component var1, Component var2) {
+      for (ServerPlayer var4 : var0.getPlayerList().getPlayers()) {
+         var4.connection.send(new ClientboundSetTitlesAnimationPacket(10, 60, 10));
+         var4.connection.send(new ClientboundSetTitleTextPacket(var1));
+         if (var2 != null) {
+            var4.connection.send(new ClientboundSetSubtitleTextPacket(var2));
+         }
+      }
+   }
+
+   // 全是我的：一次性技能。右键道具打开任务选择，选中后锁定其他所有队伍的这一格（自己队伍不受影响）。
+   private static void giveAllMineItem(ServerPlayer var0) {
+      if (!hasNamedItem(var0, "全是我的")) {
+         var0.addItem(questItem(Items.BARRIER, "全是我的", "hexbingo.item.all_mine.lore"));
+         HexManager.openTaskPick(var0, "mine");
+      }
+   }
+
+   public static boolean allMineReady(ServerPlayer var0) {
+      return hasHex(var0, "all_mine") && !ALL_MINE_USED.contains(var0.getUUID());
+   }
+
+   public static void applyAllMine(ServerPlayer var0, int var1) {
+      MinecraftServer var2 = var0.level().getServer();
+      if (var2 == null || !allMineReady(var0)) {
+         return;
+      }
+
+      Bingo var3 = Bingo.get(var2.overworld());
+      Team var4 = var3.getTeam(var0);
+      if (var4 == null || var1 < 0 || var1 >= var3.tasks().size() || var3.task(var1) == Task.EMPTY) {
+         return;
+      }
+
+      ALL_MINE_USED.add(var0.getUUID());
+
+      // 消耗掉「全是我的」道具
+      for (int var5 = 0; var5 < var0.getInventory().getContainerSize(); var5++) {
+         ItemStack var6 = var0.getInventory().getItem(var5);
+         if (!var6.isEmpty() && var6.getHoverName().getString().equals("全是我的")) {
+            var0.getInventory().setItem(var5, ItemStack.EMPTY);
+            break;
+         }
+      }
+
+      // 锁定其他所有队伍的这一格
+      for (Team var7 : var3.getTeams()) {
+         if (var7 != var4 && !var7.locked(var1)) {
+            var7.lock(var1);
+            var7.setDirty();
+         }
+      }
+
+      var3.setDirty();
+      Component var8 = var3.task(var1).contentName(var2);
+      Component var9 = Component.translatable("hexbingo.msg.all_mine_cast", var0.getDisplayName(), var8).withStyle(ChatFormatting.LIGHT_PURPLE);
+
+      for (ServerPlayer var11 : var2.getPlayerList().getPlayers()) {
+         var11.sendSystemMessage(var9);
+      }
+   }
+
    // 拾荒者：破坏方块有 3% 概率额外掉落自身（在 blockDrops 中调用）
    private static void scavengerDrop(ServerPlayer var0, BlockDropsEvent var1) {
       if (ThreadLocalRandom.current().nextDouble() < 0.03) {
@@ -11506,6 +11815,10 @@ public final class HexEffects {
          clearXrayMarkers(var2);
          applyShrinkModifiers(var2, false);
       }
+
+      // 世界缩小：对局结束恢复原边界与 PVP
+      restoreWorldShrink(var0);
+      ALL_MINE_USED.clear();
 
       END_EXILE.clear();
       XRAY_MARKERS.clear();

@@ -58,7 +58,7 @@ public class HexTaskScreen extends Screen {
 
    public void extractRenderState(GuiGraphicsExtractor var1, int var2, int var3, float var4) {
       var1.fill(0, 0, this.width, this.height, -535818216);
-      Component var5 = Component.translatable("seal".equals(this.mode) ? "hexbingo.seal.title" : "blank".equals(this.mode) ? "hexbingo.blank.title" : "hexbingo.deny.title");
+      Component var5 = Component.translatable("seal".equals(this.mode) ? "hexbingo.seal.title" : "blank".equals(this.mode) ? "hexbingo.blank.title" : "mine".equals(this.mode) ? "hexbingo.mine.title" : "hexbingo.deny.title");
       var1.centeredText(this.font, var5, this.width / 2, 10, -10496);
       var1.centeredText(
          this.font,

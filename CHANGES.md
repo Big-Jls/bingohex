@@ -1,5 +1,31 @@
 # Changelog
 
+## 26.2-1.48.0 — 2026-11-14
+
+### Added
+
+- **Hidden Compartment** (`hidden_pocket`, gold): opening a chest that has a
+  loot table has a 3% chance to spawn an extra random vanilla loot chest near
+  you.
+- **World Shrink** (`world_shrink`, gold): single-use skill item. On use the
+  whole server gets a title warning for 20 seconds (PVP is enabled), then the
+  world border shrinks to a 500-block diameter and all overworld players are
+  teleported to random spots inside the circle, restoring the original border
+  and PVP state after 5 minutes. Never offered as the fourth hex or with less
+  than 15 minutes of game time remaining (unlimited-time games are exempt).
+- **All Mine** (`all_mine`, prismatic): single-use skill item. Right-click to
+  open the task picker and choose a task; every other team can never complete
+  that cell (your own team is unaffected). Only offered as the third hex with a
+  30% chance in non-lockout modes, and never obtained through transformations.
+
+### Changed
+
+- **Cutting Edge Inventor** (`cutting_edge`): skill cooldown reduction
+  increased from 30% to 50%.
+- **X-Ray** (`xray`): ore glow outlines are now colored per ore type —
+  redstone red, lapis blue, diamond aqua, emerald green, gold yellow, copper
+  orange, coal dark gray, iron white, ancient debris dark red.
+
 ## 26.2-1.47.2 — 2026-11-14
 
 ### Changed

@@ -1436,6 +1436,33 @@
                                           "type":  "sword_fly"
                                       }
                                   ]
+                  },
+                  {
+                      "id":  "hidden_pocket",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "hidden_pocket"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "world_shrink",
+                      "color":  "gold",
+                      "effects":  [
+                                      {
+                                          "type":  "world_shrink"
+                                      }
+                                  ]
+                  },
+                  {
+                      "id":  "all_mine",
+                      "color":  "prismatic",
+                      "effects":  [
+                                      {
+                                          "type":  "all_mine"
+                                      }
+                                  ]
                   }
               ]
 }
