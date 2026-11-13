@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.9.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.1.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.49.2.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -419,7 +419,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.1 `
+.\build.ps1 -Version 26.2-1.49.2 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -442,6 +442,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.49.2 修复
+
+- **钓鱼佬**（`fisherman`）：移除钓鱼事件中重复的 `damageRodBy(1)` 调用——原版会按事件的初始耐久消耗扣鱼竿耐久，重复调用导致每次钓鱼鱼竿双倍掉耐久。
 
 ### 1.49.1 调整
 

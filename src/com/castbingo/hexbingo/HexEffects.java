@@ -11726,7 +11726,7 @@ public final class HexEffects {
          }
       }
 
-      var0.damageRodBy(1);
+      // 注意：不额外调用 damageRodBy——原版会按事件的初始耐久消耗（1 点）扣鱼竿耐久，重复调用会双倍掉耐久
    }
 
    // 从仆从大师全物品池随机取一个物品，排除鱼（重试几次）

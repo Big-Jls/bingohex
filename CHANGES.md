@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.49.2 — 2026-11-14
+
+### Fixed
+
+- **Fisherman** (`fisherman`): removed the extra `damageRodBy(1)` call in the
+  fishing event handler — vanilla already applies the event's initial rod
+  damage, so the extra call made the rod lose durability twice per catch.
+
 ## 26.2-1.49.1 — 2026-11-14
 
 ### Changed
