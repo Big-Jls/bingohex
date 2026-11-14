@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.11.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.10.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.49.11.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -130,7 +130,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 苦行者 | `ascetic` | 清空本队所有已完成格，立即获得 2 个随机彩色海克斯。只在第三次海克斯选择中出现。 |
 | DJ | `dj` | 获得音符盒×1 与随机唱片×3。 |
 | 兼容灾厄 | `bad_omen` | 每 30 秒获得一级不祥之兆，最高 III 级。 |
-| 团队背包扩容 | `team_backpack` | 你们团队的 /bp 背包容量扩容到 72 格。 |
+| 兄弟你好香 | `sniffer_egg` | 获得一个嗅探兽蛋，放在苔藓块上即可孵化。 |
 
 ### 金色（55）
 
@@ -145,14 +145,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 质变棱彩阶 | `prismatic_shift` | 立刻获得一个随机彩色海克斯。 |
 | 质变白银阶 | `silver_shift` | 立刻获得 2 个随机银色海克斯。 |
 | 小蜜蜂 | `bees` | 在其他所有队伍附近召唤 10 只愤怒的蜜蜂。蜜蜂可以无视无敌蜇伤玩家。 |
-| 饕餮盛宴 | `gluttonous_feast` | 永久获得饥饿 II；每次吃下食物，随机获得一个等级 II 的增益，持续 15 秒。 |
+| 饕餮盛宴 | `gluttonous_feast` | 永久获得饥饿 II；每次吃下食物，随机获得一个等级 II 的增益，持续 15 秒；身体体型会随进食逐渐变大。 |
 | 超强大脑 | `big_brain` | 你的所有物品变成随机物品持续 5 秒，之后恢复原背包。注意：期间新放进主物品栏的物品会被清除。 |
 | 掀桌子？ | `flip_table_one` | 重新随机一个尚未被任何队伍完成的任务。 |
 | 灵魂炸弹 | `soul_bomb` | 获得 3 个灵魂沙、2 个凋零骷髅头和 1 个打火石。 |
 | 条条大路通罗马 | `village_road` | 将你传送到最近的村庄。 |
 | 旅行青蛙 | `travel_frog` | 召唤一只青蛙；主手持半组食物右键它，可换取一张随机结构地图（沉船 / 末地遗迹 / 林地府邸 / 村庄 / 幽匿城市 / 前哨站 / 沙漠神殿 / 丛林神庙；在地狱时为猪灵堡垒 / 地狱堡垒 / 废弃地狱门）。 |
 | 健忘症 | `amnesia` | 随机将另一支队伍的一个已完成 Bingo 退回未完成。 |
-| 冰！ | `ice_boots` | 获得冰霜行者 II 钻石靴。 |
+| 冰！ | `ice_boots` | 获得冰、浮冰、蓝冰各 1–5 个，以及一双附魔「冰霜行者 I」的铁靴。 |
 | 雪傀儡互助会 | `snow_pumpkin` | 给敌方所有玩家戴上带绑定诅咒的雕刻南瓜，无法自行脱下；需要队友用剪刀右键你摘除，单人队伍可手持剪刀潜行右键自己。 |
 | 宝可梦大师 | `pokemon_master` | 获得 6 个随机刷怪蛋（可重复）。 |
 | 乌鸦嘴 | `raven_mouth` | 召唤一只黑色鹦鹉；它会随机退回你一个已完成任务，或随机完成一个任务。 |
@@ -173,7 +173,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 末影杀手 | `ender_slayer` | 击杀末影人时有 3% 概率掉落一本附魔书：精准采集 I、经验修补 I 或无限 I。 |
 | 终极刷新 | `ultimate_refresh` | 下次海克斯选择可以额外刷新一次，并随机获得 2 个战利品箱。 |
 | 自动熔炼 | `auto_smelt` | 挖掘矿物时自动烧炼掉落物，并额外获得经验。 |
-| 任务护盾 | `task_shield` | 锁定当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回。 |
+| 任务护盾 | `task_shield` | 保护当前队伍权重最高的 3 个任务，其他海克斯无法将它们退回、锁定、交换、重铸或封印。 |
 | 点石成金 | `midas_touch` | 按 G 把副手物品转化为等量金锭（贵重物品除外）。冷却 1 分钟。 |
 | 蝙蝠形态 | `bat_form` | 获得「蝙蝠形态」：右键变成蝙蝠 60 秒，蝙蝠跟在玩家脚边；可飞行（飞行速度降低 35%）、无法攻击、血量与体型变小，结束后获得 1 分钟缓降。冷却 7 分钟。 |
 | 凝视深渊 | `gaze_abyss` | 传送到最近的深暗之域（deep_dark）群系，并自动寻找洞穴中的安全落脚点。 |
@@ -188,7 +188,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 临门一脚 | `near_line` | 本队只差 1 格就能成线时，全队获得急迫 II 与速度 I。 |
 | 踏剑飞行 | `sword_fly` | 按 R 消耗剑的耐久来飞行（顺序：主手 → 副手 → 物品栏 → 团队背包，始终优先消耗档位最低的剑）：木剑满耐久可飞 10 秒，金剑 15 秒、石剑 20 秒、铁剑 30 秒、钻石剑 45 秒、下界合金剑 60 秒。飞行速度随剑档位渐变提升，最高不超过鞘翅，脚下会显示正在消耗的剑。 |
 | 隐藏夹层 | `hidden_pocket` | 开带战利品的箱子时有 3% 概率在你身边额外生成一个随机战利品箱。 |
-| 世界缩小 | `world_shrink` | 获得「世界缩小」：右键使用后全服标题警告 20 秒（期间允许 PVP），随后世界边界收缩到 500 格并把所有玩家随机传送到圈内，3 分钟后恢复边界与 PVP、把玩家传送回原位。一次性；不会在第四个海克斯或游戏剩余不足 15 分钟时刷出。 |
+| 收集者 | `collector` | 攻击时直接斩杀当前生命值低于最大值 3% 的生物和玩家。 |
 | 钓鱼佬 | `fisherman` | 获得一把附魔「海之眷顾 X」的鱼竿；钓鱼时除了鱼什么都能钓上来（随机物品池与仆从大师相同）。 |
 | 结束了！ | `ended` | 击杀末影龙会立即结束当前比赛，击杀者的队伍获胜；但你和你的队伍在末地会失去无敌保护——末影人、末影龙、摔落等伤害正常生效（主世界与地狱不受影响）。 |
 
@@ -234,8 +234,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | 潘是对的 | `pan_is_right` | 获得「潘是对的」：右键一次性重掷全队所有海克斯。道具一次性，使用后消失。 |
 | 战利品猎人 | `loot_hunter` | 击杀生物时有 3% 概率在原地生成一个装有随机原版战利品的箱子。 |
 | 卡牌重铸 | `card_recast` | 立即把自己队伍已完成的任务内容重新随机（换成卡池里的新任务），保持已完成状态。 |
-| 封印 | `seal` | 获得「封印」：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上会出现屏障图标。冷却 15 分钟。 |
-| 全是我的 | `all_mine` | 获得「全是我的」：右键打开任务界面选择一个任务，其他所有队伍永久无法完成它（自己的队伍不受影响）。一次性；只能在第三个海克斯出现，不能被质变获得。 |
+| 封印 | `seal` | 获得「封印」：右键打开 Bingo 卡面选择一个任务，所有玩家都无法完成它，该格上会出现屏障图标。一次性道具，使用后消失。 |
+| 全是我的 | `all_mine` | 获得「全是我的」：右键打开任务界面选择一个任务，其他所有队伍永久无法完成它（自己的队伍不受影响）。 |
 
 ## Hex list (English)
 
@@ -297,7 +297,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Ascetic | `ascetic` | Clear all of your team's completed cells and immediately gain 2 random prismatic hexes. Only appears in the third hex selection. |
 | DJ | `dj` | Gain 1 note block and 3 random music discs. |
 | Omen Compatible | `bad_omen` | Gain one level of Bad Omen every 30 seconds, up to level III. |
-| Team Backpack Expansion | `team_backpack` | Expand your team's /bp backpack to 72 slots. |
+| Sniffer Egg | `sniffer_egg` | Gain a sniffer egg; place it on moss to hatch it. |
 
 ### Gold (55)
 
@@ -312,14 +312,14 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Prismatic Ascension | `prismatic_shift` | Gain a random prismatic hex. |
 | Silver Ascension | `silver_shift` | Immediately gain 2 random silver hexes. |
 | Little Bees | `bees` | Summon 10 angry bees around every enemy team. Bees can sting through invulnerability. |
-| Gluttonous Feast | `gluttonous_feast` | Permanently gain Hunger II. Eating any food grants a random level II buff for 15s. |
+| Gluttonous Feast | `gluttonous_feast` | Permanently gain Hunger II. Eating any food grants a random level II buff for 15s, and your body grows a little larger each time. |
 | Big Brain | `big_brain` | All your inventory items become random items for 5s, then are restored. |
 | Flip the Table? | `flip_table_one` | Reroll one task that no team has completed yet. |
 | Soul Bomb | `soul_bomb` | Gain 3 soul sand, 2 wither skeleton skulls and 1 flint and steel. |
 | All Roads Lead to Rome | `village_road` | Teleport to the nearest village. |
 | Travel Frog | `travel_frog` | Summon a frog; right-click it with half a stack of food for a random structure map (shipwreck / End ruin / woodland mansion / village / ancient city / pillager outpost / desert pyramid / jungle temple; in the Nether: bastion / fortress / ruined portal). |
 | Amnesia | `amnesia` | Randomly revert one completed Bingo task of another team. |
-| Ice! | `ice_boots` | Gain Frost Walker II diamond boots. |
+| Ice! | `ice_boots` | Gain 1-5 ice, packed ice and blue ice, plus a pair of Frost Walker I iron boots. |
 | Snow Golem Society | `snow_pumpkin` | Put cursed carved pumpkins on all enemy players; they cannot be removed by yourself — a teammate must right-click you with shears. A solo player can sneak-right-click with shears. |
 | Pokemon Master | `pokemon_master` | Gain 6 random spawn eggs (duplicates allowed). |
 | Raven Mouth | `raven_mouth` | Summon a black parrot; it randomly reverts one of your completed tasks or completes one random task. |
@@ -340,7 +340,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Ender Slayer | `ender_slayer` | Killing an Enderman has a 3% chance to drop an enchanted book: Silk Touch I, Mending I or Infinity I. |
 | Ultimate Refresh | `ultimate_refresh` | Your next hex selection can be refreshed one extra time, and you immediately gain 2 loot chests. |
 | Auto Smelt | `auto_smelt` | Mining ores automatically smelts the drops and grants extra experience. |
-| Task Shield | `task_shield` | Lock your team's 3 highest-weight tasks so other hexes cannot push them back. |
+| Task Shield | `task_shield` | Protect your team's 3 highest-weight tasks; other hexes can no longer push them back, lock, swap, recast or seal them. |
 | Midas Touch | `midas_touch` | Press G to turn your offhand item into the same amount of gold ingots (valuables excluded). Cooldown 1 minute. |
 | Bat Form | `bat_form` | Gain 'Bat Form': right-click to become a bat for 60 seconds (flight at 35% reduced speed, cannot attack, bat-sized health and body). The bat follows at your feet; the form ends with 1 minute of Slow Falling. Cooldown 7 minutes. |
 | Gaze Into the Abyss | `gaze_abyss` | Teleport to the nearest deep dark biome and find a safe spot inside its caves. |
@@ -355,7 +355,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Near Line | `near_line` | When your team is 1 cell away from a bingo line, the whole team gains Haste II and Speed I. |
 | Sword Fly | `sword_fly` | Press R to fly by consuming sword durability (order: main hand → offhand → inventory → team backpack, always the lowest-tier sword first): a wooden sword flies 10 seconds at full durability, gold 15s, stone 20s, iron 30s, diamond 45s, netherite 60s. Flight speed ramps up with sword tier, never exceeding elytra speed; the sword being consumed is shown under your feet. |
 | Hidden Compartment | `hidden_pocket` | Opening a loot chest has a 3% chance to spawn an extra random loot chest near you. |
-| World Shrink | `world_shrink` | Gain 'World Shrink': right-click to warn the whole server for 20 seconds (PVP enabled), then the world border shrinks to 500 blocks and all players are teleported to random spots inside the circle; after 3 minutes the border and PVP are restored and players return to their original positions. Single use; never offered as the fourth hex or with less than 15 minutes of game time left. |
+| Collector | `collector` | Your attacks instantly execute creatures and players whose current health is below 3% of their maximum. |
 | Fisherman | `fisherman` | Gain a fishing rod enchanted with Luck of the Sea X; fishing reels in anything except fish (same random item pool as Pet Master). |
 | It's Over! | ended | Killing the Ender Dragon immediately ends the current game with the killer's team winning; but in the End your team loses invulnerability — enderman, dragon and fall damage all apply normally (the Overworld and Nether are unaffected). |
 
@@ -401,8 +401,8 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | Pan Is Right | `pan_is_right` | Gain 'Pan Is Right': right-click to reroll every hex of your whole team. One-time item: it disappears after use. |
 | Loot Hunter | `loot_hunter` | Killing a creature has a 3% chance to spawn a chest with random vanilla loot at its death spot. |
 | Card Recast | `card_recast` | Immediately reroll the contents of your team's completed tasks (replaced with new tasks from the pool), keeping them completed. |
-| Seal | `seal` | Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. Cooldown 15 minutes. |
-| All Mine | `all_mine` | Gain 'All Mine': right-click to open the task UI and pick a task; every other team can never complete it (your own team is unaffected). Single use; only offered as the third hex and never obtained through transformations. |
+| Seal | `seal` | Gain 'Seal': right-click to open the Bingo card and pick a task; no player can complete it and a barrier icon appears on its cell. One-time item: it disappears after use. |
+| All Mine | `all_mine` | Gain 'All Mine': right-click to open the task UI and pick a task; every other team can never complete it (your own team is unaffected). |
 
 <!-- HEX-TABLE-END -->
 
@@ -419,7 +419,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.10 `
+.\build.ps1 -Version 26.2-1.49.11 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -442,6 +442,19 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.49.11 调整
+
+- 移除银色 **团队背包扩容**（`team_backpack`）：条目、语言键与 72 格扩容逻辑一并删除。
+- 移除金色 **世界缩小**（`world_shrink`）：条目、道具/施法/缩圈/恢复逻辑与「第四个海克斯、剩余不足 15 分钟不刷」的过滤一并删除。
+- 新增银色 **兄弟你好香**（`sniffer_egg`）：获得一个嗅探兽蛋，放在苔藓块上即可孵化。
+- 新增金色 **收集者**（`collector`）：攻击时直接斩杀当前生命值低于最大值 3% 的生物和玩家。
+- **饕餮盛宴**（`gluttonous_feast`）：每次进食体型 +2%，上限 +50%；死亡重上/重登后体型保留。
+- **任务护盾**（`task_shield`）：保护范围由「不可退回」扩展到不可锁定、交换、洗牌、重铸、封锁、封印与「全是我的」，选择界面也会过滤掉受保护的任务。
+- **冰！**（`ice_boots`）：改为获得冰、浮冰、蓝冰各 1–5 个，加一双附魔「冰霜行者 I」的铁靴。
+- **封印**（`seal`）：改为一次性道具，使用后消耗「封印」物品且不再补发，移除 15 分钟冷却。
+- **全是我的**（`all_mine`）：描述删去「只能在第三个海克斯出现，不能被质变获得」，代码限制保留。
+- 修复：关闭伤害时，非小蜜蜂海克斯召唤的原版蜜蜂仍能蜇伤玩家。
 
 ### 1.49.10 调整
 

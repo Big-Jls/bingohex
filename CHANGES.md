@@ -1,5 +1,41 @@
 # Changelog
 
+## 26.2-1.49.11 — 2026-11-14
+
+### Removed
+
+- **Team Backpack Expansion** (`team_backpack`, silver): removed the hex, its
+  lang keys and the 72-slot `/bp` expansion logic.
+- **World Shrink** (`world_shrink`, gold): removed the hex, the item/cast,
+  border-shrink and restore logic, and the "no fourth hex / last 15 minutes"
+  offer filter.
+
+### Added
+
+- **Sniffer Egg** (`sniffer_egg`, silver): gain a sniffer egg, hatchable on moss.
+- **Collector** (`collector`, gold): attacks instantly execute creatures and
+  players below 3% of their maximum health.
+
+### Changed
+
+- **Gluttonous Feast** (`gluttonous_feast`): each food eaten now grows the
+  player's body scale by 2% (capped at +50%), and the scale survives death and
+  relogging.
+- **Task Shield** (`task_shield`): the 3 highest-weight tasks can no longer be
+  pushed back, locked, swapped, shuffled, recast, denied or sealed; task pickers
+  skip shielded tasks.
+- **Ice!** (`ice_boots`): now grants 1-5 ice, packed ice and blue ice plus a pair
+  of Frost Walker I iron boots instead of Frost Walker II diamond boots.
+- **Seal** (`seal`): now a single-use item that is consumed on use with no
+  re-grant, replacing the 15 minute cooldown.
+- **All Mine** (`all_mine`): description no longer mentions the third-hex /
+  no-transmute restrictions (the code restriction is unchanged).
+
+### Fixed
+
+- Vanilla bees no longer sting players while damage is disabled; only bees
+  summoned by Little Bees (`bees`) can.
+
 ## 26.2-1.49.10 — 2026-11-14
 
 ### Changed
