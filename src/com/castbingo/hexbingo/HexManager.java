@@ -421,15 +421,7 @@ public final class HexManager {
 
       MinecraftServer var7 = var0.level().getServer();
       if (var7 != null) {
-         // 世界缩小：第四个海克斯不刷；游戏剩余不足 15 分钟不刷（不限时游戏不受限）
          Bingo var8 = Bingo.get(var7.overworld());
-         long var9 = var8.runningUntil();
-         boolean var10 = var2 == 3 || (var9 != 0L && var9 - System.currentTimeMillis() < 900000L);
-         if (var10) {
-            for (int var11 = 0; var11 < 8 && var4.stream().anyMatch(var12 -> var12.id().equals("world_shrink")); var11++) {
-               var4 = rollOffer(var1, var0.getUUID(), var2, var3);
-            }
-         }
 
          // 全是我的：仅第三个海克斯、非占点模式（default/海克斯模式）、30% 概率替换一个选项
          if (var2 == 2 && !var3.contains(HexRegistry.ALL_MINE)) {
@@ -926,6 +918,12 @@ public final class HexManager {
             }
 
             if ("seal".equals(var1) && HexEffects.isSealed(var7)) {
+               continue;
+            }
+
+            // 任务护盾：受保护的任务不能被封印、锁定或封锁
+            if (("seal".equals(var1) || "mine".equals(var1) || "deny".equals(var1))
+               && HexEffects.taskShieldedByAnyTeam(var4, var8)) {
                continue;
             }
 

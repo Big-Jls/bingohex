@@ -1393,11 +1393,11 @@
                                   ]
                   },
                   {
-                      "id":  "team_backpack",
+                      "id":  "sniffer_egg",
                       "color":  "silver",
                       "effects":  [
                                       {
-                                          "type":  "team_backpack"
+                                          "type":  "sniffer_egg"
                                       }
                                   ]
                   },
@@ -1447,11 +1447,11 @@
                                   ]
                   },
                   {
-                      "id":  "world_shrink",
+                      "id":  "collector",
                       "color":  "gold",
                       "effects":  [
                                       {
-                                          "type":  "world_shrink"
+                                          "type":  "collector"
                                       }
                                   ]
                   },

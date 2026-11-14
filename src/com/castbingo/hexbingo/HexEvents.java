@@ -135,8 +135,15 @@ public class HexEvents {
    }
 
    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-   public void worldShrinkDamage(LivingIncomingDamageEvent var1) {
-      HexEffects.worldShrinkIncomingDamage(var1);
+   public void wildBeeDamage(LivingIncomingDamageEvent var1) {
+      // 关闭伤害时，只有小蜜蜂海克斯召唤的蜜蜂可以攻击玩家，原版蜜蜂的蜇伤必须被拦下
+      if (!var1.isCanceled()
+         && var1.getEntity() instanceof ServerPlayer var2
+         && var1.getSource().getDirectEntity() instanceof Bee var3
+         && !HexEffects.isHexBee(var3)
+         && HexEffects.damageDisabled(var2)) {
+         var1.setCanceled(true);
+      }
    }
 
    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -423,8 +430,6 @@ public class HexEvents {
          return HexEffects.castShrink(var0);
       } else if (var1.is(Items.BUNDLE) && var2.equals("背包小偷")) {
          return HexEffects.castBackpackThief(var0);
-      } else if (var1.is(Items.COMPASS) && var2.equals("世界缩小")) {
-         return HexEffects.castWorldShrink(var0, var1);
       } else if (var1.is(Items.BARRIER) && var2.equals("全是我的")) {
          HexManager.openTaskPick(var0, "mine");
          return true;
@@ -539,7 +544,6 @@ public class HexEvents {
       HexEffects.tickIncubations(var1.getServer());
       HexEffects.tickShrinks(var1.getServer());
       HexEffects.tickBlackstone(var1.getServer());
-      HexEffects.tickWorldShrink(var1.getServer());
    }
 
    @SubscribeEvent
