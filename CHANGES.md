@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.2-1.49.12 — 2026-11-14
+
+### Removed
+
+- `/bingo trap`: the item is the intended entry point (right-click the iron chain
+  "Trapped With Me"), so the command and its `hexbingo.hook.no_trap` lang keys
+  were removed.
+
 ## 26.2-1.49.11 — 2026-11-14
 
 ### Removed

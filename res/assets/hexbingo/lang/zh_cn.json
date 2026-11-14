@@ -69,7 +69,6 @@
     "hexbingo.msg.trap_none":  "没有可困住的敌人。",
     "hexbingo.msg.trap_busy":  "已经有人被困住了。",
     "hexbingo.msg.trap_cooldown":  "困人冷却中：%s 秒。",
-    "hexbingo.hook.no_trap":  "你需要先获得「和我一起困在这里」海克斯。",
     "hexbingo.item.trap.lore":  "右键：与最近的敌人进入基岩决斗场；允许 PVP，先死亡者失败，死亡者复活后额外坐牢 20 秒，胜者立即出来；5 分钟无人交战则双方出来。",
     "hexbingo.item.fae.lore":  "右键：把敌对队伍变成小动物 1 分钟。冷却 5 分钟。",
     "hexbingo.msg.song_buff":  "你获得了永久 %s。",

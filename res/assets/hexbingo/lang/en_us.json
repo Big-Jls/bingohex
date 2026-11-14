@@ -69,7 +69,6 @@
     "hexbingo.msg.trap_none":  "No enemy to trap.",
     "hexbingo.msg.trap_busy":  "Someone is already trapped.",
     "hexbingo.msg.trap_cooldown":  "Trap is on cooldown: %s seconds.",
-    "hexbingo.hook.no_trap":  "You need the Trapped With Me hex first.",
     "hexbingo.item.trap.lore":  "Right-click: enter a bedrock duel with the nearest enemy. PvP is allowed; whoever dies first loses and is jailed for an extra 20 seconds after respawning, the winner leaves at once; both leave after 5 minutes without PvP.",
     "hexbingo.item.fae.lore":  "Right-click: turn the enemy team into critters for 1 minute. 5 minute cooldown.",
     "hexbingo.msg.song_buff":  "You gained a permanent %s.",

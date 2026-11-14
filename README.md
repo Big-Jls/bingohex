@@ -42,7 +42,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 
 1. 安装 NeoForge 26.2.0.93+ 与官方 LibX 26.2-8.0.0。
 2. 安装 ReBongo（`ReBongo-26.2-1.0.0-port.11.jar`，`modId` 为 `bongo`）。
-3. 把 `HexBingo-26.2-1.49.11.jar` 放入客户端与服务端的 `mods`。
+3. 把 `HexBingo-26.2-1.49.12.jar` 放入客户端与服务端的 `mods`。
 4. 开一局 海克斯Bingo：/bingo create bongo:<难度> bongo:mayhem
 5. 按提示选择海克斯。
 
@@ -64,7 +64,6 @@ ReBongo：https://github.com/Big-Jls/rebongo
 | `/bingo rtp` | 所有人 | 随机传送（需对应海克斯） |
 | `/bingo hook` | 所有人 | 钩爪（需对应海克斯） |
 | `/bingo boomerang` | 所有人 | 回旋镖（需对应海克斯） |
-| `/bingo trap` | 所有人 | 陷阱（需对应海克斯） |
 | `/bingo spy <队友> <目标>` | 所有人 | 间谍交换 |
 
 > `/bingo hexall` 不是 K 键的名单：K 只查看，`hexall` 是管理员给全服每人发一次「自由选一个」的机会。
@@ -419,7 +418,7 @@ ReBongo：https://github.com/Big-Jls/rebongo
 需要 JDK 25、NeoForge 26.2.0.93 安装、官方 LibX 与已构建的 ReBongo jar：
 
 ```powershell
-.\build.ps1 -Version 26.2-1.49.11 `
+.\build.ps1 -Version 26.2-1.49.12 `
   -MinecraftDir "D:\minecraft\.minecraft" `
   -NeoForgeVersion "26.2-NeoForge_26.2.0.93" `
   -LibXJar "D:\minecraft\.minecraft\versions\26.2-NeoForge_26.2.0.93\mods\LibX-26.2-8.0.0.jar" `
@@ -442,6 +441,10 @@ ReBongo：https://github.com/Big-Jls/rebongo
 本项目为非官方附属，未使用上游图标，也不暗示任何官方关系（Apache License 2.0 第 6 条不授予商标权）。
 
 ## 更新日志
+
+### 1.49.12 调整
+
+- 移除 `/bingo trap` 指令（物品已尽量不会丢失，右键铁链「和我一起困在这里」即为正常入口），并清理随之失效的 `hexbingo.hook.no_trap` 语言键。
 
 ### 1.49.11 调整
 

@@ -74,15 +74,7 @@ public final class HexCommands {
                               return 1;
                            }
                         })))
-                     .then(Commands.literal("trap").executes(var0x -> {
-                        requireRunning(var0x.getSource());
-                        ServerPlayer var1 = ((CommandSourceStack)var0x.getSource()).getPlayerOrException();
-                        if (!HexEffects.startTrap(var1)) {
-                           throw new SimpleCommandExceptionType(Component.translatable("hexbingo.hook.no_trap")).create();
-                        } else {
-                           return 1;
-                        }
-                     })))
+                     )
                   .then(
                      Commands.literal("spy")
                         .then(
